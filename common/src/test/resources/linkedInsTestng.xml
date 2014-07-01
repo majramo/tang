@@ -1,0 +1,12 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Suite">
+    <parameter name="browser" value="Firefox"/>
+
+    <test name="Test Linkedins data">
+        <packages>
+            <package name="verification.linkedinWithDataProvider.*" />
+        </packages>
+    </test> <!-- Test -->
+</suite> <!-- Suite -->
+
+        
