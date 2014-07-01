@@ -1,19 +1,17 @@
 package reports
 
 import corebase.ISeleniumHelper
-import corebase.ScreenshotReportNGUtils
 import corebase.SeleniumHelper
+import dtos.FileHelper
+import dtos.FileUtilsHelper
 import org.apache.log4j.Logger
-import org.apache.velocity.VelocityContext
-import org.testng.*
-import org.uncommons.reportng.HTMLReporter
-
-import static dtos.base.Constants.*
-
+import org.testng.ITestContext
+import org.testng.ITestResult
+import org.testng.Reporter
 
 public class ReporterHelper extends Reporter {
     private final static Logger log = Logger.getLogger(getClass())
-
+    private final static FileUtilsHelper fileUtilsHelper = new FileUtilsHelper()
 
     public static void log(String msg) {
         //Reporter.log(msg + "<br/>")
@@ -31,21 +29,26 @@ public class ReporterHelper extends Reporter {
     }
 
     public String addPassedIcon() {
-        addIcon(this.class.getResource("/icons/passedTestIcon.jpg"))
+        addIcon("/icons/passedTest.jpg")
     }
 
     public String addFaildIcon() {
-        addIcon(this.class.getResource("/icons/failedTestIcon.jpg"))
+        addIcon("/icons/failedTest.jpg")
     }
 
     public String addSkippedIcon() {
-        addIcon(this.class.getResource("/icons/skippedTestIcon.jpg"))
+        addIcon("/icons/skippedTest.jpg")
     }
 
-    private void addIcon(filePath) {
-        def str =   "<img src=\"" + filePath + "\" width=\"80\" height=\"80\" hspace=\"10\" />"
-        Reporter.log(str)
+    private void addIcon(resource) {
+        File file = fileUtilsHelper.loadResourceFileIfExists(resource)
+        if(file != null){
+            def str = "<img src=\"" + file.getPath() + "\" width=\"80\" height=\"80\" hspace=\"10\" />"
+            Reporter.log(str)
+        }
     }
 
-
+    private void addFireFoxIcon() {
+        addIcon("/icons/firefox.jpg")
+    }
 }
