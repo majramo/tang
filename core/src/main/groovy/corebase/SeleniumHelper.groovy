@@ -1000,7 +1000,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
     private static String getHtmlSourceTag(final String filePath, fileName = "") {
-        def fileIcon =  this.class.getResource("/icons/htmlIcon.jpg")
+        def fileIcon =  this.class.getResource("/icons/html.jpg")
         def str = '<br/>page source: ' +
                 "<a href=\"" + filePath + "\" target=\"_blank\">" +
                 fileName + "<br>" +

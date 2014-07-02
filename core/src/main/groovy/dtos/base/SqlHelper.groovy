@@ -69,6 +69,7 @@ public class SqlHelper {
 		if(jDbcConnection != null){
 			if(sqlHelperMock){
 				dbResult[DB_MOCK_DATA] =  DB_MOCK_DATA
+                return null
 			}else{
 				switch (dbRunType){
 					case dbRunTypeFirstRow:
