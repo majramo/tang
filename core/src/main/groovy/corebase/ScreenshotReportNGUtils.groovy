@@ -1,8 +1,9 @@
 package corebase
 
-import org.apache.commons.lang3.StringUtils;
-import org.testng.ITestResult;
-import org.uncommons.reportng.ReportNGUtils;
+import org.apache.commons.lang3.StringUtils
+import org.testng.ITestResult
+import org.uncommons.reportng.ReportNGUtils
+
 import static dtos.base.Constants.*
 
 public class ScreenshotReportNGUtils extends ReportNGUtils {
@@ -21,6 +22,10 @@ public class ScreenshotReportNGUtils extends ReportNGUtils {
     }
     private static List<String> addTestAttributes(ITestResult result, List<String> outputIn) {
         List<String> outputOut = new ArrayList<String>();
+        if (StringUtils.isNotBlank((String) result.getAttribute(ICONS))) {
+            outputOut.add(result.getAttribute(ICONS));
+        }
+
         if (StringUtils.isNotBlank((String) result.getAttribute(DESCRIPTION))) {
             outputOut.add("Description: " + result.getAttribute(DESCRIPTION));
         }
@@ -30,6 +35,7 @@ public class ScreenshotReportNGUtils extends ReportNGUtils {
         if (StringUtils.isNotBlank((String) result.getAttribute(BROWSER))) {
             outputOut.add("Browser: " + result.getAttribute(BROWSER));
         }
+
         outputOut.addAll(outputIn)
         return outputOut
     }

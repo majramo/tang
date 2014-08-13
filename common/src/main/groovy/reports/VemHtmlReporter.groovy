@@ -1,14 +1,15 @@
 package reports
 
+import corebase.ISeleniumHelper
 import corebase.ScreenshotReportNGUtils
-import corebase.SeleniumHelper
+import org.apache.commons.lang.StringUtils
 import org.apache.log4j.Logger
 import org.apache.velocity.VelocityContext
 import org.testng.*
 import org.uncommons.reportng.HTMLReporter
 
-import static dtos.base.Constants.*
 import static corebase.GlobalConstants.SELENIUM_HELPER
+import static dtos.base.Constants.*
 
 /**
  * Created with IntelliJ IDEA.
@@ -57,9 +58,23 @@ public class VemHtmlReporter extends HTMLReporter implements ITestListener, ICon
     @Override
     void onTestStart(ITestResult testResult) {
         log.debug("Test is started: " + testResult.getMethod().getMethodName())
-        testResult.setAttribute(DESCRIPTION, testResult.getMethod().getDescription())
-        testResult.setAttribute(ENVIRONMENT, testResult.getTestContext().getAttribute(ENVIRONMENT))
-        testResult.setAttribute(BROWSER, testResult.getTestContext().getAttribute(BROWSER))
+        String environment = testResult.getTestContext().getAttribute(ENVIRONMENT)
+        String browser = testResult.getTestContext().getAttribute(BROWSER)
+        String browserIcon = testResult.getTestContext().getAttribute(BROWSER_ICON)
+        String description = testResult.getMethod().getDescription()
+
+        if(StringUtils.isNotBlank(browserIcon)){
+            browserIcon = browserIcon.toLowerCase()
+        }
+        if(StringUtils.isNotBlank(environment)){
+            environment = environment.toLowerCase()
+        }
+        testResult.setAttribute(ENVIRONMENT, environment)
+        testResult.setAttribute(BROWSER, browser)
+//        browserIcon = FIREFOX
+
+        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon, environment))
+//        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon.toLowerCase(), "haf", "hrf", "trf", "opera"))
 
     }
 
@@ -121,7 +136,7 @@ public class VemHtmlReporter extends HTMLReporter implements ITestListener, ICon
 
     private void takeScreenShotAndAddToReport(ITestResult testResult, String message) {
         ITestContext testContext = testResult.getTestContext()
-        SeleniumHelper seleniumHelper = (SeleniumHelper) testContext.getAttribute(SELENIUM_HELPER)
+        ISeleniumHelper seleniumHelper = (ISeleniumHelper) testContext.getAttribute(SELENIUM_HELPER)
         Reporter.log(message)
         if (seleniumHelper != null) {
             seleniumHelper.takeScreenShotAndSource()
