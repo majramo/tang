@@ -2,6 +2,7 @@ package corebase
 import dtos.SettingsHelper
 import org.apache.commons.lang3.StringUtils
 import org.apache.log4j.Logger
+import org.codehaus.groovy.runtime.StackTraceUtils
 import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.firefox.FirefoxBinary
@@ -119,6 +120,7 @@ public class SeleniumHelper implements ISeleniumHelper {
 
 
     public ISeleniumHelper init(String browser, String outputDir = "./", long implicitlyWait = defaultImplicitlyWait, long defaultPageLoadTimeout = defaultPageLoadTimeoutMilliSeconds) throws MalformedURLException, SkipException {
+        log.info getCurrentMethodName() + " browser<$browser> outputDir<$outputDir> implicitlyWait<$implicitlyWait> defaultPageLoadTimeout<$defaultPageLoadTimeout>"
         switch (OS) {
             case ~/^win.*/:
                 os = WIN
@@ -162,8 +164,8 @@ public class SeleniumHelper implements ISeleniumHelper {
             Reporter.log("Can't set up driver $browser with capability <$capability>")
             throw new SkipException("Can't set up driver $browser with capability <$capability>")
         }
-        log.info "browser <$browser>"
-        log.info "capability <$capability>"
+        log.info getCurrentMethodName() + " browser<$browser>"
+        log.info getCurrentMethodName() + " capability<$capability>"
 
         switch (capability.getBrowserName()) {
             case ~/.*explorer.*/:
@@ -194,12 +196,12 @@ public class SeleniumHelper implements ISeleniumHelper {
 
         if (!browser.toString().contains("CH_") && !browser.toString().contains("CHROME") && !browser.toString().contains("SAFARI")) {
             try {
-                driver.manage().timeouts().implicitlyWait(this.defaultImplicitlyWait, TimeUnit.SECONDS)
+               changeImplicitTimeToSeconds(this.defaultImplicitlyWait)
             } catch (GroovyRuntimeException e) {
                 log.info("Driver $browser can't set implicitlyWait " + e)
             }
             try {
-                driver.manage().timeouts().pageLoadTimeout(this.defaultPageLoadTimeoutMilliSeconds, TimeUnit.SECONDS)
+                driver.manage().timeouts().pageLoadTimeout(this.defaultPageLoadTimeoutMilliSeconds)
             } catch (GroovyRuntimeException e) {
                 log.info("Driver $browser can't set pageLoadTimeout " + e)
             }
@@ -411,6 +413,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
     public void openUrl(final String url) {
+        log.info getCurrentMethodName() + " url<$url>"
         slowDown()
         driver.get(url)
     }
@@ -434,9 +437,10 @@ public class SeleniumHelper implements ISeleniumHelper {
         driver.navigate().refresh()
     }
 
-    public boolean isSelected(final String xpath) {
-        if (!"".equals(xpath)) {
-            final WebElement we = findElementByXpathOrId(xpath, true)
+    public boolean isSelected(final String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        if (!"".equals(element)) {
+            final WebElement we = findElementByXpathOrId(element, true)
             if (we != null) {
                 return we.isSelected()
             }
@@ -445,9 +449,10 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
 
-    public boolean isSelected(final String xpath, int index) {
-        if (!"".equals(xpath)) {
-            final WebElement we = findElementByXpathOrId(xpath + "/option[$index]")
+    public boolean isSelected(final String element, int index) {
+        log.info getCurrentMethodName() + " element<$element> index<$index>"
+        if (!"".equals(element)) {
+            final WebElement we = findElementByXpathOrId(element + "/option[$index]")
             if (we != null) {
                 return we.isSelected()
             }
@@ -455,17 +460,34 @@ public class SeleniumHelper implements ISeleniumHelper {
         return false
     }
 
-    public boolean isTagAvailable(final String xpath, int changedImplicitlyWait) {
-        driver.manage().timeouts().implicitlyWait(changedImplicitlyWait, TimeUnit.SECONDS)
-        boolean result = isTagAvailable(xpath)
-        driver.manage().timeouts().implicitlyWait(this.defaultImplicitlyWait, TimeUnit.SECONDS)
+    public boolean isTagAvailable(final String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
+        boolean result = isTagAvailable(element)
+        resetImplicitTime()
         return result
     }
 
+    private void resetImplicitTime() {
+        log.info getCurrentMethodName()
+        changeImplicitTimeToSeconds(this.defaultImplicitlyWait)
+    }
 
-    public boolean isTagAvailable(final String xpath) {
-        if (!"".equals(xpath)) {
-            final WebElement we = findElementByXpathOrId(xpath, true)
+    private void changeImplicitTimeToSeconds(long changedImplicitlyWait) {
+        def methodName =  getCurrentMethodName()
+        log.info methodName + " changedImplicitlyWait<$changedImplicitlyWait>"
+        try{
+            driver.manage().timeouts().implicitlyWait(changedImplicitlyWait, TimeUnit.SECONDS)
+        }catch(org.openqa.selenium.NoSuchWindowException e){
+             log.error("$methodName $e")
+        }
+    }
+
+
+    public boolean isTagAvailable(final String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        if (!"".equals(element)) {
+            final WebElement we = findElementByXpathOrId(element, true)
             if (we != null) {
                 return true
             }
@@ -473,19 +495,21 @@ public class SeleniumHelper implements ISeleniumHelper {
         return false
     }
 
-    public boolean isTagUnavailable(final String xpath, int changedImplicitlyWait) {
-        driver.manage().timeouts().implicitlyWait(changedImplicitlyWait, TimeUnit.SECONDS)
-        boolean result = isTagUnavailable(xpath)
-        driver.manage().timeouts().implicitlyWait(this.defaultImplicitlyWait, TimeUnit.SECONDS)
+    public boolean isTagUnavailable(final String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
+        boolean result = isTagUnavailable(element)
+        resetImplicitTime()
         return result
     }
 
 
-    public boolean isTagUnavailable(final String xpath) {
-        if (!"".equals(xpath)) {
-            driver.manage().timeouts().implicitlyWait(IMPLICT_WAIT, TimeUnit.SECONDS)
-            final WebElement we = findElementByXpathOrId(xpath, true)
-            driver.manage().timeouts().implicitlyWait(this.defaultImplicitlyWait, TimeUnit.SECONDS)
+    public boolean isTagUnavailable(final String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        if (!"".equals(element)) {
+           changeImplicitTimeToSeconds(IMPLICT_WAIT)
+            final WebElement we = findElementByXpathOrId(element, true)
+           resetImplicitTime()
             if (we == null) {
                 return true
             }
@@ -493,14 +517,16 @@ public class SeleniumHelper implements ISeleniumHelper {
         return false
     }
 
-    public String getText(final String xpath) {
-        final WebElement we = findElementByXpathOrId(xpath)
+    public String getText(final String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        final WebElement we = findElementByXpathOrId(element)
         return (we != null) ? we.getText() : null
     }
 
 
-    public boolean isTextPresent(final String xpath, final String text) {
-        final WebElement we = findElementByXpathOrId(xpath, true)
+    public boolean isTextPresent(final String element, final String text) {
+        log.info getCurrentMethodName() + " element<$element> text<$text>"
+        final WebElement we = findElementByXpathOrId(element, true)
         if (we == null) {
             return false
         }
@@ -511,8 +537,9 @@ public class SeleniumHelper implements ISeleniumHelper {
      * Click button to open modal window and switch to it
      * @param we webElement handle of a button
      */
-    public void clickAndSwitchToModalWindow(String linkToClickOn, String elementOneToWaitFor, String elementTwoToWaitFor = "") {
-        final WebElement we = findElementByXpathOrId(linkToClickOn)
+    public void clickAndSwitchToModalWindow(String element, String elementOneToWaitFor, String elementTwoToWaitFor = "") {
+        log.info getCurrentMethodName() + " element<$element> elementOneToWaitFor<$elementOneToWaitFor> elementTwoToWaitFor<$elementTwoToWaitFor>"
+        final WebElement we = findElementByXpathOrId(element)
 
         Set<String> initWindowHandles = driver.getWindowHandles();
 
@@ -540,8 +567,9 @@ public class SeleniumHelper implements ISeleniumHelper {
      * Click button to open modal window and switch to it
      * @param we webElement handle of a button
      */
-    public void typeAndSwitchToModalWindows(String xpath, data, String elementOneToWaitFor, String elementToClickOn) {
-        final WebElement we = findElementByXpathOrId(xpath)
+    public void typeAndSwitchToModalWindows(String element, data, String elementOneToWaitFor, String elementToClickOn) {
+        log.info getCurrentMethodName() + " element<$element> data<$data> elementOneToWaitFor<$elementOneToWaitFor> elementToClickOn<$elementToClickOn>"
+        final WebElement we = findElementByXpathOrId(element)
 
         Set<String> initWindowHandles = driver.getWindowHandles();
 
@@ -573,8 +601,9 @@ public class SeleniumHelper implements ISeleniumHelper {
      * Click button to open modal window and switch to it
      * @param we webElement handle of a button
      */
-    public boolean clickAndSwitchToModalWindowIfExists(String linkToClickOn, int sleepTimeSeconds) {
-        final WebElement we = findElementByXpathOrId(linkToClickOn)
+    public boolean clickAndSwitchToModalWindowIfExists(String element, int sleepTimeSeconds) {
+        log.info getCurrentMethodName() + " element<$element> sleepTimeSeconds<$sleepTimeSeconds>"
+        final WebElement we = findElementByXpathOrId(element)
 
         Set<String> initWindowHandles = driver.getWindowHandles();
         def currentWindow = driver.getWindowHandle()
@@ -599,10 +628,11 @@ public class SeleniumHelper implements ISeleniumHelper {
         return true
     }
 
-    public boolean click(final String xpath) {
-        log.debug("click $xpath")
-        requireVisibleXpath(xpath)
-        final WebElement we = findElementByXpathOrId(xpath)
+    public boolean click(final String element) {
+        log.info getCurrentMethodName() + " element<$element>>"
+
+        requireVisibleXpath(element)
+        final WebElement we = findElementByXpathOrId(element)
         if (we == null) {
             return false
         }
@@ -611,34 +641,37 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
 
-    public boolean click(String xpath, int changedImplicitlyWait) {
-        driver.manage().timeouts().implicitlyWait(changedImplicitlyWait, TimeUnit.SECONDS)
-        boolean result = click(xpath)
-        driver.manage().timeouts().implicitlyWait(this.defaultImplicitlyWait, TimeUnit.SECONDS)
+    public boolean click(String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
+        boolean result = click(element)
+        resetImplicitTime()
         return result
     }
 
 
-    public boolean doubleClick(String xpath, int changedImplicitlyWait) {
-        driver.manage().timeouts().implicitlyWait(changedImplicitlyWait, TimeUnit.SECONDS)
-        boolean result = doubleClick(xpath)
-        driver.manage().timeouts().implicitlyWait(this.defaultImplicitlyWait, TimeUnit.SECONDS)
+    public boolean doubleClick(String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
+        boolean result = doubleClick(element)
+       resetImplicitTime()
         return result
     }
 
 
-    public boolean doubleClick(String xpath) {
-        log.debug("doubleClick $xpath")
-        requireVisibleXpath(xpath)
+    public boolean doubleClick(String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        requireVisibleXpath(element)
         Actions actions = new Actions(driver);
-        WebElement webElement = findElementByXpathOrId(xpath, true);
+        WebElement webElement = findElementByXpathOrId(element, true);
         new Actions(driver).doubleClick(webElement).perform();
        // actions.moveToElement(webElement);
         return true
     }
 
-    public boolean click(final String xpath, final String subXpath) {
-        final WebElement we = findElementByXpathOrId(xpath)
+    public boolean click(final String element, final String subXpath) {
+        log.info getCurrentMethodName() + " element<$element> subXpath<$subXpath>"
+        final WebElement we = findElementByXpathOrId(element)
         final WebElement subWe = we.findElement(By.xpath(subXpath))
 
         try {
@@ -651,8 +684,9 @@ public class SeleniumHelper implements ISeleniumHelper {
         return true
     }
 
-    public boolean select(final String xpath, final String text) {
-        final WebElement we = findElementByXpathOrId(xpath + "/option[.='" + text + "']")
+    public boolean select(final String element, final String text) {
+        log.info getCurrentMethodName() + " element<$element> text<$text>"
+        final WebElement we = findElementByXpathOrId(element + "/option[.='" + text + "']")
         if (we == null) {
             return false
         }
@@ -660,8 +694,9 @@ public class SeleniumHelper implements ISeleniumHelper {
         return true
     }
 
-    public boolean select(final String xpath, final int index) {
-        final WebElement we = findElementByXpathOrId(xpath + "/option[$index]")
+    public boolean select(final String element, final int index) {
+        log.info getCurrentMethodName() + " element<$element> index<$index>"
+        final WebElement we = findElementByXpathOrId(element + "/option[$index]")
         if (we == null) {
             return false
         }
@@ -677,8 +712,8 @@ public class SeleniumHelper implements ISeleniumHelper {
         driver.navigate().back()
     }
 
-    public int getXpathCount(final String xpath) {
-        final List<WebElement> webElements = findElementsByXpath(xpath)
+    public int getXpathCount(final String element) {
+        final List<WebElement> webElements = findElementsByXpath(element)
         return webElements.size()
     }
 
@@ -686,20 +721,23 @@ public class SeleniumHelper implements ISeleniumHelper {
         return driver.getPageSource()
     }
 
-    public String getAttribute(final String xpath, final String attributeName) {
-        final WebElement we = findElementByXpathOrId(xpath)
+    public String getAttribute(final String element, final String attributeName) {
+        log.info getCurrentMethodName() + " element<$element> attributeName<$attributeName>"
+        final WebElement we = findElementByXpathOrId(element)
         return (we != null) ? we.getAttribute(attributeName) : null
     }
 
 
-    public boolean typeAndEnter(final String xpath, String text) {
-        requireVisibleXpath(xpath)
-        return type(xpath, text + Keys.ENTER)
+    public boolean typeAndEnter(final String element, String text) {
+        log.info getCurrentMethodName() + " element<$element> text<$text>"
+        requireVisibleXpath(element)
+        return type(element, text + Keys.ENTER)
     }
 
 
-    void selectAllAndType(String xpath, String text) {
-        final WebElement we = findElementByXpathOrId(xpath)
+    void selectAllAndType(String element, String text) {
+        log.info getCurrentMethodName() + " element<$element> text<$text>"
+        final WebElement we = findElementByXpathOrId(element)
         selectAll(we)
         text = text.toString()
         if (!"".equals(text)) {
@@ -707,13 +745,13 @@ public class SeleniumHelper implements ISeleniumHelper {
         }
     }
 
-    void selectAllAndTypeAndExpectError(String xpath, String text, Exception e) {
-        typeAndSwitchToModalWindows(xpath, text, "//*[@id='caption']/img[contains(@src, 'warn')]", "btOk" )
+    void selectAllAndTypeAndExpectError(String element, String text, Exception e) {
+        typeAndSwitchToModalWindows(element, text, "//*[@id='caption']/img[contains(@src, 'warn')]", "btOk" )
     }
 
 
-    void selectAll(String xpath){
-        final WebElement we = findElementByXpathOrId(xpath)
+    void selectAll(String element){
+        final WebElement we = findElementByXpathOrId(element)
         we.click()
         if(macDriver){
             we.sendKeys(Keys.chord(Keys.COMMAND, "a"))
@@ -732,18 +770,18 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
 
-    void selectAllAndTypeAndEnter(String xpath, String text) {
-        selectAllAndType(xpath, text + Keys.ENTER)
+    void selectAllAndTypeAndEnter(String element, String text) {
+        selectAllAndType(element, text + Keys.ENTER)
     }
 
-    void selectAllAndTypeAndEnterAndExpectError(String xpath, String text, Exception e) {
-        selectAllAndTypeAndExpectError(xpath, text + Keys.ENTER, e)
+    void selectAllAndTypeAndEnterAndExpectError(String element, String text, Exception e) {
+        selectAllAndTypeAndExpectError(element, text + Keys.ENTER, e)
     }
 
-    public boolean type(final String xpath, text) {
-        log.debug("type $xpath $text")
-        requireVisibleXpath(xpath)
-        final WebElement we = findElementByXpathOrId(xpath)
+    public boolean type(final String element, text) {
+        log.info getCurrentMethodName() + " element<$element> text<$text>"
+        requireVisibleXpath(element)
+        final WebElement we = findElementByXpathOrId(element)
         if (we == null) {
             return false
         }
@@ -756,8 +794,8 @@ public class SeleniumHelper implements ISeleniumHelper {
         return true
     }
 
-    public boolean sendKeys(final String xpath, text) {
-        final WebElement we = findElementByXpathOrId(xpath)
+    public boolean sendKeys(final String element, text) {
+        final WebElement we = findElementByXpathOrId(element)
         if (we == null) {
             return false
         }
@@ -783,28 +821,32 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
 
-    private WebElement findElementByXpathOrId(final String xpath, final boolean skipError) {
-        if(xpath.startsWith("/") || xpath.startsWith("\\./") ){
-            return findElementByXpath(xpath, skipError)
+    private WebElement findElementByXpathOrId(final String element, final boolean skipError) {
+        if(element.startsWith("/") || element.startsWith("\\./") ){
+            return findElementByXpath(element, skipError)
         }else{
-            return findElementById(xpath, skipError)
+            return findElementById(element, skipError)
         }
     }
 
-    private WebElement findElementByXpathOrId(final String xpath) {
-        findElementByXpathOrId(xpath, false)
+    private WebElement findElementByXpathOrId(final String element) {
+        findElementByXpathOrId(element, false)
     }
 
    private WebElement findElementById(final String id, final boolean skipError) {
-       log.info("findElementById <$id>")
+       def methodName = getCurrentMethodName()
+       log.info "$methodName id<$id> skipError<$skipError>"
         try {
             if (!"".equals(id)) {
                 slowDown()
-                return driver.findElement(By.id(id))
+                WebElement webElement = driver.findElement(By.id(id))
+                log.info "$methodName webElement<$webElement>"
+                return webElement
             } else {
                 return null
             }
         } catch (NoSuchElementException e) {
+            log.info "$methodName webElement not found"
             if (!skipError) {
                 log.error("id: " + skipError + " " + id)
                 takeScreenShot("Couldn't find id: " + id)
@@ -815,23 +857,31 @@ public class SeleniumHelper implements ISeleniumHelper {
                 return null
             }
         } catch (org.openqa.selenium.UnhandledAlertException unhandledAlertExceptio) {
+            log.info "$methodName webElement not found"
             Reporter.log(getHtmlImgTag("UnhandledAlertException: ", unhandledAlertExceptio))
             takeScreenShotAndSource("UnhandledAlertException")
             switchToNextWindow()
             takeScreenShotAndSource("Modal dialog present: ")
+        } catch (Exception e) {
+            log.error "$methodName Error $e"
+            throw e
         }
     }
 
     private WebElement findElementByXpath(final String xpath, final boolean skipError) {
-        log.info("findElementByXpath <$xpath>")
+        def methodName = getCurrentMethodName()
+        log.info "$methodName xpath<$xpath> skipError<$skipError>"
         try {
             if (!"".equals(xpath)) {
                 slowDown()
-                return driver.findElement(By.xpath(xpath))
+                WebElement webElement = driver.findElement(By.xpath(xpath))
+                log.info "$methodName webElement<$webElement>"
+                return webElement
             } else {
                 return null
             }
         } catch (NoSuchElementException e) {
+            log.info "$methodName webElement not found"
             if (!skipError) {
                 log.error("xpath: " + skipError + " " + xpath)
                 Reporter.log("xpath: " + skipError + " " + xpath)
@@ -844,6 +894,9 @@ public class SeleniumHelper implements ISeleniumHelper {
 //                takeScreenShot("Couldn't find xpath: " + xpath)
                 return null
             }
+        } catch (Exception e) {
+            log.error "$methodName Error $e"
+            throw e
         }
     }
 
@@ -1022,18 +1075,20 @@ public class SeleniumHelper implements ISeleniumHelper {
 
     public void switchToNextWindow() {
         //Store the current window handle
-        log.info("Before push windowHandler size: " + windowHandler.size() )
+        def methodName = getCurrentMethodName()
+        log.info methodName
+        log.info("$methodName saved windowHandler size<" + windowHandler.size() + ">" )
         windowHandler.each {
-            log.info( "Before push windowHandler $it")
+            log.info( "$methodName saved windowHandler<$it>")
         }
-        log.info("Before  W " + driver.getWindowHandles().size()+ " H: " + windowHandler.size())
+        log.info("$methodName actual getWindowHandles size<" +  driver.getWindowHandles().size() + ">" )
 
         while(driver.getWindowHandles().size() <= windowHandler.size()){
-            log.info("Waiting W " + driver.getWindowHandles().size()+ " H: " + windowHandler.size())
+            log.info("$methodName Waiting getWindowHandles<" + driver.getWindowHandles().size()+ "> windowHandler<" + windowHandler.size() + ">")
             sleep(1000)
         }
         def currentWindow = driver.getWindowHandle()
-        log.info( "currentWindow $currentWindow")
+        log.info( "actual $currentWindow")
 
         windowHandler.push(currentWindow)
         windowHandler.each {
@@ -1047,12 +1102,16 @@ public class SeleniumHelper implements ISeleniumHelper {
         log.info("After   W " + driver.getWindowHandles().size()+ " H: " + windowHandler.size())
 
         //Switch to new window opened
+        resetImplicitTime()
+
     }
 
     public void switchToPreviousWindow() {
-        log.info("Before pop windowHandler size: " + windowHandler.size() )
+        def methodName = getCurrentMethodName()
+        log.info methodName
+        log.info("$methodName saved windowHandler size<" + windowHandler.size() + ">" )
         windowHandler.each {
-            log.info( "Before pop windowHandler $it")
+            log.info( "$methodName saved windowHandler<$it>")
         }
         def previuosWindow = windowHandler.pop()
         log.info( "previuosWindow $previuosWindow")
@@ -1061,6 +1120,7 @@ public class SeleniumHelper implements ISeleniumHelper {
             log.info( "After pop windowHandler $it")
         }
         log.info("After  pop windowHandler size: " + windowHandler.size() )
+        resetImplicitTime()
 
     }
 
@@ -1141,15 +1201,17 @@ public class SeleniumHelper implements ISeleniumHelper {
         throw new ScreenshotException("Required title ($title) was not found")
     }
 
-    public void switchToFrame(String frameXpath) {
+    public void switchToFrame(String frameElement) {
+        log.info getCurrentMethodName() + " frameElement<$frameElement>"
         driver.switchTo().defaultContent()
-        requireVisibleXpath(frameXpath)
-        WebElement frame = findElementByXpathOrId(frameXpath, true)
+        requireVisibleXpath(frameElement)
+        WebElement frame = findElementByXpathOrId(frameElement, true)
         driver.switchTo().frame(frame);
     }
 
-    public void switchToSubFrame(String frameXpath) {
-        WebElement frame = findElementByXpathOrId(frameXpath, true)
+    public void switchToSubFrame(String frameElement) {
+        log.info getCurrentMethodName() + " frameElement<$frameElement>"
+        WebElement frame = findElementByXpathOrId(frameElement, true)
         driver.switchTo().frame(frame);
     }
 
@@ -1157,19 +1219,21 @@ public class SeleniumHelper implements ISeleniumHelper {
         driver.switchTo().defaultContent()
     }
 
-    public void requireXpath(String xpath) {
-        findElementByXpathOrId(xpath, false)
+    public void requireXpath(String element) {
+        findElementByXpathOrId(element, false)
     }
 
 
-    public void requireXpath(String xpath, int changedImplicitlyWait) {
-        driver.manage().timeouts().implicitlyWait(changedImplicitlyWait, TimeUnit.SECONDS)
-        requireXpath(xpath)
-        driver.manage().timeouts().implicitlyWait(this.defaultImplicitlyWait, TimeUnit.SECONDS)
+    public void requireXpath(String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
+        requireXpath(element)
+       resetImplicitTime()
     }
 
-    public void requireVisibleXpath(String xpath) {
-        WebElement webElement = findElementByXpathOrId(xpath, false)
+    public void requireVisibleXpath(String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        WebElement webElement = findElementByXpathOrId(element, false)
         for (int second = 0; ; second++) {
             if (second >= 60) {
                 throw new ScreenshotException("Required Xpath is not visible")
@@ -1177,7 +1241,7 @@ public class SeleniumHelper implements ISeleniumHelper {
             try {
                 if (!webElement.isDisplayed()){
                     Thread.sleep(1000)
-                    webElement = findElementByXpathOrId(xpath, false)
+                    webElement = findElementByXpathOrId(element, false)
                 } else {
                     break
                 }
@@ -1186,36 +1250,41 @@ public class SeleniumHelper implements ISeleniumHelper {
         }
     }
 
-    public void requireVisibleXpath(String xpath, int changedImplicitlyWait) {
-        driver.manage().timeouts().implicitlyWait(changedImplicitlyWait, TimeUnit.SECONDS)
-        requireVisibleXpath(xpath)
-        driver.manage().timeouts().implicitlyWait(this.defaultImplicitlyWait, TimeUnit.SECONDS)
+    public void requireVisibleXpath(String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
+        requireVisibleXpath(element)
+       resetImplicitTime()
     }
 
-    public boolean isDisplayed(String xpath, int changedImplicitlyWait) {
-        driver.manage().timeouts().implicitlyWait(changedImplicitlyWait, TimeUnit.SECONDS)
-        return isDisplayed(xpath)
-        driver.manage().timeouts().implicitlyWait(this.defaultImplicitlyWait, TimeUnit.SECONDS)
+    public boolean isDisplayed(String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
+        return isDisplayed(element)
+       resetImplicitTime()
     }
 
 
-    public boolean isDisplayed(String xpath) {
-        WebElement webElement = findElementByXpathOrId(xpath, true)
+    public boolean isDisplayed(String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        WebElement webElement = findElementByXpathOrId(element, true)
         if(webElement != null){
             return webElement.isDisplayed()
         }
         return false
     }
 
-    void hover(String xpath) {
+    void hover(String element) {
+        log.info getCurrentMethodName() + " element<$element>"
         Actions actions = new Actions(driver);
-        WebElement menuHoverLink = findElementByXpathOrId(xpath, true);
+        WebElement menuHoverLink = findElementByXpathOrId(element, true);
         new Actions(driver).moveToElement(menuHoverLink).perform();
         actions.moveToElement(menuHoverLink);
     }
 
-    void scrollIntoView(String xpath) {
-        hover(xpath)
+    void scrollIntoView(String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        hover(element)
     }
 
     void close() {
@@ -1257,5 +1326,8 @@ public class SeleniumHelper implements ISeleniumHelper {
         }
     }
 
-
+    private getCurrentMethodName(){
+        def marker = new Throwable()
+        return StackTraceUtils.sanitize(marker).stackTrace[1].methodName
+    }
 }
