@@ -2,7 +2,7 @@ package base
 
 import org.testng.Reporter
 
-public class VemHtmlHelper {
+public class TangHtmlHelper {
     public String getHtmlImgTags(String title, String urlTitle = "", final String url = "") {
         def str = '<br/>' + title +
                 "<a href=\"" + url + "\" target=\"_blank\">" +

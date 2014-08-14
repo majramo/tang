@@ -18,13 +18,13 @@ import static dtos.base.Constants.*
  * Time: 23:59
  * To change this template use File | Settings | File Templates.
  */
-public class VemHtmlReporter extends HTMLReporter implements ITestListener, IConfigurationListener {
+public class TangHtmlReporter extends HTMLReporter implements ITestListener, IConfigurationListener {
     protected static final ScreenshotReportNGUtils reportNGScreenShotUtils = new ScreenshotReportNGUtils()
     private final static String CLASS_NAME = this.getSimpleName() + ": "
     private final static Logger log = Logger.getLogger(getClass())
     protected final static ReporterHelper reporterHelper = new ReporterHelper()
 
-    public VemHtmlReporter() {
+    public TangHtmlReporter() {
     }
     /* (non-Javadoc)
     * @see org.uncommons.reportng.AbstractReporter#createContext()
@@ -63,19 +63,11 @@ public class VemHtmlReporter extends HTMLReporter implements ITestListener, ICon
         String browserIcon = testResult.getTestContext().getAttribute(BROWSER_ICON)
         String description = testResult.getMethod().getDescription()
 
-        if(StringUtils.isNotBlank(browserIcon)){
-            browserIcon = browserIcon.toLowerCase()
-        }
-        if(StringUtils.isNotBlank(environment)){
-            environment = environment.toLowerCase()
-        }
+
         testResult.setAttribute(ENVIRONMENT, environment)
         testResult.setAttribute(BROWSER, browser)
-//        browserIcon = FIREFOX
 
-        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon, environment))
-//        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon.toLowerCase(), "haf", "hrf", "trf", "opera"))
-
+        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon?.toLowerCase(), environment?.toLowerCase()))
     }
 
     @Override

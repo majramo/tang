@@ -1,7 +1,7 @@
 package pages.amazon
 
 import base.AnyPage
-import base.VemAssert
+import base.TangAssert
 import corebase.ISeleniumHelper
 import org.graphwalker.exceptions.InvalidDataException
 import org.graphwalker.multipleModels.ModelAPI
@@ -26,13 +26,13 @@ public class AmazonStartPage extends AnyPage {
     private static ModelAPI modelAPI;
     private int expected_num_of_books = 0
 
-    public AmazonStartPage(final ISeleniumHelper driver, VemAssert vemAssert, ModelAPI modelAPI) {
+    public AmazonStartPage(final ISeleniumHelper driver, TangAssert vemAssert, ModelAPI modelAPI) {
         super(driver)
         this.modelAPI = modelAPI;
 //        driver.setSlowDownOn(2000)
     }
 
-    public AmazonStartPage(final ISeleniumHelper driver, VemAssert vemAssert) {
+    public AmazonStartPage(final ISeleniumHelper driver, TangAssert vemAssert) {
         super(driver)
     }
 

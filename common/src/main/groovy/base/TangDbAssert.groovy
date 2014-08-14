@@ -3,7 +3,7 @@ package base
 import org.testng.Assert
 import org.testng.Reporter
 
-public class VemDbAssert {
+public class TangDbAssert {
 
     public void assertTrue(boolean condition, String assertOn, String message = "") {
         Reporter.log("AssertTrue (" + assertOn + ")")

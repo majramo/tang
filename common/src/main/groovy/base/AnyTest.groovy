@@ -31,7 +31,7 @@ public class AnyTest {
 
     protected ISeleniumHelper driver
     private String testBrowser
-    public VemAssert vemAssert
+    public TangAssert vemAssert
     SettingsHelper settingsHelper = new SettingsHelper()
     def settings = settingsHelper.settings
     def applicationConf = settingsHelper.applicationConf
@@ -59,7 +59,7 @@ public class AnyTest {
 
     String getBrowserIcon(String browser){
         def browserIcon = ""
-        switch (browser.toLowerCase()) {
+        switch (browser?.toLowerCase()) {
             case ~/.*firefox.*/:
                 browserIcon = FIREFOX
                 break
@@ -100,7 +100,7 @@ public class AnyTest {
             }
             testContext.setAttribute(SELENIUM_HELPER, driver)
             testContext.setAttribute(WEB_DRIVER, driver)
-            vemAssert = new VemAssert(driver)
+            vemAssert = new TangAssert(driver)
         } catch (Exception skipException) {
             log.error(skipException)
             throw new SkipException(skipException.toString())
