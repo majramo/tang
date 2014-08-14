@@ -1103,7 +1103,7 @@ public class SeleniumHelper implements ISeleniumHelper {
 
         //Switch to new window opened
         resetImplicitTime()
-
+        waitForPageReadyStateComplete()
     }
 
     public void switchToPreviousWindow() {
@@ -1121,7 +1121,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         }
         log.info("After  pop windowHandler size: " + windowHandler.size() )
         resetImplicitTime()
-
+        waitForPageReadyStateComplete()
     }
 
     private void setDriverPath(String driverPath, String webDriverProperty) {
