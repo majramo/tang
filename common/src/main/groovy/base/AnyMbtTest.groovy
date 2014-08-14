@@ -12,7 +12,7 @@ import org.testng.Reporter
 public class AnyMbtTest extends org.graphwalker.multipleModels.ModelAPI {
 
     public ISeleniumHelper driver
-    public static VemAssert vemAssert
+    public static TangAssert vemAssert
     SettingsHelper settingsHelper = new SettingsHelper()
     def settings = settingsHelper.settings
     private final static Logger log = Logger.getLogger("AMT  ")
@@ -24,7 +24,7 @@ public class AnyMbtTest extends org.graphwalker.multipleModels.ModelAPI {
         } else {
             driver = new SeleniumDummyHelper().init("", "")
         }
-        vemAssert = new VemAssert(driver);
+        vemAssert = new TangAssert(driver);
         driver.setTestName(AnyMbtTest.class.getSimpleName())
     }
 

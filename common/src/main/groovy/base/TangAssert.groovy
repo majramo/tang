@@ -6,10 +6,10 @@ import org.testng.Reporter
 
 import static org.testng.Assert.assertNotNull
 
-public class VemAssert {
+public class TangAssert {
     private static ISeleniumHelper driver
 
-    public VemAssert(ISeleniumHelper driver) {
+    public TangAssert(ISeleniumHelper driver) {
         this.driver = driver
     }
 

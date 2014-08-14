@@ -18,7 +18,7 @@ public class AnySqlTest {
     protected SqlHelper driver
     protected String database
     private String testBrowser
-    public VemDbAssert vemAssert
+    public TangDbAssert vemAssert
     SettingsHelper settingsHelper = new SettingsHelper()
     def settings = settingsHelper.settings
     def applicationConf = settingsHelper.applicationConf
@@ -52,7 +52,7 @@ public class AnySqlTest {
         log.info("BeforeClass " + testContext.getName())
         database = testContext.getAttribute(DATABASE)
         String environment = testContext.getAttribute(ENVIRONMENT)
-        vemAssert = new VemDbAssert()
+        vemAssert = new TangDbAssert()
         Reporter.log("environment $environment")
         Reporter.log("DATABASE $database")
         Reporter.log(database)
@@ -62,7 +62,7 @@ public class AnySqlTest {
             vemAssert.assertTrue(driver.isConnectionOk(database), "Connection $database is not working")
 
             testContext.setAttribute(SQL_HELPER, driver)
-            //vemAssert = new VemAssert(driver)
+            //vemAssert = new TangAssert(driver)
         } catch (Exception skipException) {
             log.error(skipException)
             throw new SkipException(skipException.toString())
