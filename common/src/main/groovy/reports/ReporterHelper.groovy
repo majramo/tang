@@ -2,12 +2,13 @@ package reports
 
 import corebase.ISeleniumHelper
 import corebase.SeleniumHelper
-import dtos.FileHelper
 import dtos.FileUtilsHelper
 import org.apache.log4j.Logger
 import org.testng.ITestContext
 import org.testng.ITestResult
 import org.testng.Reporter
+
+import static corebase.GlobalConstants.*
 
 public class ReporterHelper extends Reporter {
     private final static Logger log = Logger.getLogger(getClass())
@@ -40,15 +41,35 @@ public class ReporterHelper extends Reporter {
         addIcon("/icons/skippedTest.jpg")
     }
 
+
+    public String addIcons(String[] icons) {
+        return getIconsString(icons)
+
+    }
+
+
     private void addIcon(resource) {
         File file = fileUtilsHelper.loadResourceFileIfExists(resource)
-        if(file != null){
+        if (file != null) {
             def str = "<img src=\"" + file.getPath() + "\" width=\"80\" height=\"80\" hspace=\"10\" />"
             Reporter.log(str)
         }
     }
 
+    private String getIconsString(String[] resources) {
+        def str = ""
+        resources.each {
+            File file = fileUtilsHelper.loadResourceFileIfExists("/icons/${it}.jpg")
+            if (file != null) {
+                str += "<img src=\"" + file.getPath() + "\" width=\"30\" height=\"30\" hspace=\"30\" /> "
+            }
+        }
+        return str
+    }
+
+
     private void addFireFoxIcon() {
         addIcon("/icons/firefox.jpg")
     }
+
 }

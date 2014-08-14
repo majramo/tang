@@ -13,7 +13,13 @@ import org.testng.SkipException
 import org.testng.annotations.*
 import reports.ReporterHelper
 
+import static corebase.GlobalConstants.CHROME
+import static corebase.GlobalConstants.FIREFOX
+import static corebase.GlobalConstants.INTERNET_EXPLORER
+import static corebase.GlobalConstants.OPERA
+import static corebase.GlobalConstants.SAFARI
 import static dtos.base.Constants.BROWSER
+import static dtos.base.Constants.BROWSER_ICON
 import static dtos.base.Constants.ENVIRONMENT
 import static corebase.GlobalConstants.SELENIUM_HELPER
 import static corebase.GlobalConstants.WEB_DRIVER
@@ -45,9 +51,32 @@ public class AnyTest {
             browser = settings.defaultBrowser
         }
         testContext.setAttribute(BROWSER, browser)
+        testContext.setAttribute(BROWSER_ICON, getBrowserIcon(browser))
         testContext.setAttribute(ENVIRONMENT, environment)
         log.info(testContext.getName())
 
+    }
+
+    String getBrowserIcon(String browser){
+        def browserIcon = ""
+        switch (browser.toLowerCase()) {
+            case ~/.*firefox.*/:
+                browserIcon = FIREFOX
+                break
+            case ~/.*explorer.*/:
+                browserIcon = INTERNET_EXPLORER
+                break
+            case ~/.*chrome.*/:
+                browserIcon = CHROME
+                break
+            case ~/.*opera.*/:
+                browserIcon = OPERA
+                break
+            case ~/.*safari.*/:
+                browserIcon = SAFARI
+                break
+        }
+        return browserIcon
     }
 
     @BeforeClass(alwaysRun = true)
