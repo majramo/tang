@@ -19,7 +19,10 @@ Build
 mvn clean install
 
 Test
-mvn test
+mvn clean test
+
+Test with reportyng example
+mvn clean test -DtestFile=dummyTestng -P tang site org.reportyng:reporty-ng:1.2:reportyng
 
 Examples and Help
 https://github.com/majramo/tang
