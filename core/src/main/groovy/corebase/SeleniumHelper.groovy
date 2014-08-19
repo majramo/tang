@@ -86,6 +86,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     boolean macDriver
     private String javascriptToRun
     private String outputDirectory
+    private String browser
     private static String os
 
     public void printWindows(){
@@ -116,10 +117,16 @@ public class SeleniumHelper implements ISeleniumHelper {
     public ISeleniumHelper changeBrowser(String browser) {
         return init(browser, outputDirectory + "/", defaultImplicitlyWait, defaultPageLoadTimeoutMilliSeconds)
     }
+   public ISeleniumHelper restartBrowser() {
+        driver.quit()
+        return init(browser, outputDirectory + "/", defaultImplicitlyWait, defaultPageLoadTimeoutMilliSeconds)
+    }
 
 
 
     public ISeleniumHelper init(String browser, String outputDir = "./", long implicitlyWait = defaultImplicitlyWait, long defaultPageLoadTimeout = defaultPageLoadTimeoutMilliSeconds) throws MalformedURLException, SkipException {
+        windowHandler.clear()
+
         log.info getCurrentMethodName() + " browser<$browser> outputDir<$outputDir> implicitlyWait<$implicitlyWait> defaultPageLoadTimeout<$defaultPageLoadTimeout>"
         switch (OS) {
             case ~/^win.*/:
@@ -132,6 +139,7 @@ public class SeleniumHelper implements ISeleniumHelper {
             outputDirectory = outputDir.substring(0, outputDir.lastIndexOf(File.separator))
         }
         browser = browser.trim()
+        this.browser = browser
         System.setProperty(REPORT_NG_ESCAPE_OUTPUT_PROPERTY, "true")
         System.setProperty(REPORT_NG_REPORTING_TITLE, "Test Automation NG")
         System.setProperty(OUTPUT_DIRECTORY_PROPERTY, outputDirectory)
@@ -601,9 +609,11 @@ public class SeleniumHelper implements ISeleniumHelper {
      * Click button to open modal window and switch to it
      * @param we webElement handle of a button
      */
-    public boolean clickAndSwitchToModalWindowIfExists(String element, int sleepTimeSeconds) {
-        log.info getCurrentMethodName() + " element<$element> sleepTimeSeconds<$sleepTimeSeconds>"
+    public boolean clickAndSwitchToModalWindowIfExists(String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> sleepTimeSeconds<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
         final WebElement we = findElementByXpathOrId(element)
+        resetImplicitTime()
 
         Set<String> initWindowHandles = driver.getWindowHandles();
         def currentWindow = driver.getWindowHandle()
@@ -616,7 +626,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         };
         thread1.start();
         //Wait for window to appear
-        sleep(sleepTimeSeconds * 1000)
+        sleep(4000)
         thread1.interrupt();
         thread1 = null;
 

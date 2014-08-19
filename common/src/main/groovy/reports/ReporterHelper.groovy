@@ -51,7 +51,7 @@ public class ReporterHelper extends Reporter {
     private void addIcon(resource) {
         File file = fileUtilsHelper.loadResourceFileIfExists(resource)
         if (file != null) {
-            def str = "<img src=\"" + file.getPath() + "\" width=\"80\" height=\"80\" hspace=\"10\" />"
+            def str = "<img src=\"" + file.getPath() + "\" width=\"60\" height=\"60\" hspace=\"10\" />"
             Reporter.log(str)
         }
     }
@@ -61,7 +61,7 @@ public class ReporterHelper extends Reporter {
         resources.each {
             File file = fileUtilsHelper.loadResourceFileIfExists("/icons/${it}.jpg")
             if (file != null) {
-                str += "<img src=\"" + file.getPath() + "\" width=\"30\" height=\"30\" hspace=\"30\" /> "
+                str += "<img src=\"" + file.getPath() + "\" width=\"60\" height=\"60\" hspace=\"10\" /> "
             }
         }
         return str

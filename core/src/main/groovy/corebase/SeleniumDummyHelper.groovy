@@ -389,4 +389,7 @@ class SeleniumDummyHelper implements ISeleniumHelper {
     public ISeleniumHelper changeBrowserToInternetExplorer() {
     }
 
+    public ISeleniumHelper restartBrowser() {
+    }
+
 }

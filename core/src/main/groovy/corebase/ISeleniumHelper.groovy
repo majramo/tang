@@ -167,4 +167,5 @@ public interface ISeleniumHelper {
     public ISeleniumHelper changeBrowserToSafari()
 
     public ISeleniumHelper changeBrowserToInternetExplorer()
+    public ISeleniumHelper restartBrowser()
 }
