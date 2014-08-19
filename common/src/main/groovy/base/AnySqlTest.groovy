@@ -18,7 +18,7 @@ public class AnySqlTest {
     protected SqlHelper driver
     protected String database
     private String testBrowser
-    public TangDbAssert vemAssert
+    public TangDbAssert tangAssert
     SettingsHelper settingsHelper = new SettingsHelper()
     def settings = settingsHelper.settings
     def applicationConf = settingsHelper.applicationConf
@@ -52,17 +52,17 @@ public class AnySqlTest {
         log.info("BeforeClass " + testContext.getName())
         database = testContext.getAttribute(DATABASE)
         String environment = testContext.getAttribute(ENVIRONMENT)
-        vemAssert = new TangDbAssert()
+        tangAssert = new TangDbAssert()
         Reporter.log("environment $environment")
         Reporter.log("DATABASE $database")
         Reporter.log(database)
         try {
             log.info(testContext.getOutputDirectory())
             driver = new SqlHelper(null, log, database, settings.dbRun, settings)
-            vemAssert.assertTrue(driver.isConnectionOk(database), "Connection $database is not working")
+            tangAssert.assertTrue(driver.isConnectionOk(database), "Connection $database is not working")
 
             testContext.setAttribute(SQL_HELPER, driver)
-            //vemAssert = new TangAssert(driver)
+            //tangAssert = new TangAssert(driver)
         } catch (Exception skipException) {
             log.error(skipException)
             throw new SkipException(skipException.toString())
@@ -112,7 +112,7 @@ public class AnySqlTest {
         dbResult.each {
             Reporter.log(counter++ + " " + it.toString())
         }
-        vemAssert.assertTrue(dbResult.size() == 0, "No duplicates", "Result should have no duplicates")
+        tangAssert.assertTrue(dbResult.size() == 0, "No duplicates", "Result should have no duplicates")
     }
 
     public void checkNullValueInFieldInTableQuery(String table, String field) {
@@ -132,7 +132,7 @@ public class AnySqlTest {
         dbResult.each {
             Reporter.log(counter++ + " " + it.toString())
         }
-        vemAssert.assertTrue(dbResult.size() == 0, "No value $value", "Result should have value $value")
+        tangAssert.assertTrue(dbResult.size() == 0, "No value $value", "Result should have value $value")
     }
 
     public void setSqlHelper(ITestContext testContext, SqlHelper driver) {

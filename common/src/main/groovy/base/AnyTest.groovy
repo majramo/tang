@@ -31,7 +31,7 @@ public class AnyTest {
 
     protected ISeleniumHelper driver
     private String testBrowser
-    public TangAssert vemAssert
+    public TangAssert tangAssert
     SettingsHelper settingsHelper = new SettingsHelper()
     def settings = settingsHelper.settings
     def applicationConf = settingsHelper.applicationConf
@@ -100,7 +100,7 @@ public class AnyTest {
             }
             testContext.setAttribute(SELENIUM_HELPER, driver)
             testContext.setAttribute(WEB_DRIVER, driver)
-            vemAssert = new TangAssert(driver)
+            tangAssert = new TangAssert(driver)
         } catch (Exception skipException) {
             log.error(skipException)
             throw new SkipException(skipException.toString())

@@ -26,13 +26,13 @@ public class AmazonStartPage extends AnyPage {
     private static ModelAPI modelAPI;
     private int expected_num_of_books = 0
 
-    public AmazonStartPage(final ISeleniumHelper driver, TangAssert vemAssert, ModelAPI modelAPI) {
+    public AmazonStartPage(final ISeleniumHelper driver, TangAssert tangAssert, ModelAPI modelAPI) {
         super(driver)
         this.modelAPI = modelAPI;
 //        driver.setSlowDownOn(2000)
     }
 
-    public AmazonStartPage(final ISeleniumHelper driver, TangAssert vemAssert) {
+    public AmazonStartPage(final ISeleniumHelper driver, TangAssert tangAssert) {
         super(driver)
     }
 
@@ -90,21 +90,21 @@ public class AmazonStartPage extends AnyPage {
      * This method implements the Vertex 'v_BaseURL'
      */
     public void v_BaseURL() {
-        vemAssert.assertTrue(driver.getTitle().matches(AMAZON_COM + " .*"));
+        tangAssert.assertTrue(driver.getTitle().matches(AMAZON_COM + " .*"));
     }
 
     /**
      * This method implements the Vertex 'v_BookInformation'
      */
     public void v_BookInformation() {
-        vemAssert.assertTrue(driver.getText(BOOK_INFO_TITLE).contains(PRACTICAL_MBT_BOOK_NAME))
+        tangAssert.assertTrue(driver.getText(BOOK_INFO_TITLE).contains(PRACTICAL_MBT_BOOK_NAME))
     }
 
     /**
      * This method implements the Vertex 'v_BrowserStarted'
      */
     public void v_BrowserStarted() {
-        vemAssert.assertNotNull(driver);
+        tangAssert.assertNotNull(driver);
     }
 
     /**
@@ -114,16 +114,16 @@ public class AmazonStartPage extends AnyPage {
     public void v_OtherBoughtBooks() throws InterruptedException {
         sleep(3000)
         driver.isTagAvailable(".//*[@id='confirm-text']")
-        vemAssert.assertTrue(driver.isTagAvailable(CUSTOMER_WHO_BOUGHT), "Other books info not found " + CUSTOMER_WHO_BOUGHT)
-        vemAssert.assertTrue(driver.isTextPresent(CUSTOMER_WHO_BOUGHT, PRACTICAL_MBT_BOOK_NAME), "Books info not found " + PRACTICAL_MBT_BOOK_NAME)
+        tangAssert.assertTrue(driver.isTagAvailable(CUSTOMER_WHO_BOUGHT), "Other books info not found " + CUSTOMER_WHO_BOUGHT)
+        tangAssert.assertTrue(driver.isTextPresent(CUSTOMER_WHO_BOUGHT, PRACTICAL_MBT_BOOK_NAME), "Books info not found " + PRACTICAL_MBT_BOOK_NAME)
     }
 
     /**
      * This method implements the Vertex 'v_SearchResult'
      */
     public void v_SearchResult() {
-        vemAssert.assertTrue(driver.isTagAvailable(SEARCH_RESUTLS), "The book tag");
-        vemAssert.assertTrue(driver.isTextPresent(SEARCH_RESUTLS, PRACTICAL_MBT_BOOK_NAME), "Book " + PRACTICAL_MBT_BOOK_NAME);
+        tangAssert.assertTrue(driver.isTagAvailable(SEARCH_RESUTLS), "The book tag");
+        tangAssert.assertTrue(driver.isTextPresent(SEARCH_RESUTLS, PRACTICAL_MBT_BOOK_NAME), "Book " + PRACTICAL_MBT_BOOK_NAME);
 
     }
 
@@ -133,29 +133,29 @@ public class AmazonStartPage extends AnyPage {
         Integer expected_num_of_books = Integer.valueOf(modelAPI.getMbt().getDataValue("num_of_books"));
 
         if (expected_num_of_books == 0) {
-            vemAssert.assertTrue(driver.isTagAvailable(EMPTY_SHOPPING_BAG))
+            tangAssert.assertTrue(driver.isTagAvailable(EMPTY_SHOPPING_BAG))
             return;
         }
 
-        vemAssert.assertEquals(expected_num_of_books, Integer.parseInt(driver.getText(ITEMS_IN_SHOPPINGBAG)));
+        tangAssert.assertEquals(expected_num_of_books, Integer.parseInt(driver.getText(ITEMS_IN_SHOPPINGBAG)));
     }
 
     public void v_ShoppingCart() throws InvalidDataException, InterruptedException {
         verifyTitle()
 
         if (expected_num_of_books == 0) {
-            vemAssert.assertTrue(driver.isTagAvailable(EMPTY_SHOPPING_BAG))
+            tangAssert.assertTrue(driver.isTagAvailable(EMPTY_SHOPPING_BAG))
             return;
         }
 
-        vemAssert.assertEquals(expected_num_of_books, Integer.parseInt(driver.getText(ITEMS_IN_SHOPPINGBAG)));
+        tangAssert.assertEquals(expected_num_of_books, Integer.parseInt(driver.getText(ITEMS_IN_SHOPPINGBAG)));
     }
 
     private void verifyTitle() {
 
         String title = driver.requireTitle(SHOPPING_CART)
-        vemAssert.assertTrue(title.contains(AMAZON_COM), "Title <" + title + "> does not match <" + AMAZON_COM + ">");
-        vemAssert.assertTrue(title.contains(SHOPPING_CART), "Title <" + title + "> does not match <" + SHOPPING_CART + ">");
+        tangAssert.assertTrue(title.contains(AMAZON_COM), "Title <" + title + "> does not match <" + AMAZON_COM + ">");
+        tangAssert.assertTrue(title.contains(SHOPPING_CART), "Title <" + title + "> does not match <" + SHOPPING_CART + ">");
     }
 
     public verifyShoppingCart() {

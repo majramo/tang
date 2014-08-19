@@ -33,7 +33,7 @@ public class IkeaResultsPage extends AnyPage {
         }
         if (foundProductsCount < expectedProductsCount) {
             driver.takeScreenShot("searchResultShouldBeAtLeast")
-            vemAssert.assertTrue(false, "Expected $expectedProductsCount got $foundProductsCount")
+            tangAssert.assertTrue(false, "Expected $expectedProductsCount got $foundProductsCount")
         }
     }
 

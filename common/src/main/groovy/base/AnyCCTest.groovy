@@ -13,7 +13,7 @@ public class AnyCCTest {
 
     private final static Logger log = Logger.getLogger("ACCT ")
     protected ISeleniumHelper driver
-    public TangAssert vemAssert
+    public TangAssert tangAssert
     private final static DEFAULT_BROWSER = "Firefox"
     private SettingsHelper settingsHelper = new SettingsHelper()
     private settings = settingsHelper.settings
@@ -31,7 +31,7 @@ public class AnyCCTest {
                 driver = new SeleniumDummyHelper().init(DEFAULT_BROWSER, outputDiretory)
             }
             driver.setTestName("cc_")
-            vemAssert = new TangAssert(driver)
+            tangAssert = new TangAssert(driver)
         } catch (Exception skipException) {
             log.error(skipException)
             throw skipException

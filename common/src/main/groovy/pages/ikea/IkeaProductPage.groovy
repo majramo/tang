@@ -28,7 +28,7 @@ public class IkeaProductPage extends AnyPage {
     void statusShouldBeInStock() {
         String statusText = driver.getText(STATUS_TEXT)
         String statusColor = driver.getAttribute(IMAGE, IMAGE_SRC)
-        vemAssert.assertTrue(statusText.contains(IN_STOCK_TEXT))
-        vemAssert.assertTrue(statusColor.contains(STATUS_COLOR))
+        tangAssert.assertTrue(statusText.contains(IN_STOCK_TEXT))
+        tangAssert.assertTrue(statusColor.contains(STATUS_COLOR))
     }
 }
