@@ -8,8 +8,8 @@ public class JdbcConnection {
     private static final String DB_NAME = ";databaseName="
     private static final String ERROR_DB_CONNECTION = "Could not establish connection to the database."
     private jDbcConnection
-    private final static Logger log = Logger.getLogger("JC   ")
-    SettingsHelper settingsHelper = new SettingsHelper()
+    private final static Logger log = Logger.getLogger("JdC  ")
+    SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
     public boolean mockDb = false
 

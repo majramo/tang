@@ -21,14 +21,12 @@ import org.openqa.selenium.support.ui.WebDriverWait
 import org.testng.Reporter
 import org.testng.SkipException
 
-import java.lang.reflect.Method
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 import static corebase.GlobalConstants.*
-import static corebase.GlobalConstants.MAC
 
 public class SeleniumHelper implements ISeleniumHelper {
 
@@ -44,9 +42,9 @@ public class SeleniumHelper implements ISeleniumHelper {
     private int slowDownForMilliSeconds = 2000
     private String testName = ""
     private counter = 1
-    private final static Logger log = Logger.getLogger("SH   ")
+    private final static Logger log = Logger.getLogger("SeH   ")
     protected String HTML
-    protected SettingsHelper settingsHelper = new SettingsHelper()
+    protected SettingsHelper settingsHelper = SettingsHelper.getInstance()
     protected settings = settingsHelper.settings
     public applicationConf = settingsHelper.applicationConf
     protected URL COMPANY_HUB_URL
@@ -88,6 +86,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     private String outputDirectory
     private String browser
     private static String os
+    private static long sleepTimeInMilliseconds = 0
 
     public void printWindows(){
         println "   ### windowHandler"
@@ -206,12 +205,12 @@ public class SeleniumHelper implements ISeleniumHelper {
             try {
                changeImplicitTimeToSeconds(this.defaultImplicitlyWait)
             } catch (GroovyRuntimeException e) {
-                log.info("Driver $browser can't set implicitlyWait " + e)
+                log.debug("Driver $browser can't set implicitlyWait " + e)
             }
             try {
                 driver.manage().timeouts().pageLoadTimeout(this.defaultPageLoadTimeoutMilliSeconds)
             } catch (GroovyRuntimeException e) {
-                log.info("Driver $browser can't set pageLoadTimeout " + e)
+                log.debug("Driver $browser can't set pageLoadTimeout " + e)
             }
         }
 
@@ -222,24 +221,24 @@ public class SeleniumHelper implements ISeleniumHelper {
         File file;
         String path = firefoxAddon.getFullPath();
         if (path == null) {
-            log.info("Firefox addon path can not be null");
+            log.warn("Firefox addon path can not be null");
             return false;
         }
         URL url = this.class.getResource(path);
         if (url == null) {
-            log.info("Firefox addon URL can not be null");
+            log.warn("Firefox addon URL can not be null");
             return false;
         }
         try {
             file  = new File(url.toURI());
         } catch (URISyntaxException e) {
-            log.info("Failed to generate Firefox addon file: " + e);
+            log.warn("Failed to generate Firefox addon file: " + e);
             return false;
         }
         try {
             firefoxProfile.addExtension(file);
         } catch (IOException e) {
-            log.info("Failed to load Firefox addon: " + e);
+            log.warn("Failed to load Firefox addon: " + e);
             return false;
         }
         if (firefoxAddon.getName().equalsIgnoreCase("firebug")) {
@@ -424,6 +423,18 @@ public class SeleniumHelper implements ISeleniumHelper {
         log.info getCurrentMethodName() + " url<$url>"
         slowDown()
         driver.get(url)
+    }
+
+    public void sleep(long milliseconds ) {
+        sleepTimeInMilliseconds +=  milliseconds
+        log.info(getCurrentMethodName() + " sleepTimeInMilliseconds $sleepTimeInMilliseconds <$milliseconds>")
+        driver.sleep(milliseconds)
+    }
+
+    public void threadSleep(long milliseconds ) {
+        sleepTimeInMilliseconds +=  milliseconds
+        log.info(getCurrentMethodName() + " threadsleepTimeInMilliseconds $sleepTimeInMilliseconds <$milliseconds>")
+        driver.sleep(milliseconds)
     }
 
     public slowDown(slowDownTime = slowDownForMilliSeconds) {
@@ -626,7 +637,8 @@ public class SeleniumHelper implements ISeleniumHelper {
         };
         thread1.start();
         //Wait for window to appear
-        sleep(4000)
+        sleep(5)
+        waitForPageReadyStateComplete()
         thread1.interrupt();
         thread1 = null;
 
@@ -687,7 +699,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         try {
             subWe.click()
         } catch (ElementNotVisibleException e) {
-            log.info(e)
+            log.warn(e)
             final String href = subWe.getAttribute("href")
             driver.get(href)
         }
@@ -856,7 +868,7 @@ public class SeleniumHelper implements ISeleniumHelper {
                 return null
             }
         } catch (NoSuchElementException e) {
-            log.info "$methodName webElement not found"
+            log.debug "$methodName webElement not found"
             if (!skipError) {
                 log.error("id: " + skipError + " " + id)
                 takeScreenShot("Couldn't find id: " + id)
@@ -867,7 +879,7 @@ public class SeleniumHelper implements ISeleniumHelper {
                 return null
             }
         } catch (org.openqa.selenium.UnhandledAlertException unhandledAlertExceptio) {
-            log.info "$methodName webElement not found"
+            log.error "$methodName webElement not found"
             Reporter.log(getHtmlImgTag("UnhandledAlertException: ", unhandledAlertExceptio))
             takeScreenShotAndSource("UnhandledAlertException")
             switchToNextWindow()
@@ -891,7 +903,7 @@ public class SeleniumHelper implements ISeleniumHelper {
                 return null
             }
         } catch (NoSuchElementException e) {
-            log.info "$methodName webElement not found"
+            log.warn "$methodName webElement not found"
             if (!skipError) {
                 log.error("xpath: " + skipError + " " + xpath)
                 Reporter.log("xpath: " + skipError + " " + xpath)
@@ -1008,9 +1020,9 @@ public class SeleniumHelper implements ISeleniumHelper {
         } catch (IOException e) {
                 Reporter.log("Can't move screenShot. Exists here: " + tempScreenShotFile)
                 Reporter.log(getHtmlImgTag(tempScreenShotFile.getAbsoluteFile().getAbsolutePath(), tempScreenShotFile))
-                log.info("Moving screenshot file failed. " + e)
+                log.error("Moving screenshot file failed. " + e)
         } catch (ClassCastException e) {
-                log.info("WebDriver does not support screenShots: " + e)
+                log.error("WebDriver does not support screenShots: " + e)
         }
     }
 
@@ -1049,7 +1061,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         File destinationDir = new File(dir)
         if (!destinationDir.isDirectory()) {
             destinationDir.mkdir()
-            Thread.sleep(10)
+            threadSleep(10)
         }
     }
 
@@ -1086,7 +1098,6 @@ public class SeleniumHelper implements ISeleniumHelper {
     public void switchToNextWindow() {
         //Store the current window handle
         def methodName = getCurrentMethodName()
-        log.info methodName
         log.info("$methodName saved windowHandler size<" + windowHandler.size() + ">" )
         windowHandler.each {
             log.info( "$methodName saved windowHandler<$it>")
@@ -1095,7 +1106,7 @@ public class SeleniumHelper implements ISeleniumHelper {
 
         while(driver.getWindowHandles().size() <= windowHandler.size()){
             log.info("$methodName Waiting getWindowHandles<" + driver.getWindowHandles().size()+ "> windowHandler<" + windowHandler.size() + ">")
-            sleep(1000)
+            sleep(1002)
         }
         def currentWindow = driver.getWindowHandle()
         log.info( "actual $currentWindow")
@@ -1118,7 +1129,6 @@ public class SeleniumHelper implements ISeleniumHelper {
 
     public void switchToPreviousWindow() {
         def methodName = getCurrentMethodName()
-        log.info methodName
         log.info("$methodName saved windowHandler size<" + windowHandler.size() + ">" )
         windowHandler.each {
             log.info( "$methodName saved windowHandler<$it>")
@@ -1151,7 +1161,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     private void moveDriverWindow(boolean arrangeWindows, browser, WebDriver driver) {
         if (arrangeWindows && !isBrowserHtmlUnit(browser)) {
             driver.manage().window().setPosition(getPoint());
-            Thread.sleep(100)
+            threadSleep(10)
         }
     }
 
@@ -1250,7 +1260,7 @@ public class SeleniumHelper implements ISeleniumHelper {
             }
             try {
                 if (!webElement.isDisplayed()){
-                    Thread.sleep(1000)
+                    threadSleep(1001)
                     webElement = findElementByXpathOrId(element, false)
                 } else {
                     break

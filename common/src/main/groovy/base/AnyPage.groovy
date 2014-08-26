@@ -6,7 +6,7 @@ import dtos.SettingsHelper
 public class AnyPage {
     public ISeleniumHelper driver
     public TangAssert tangAssert
-    SettingsHelper settingsHelper = new SettingsHelper()
+    SettingsHelper settingsHelper = SettingsHelper.getInstance()
     public applicationConf = settingsHelper.applicationConf
 
     public AnyPage(final ISeleniumHelper driver) {

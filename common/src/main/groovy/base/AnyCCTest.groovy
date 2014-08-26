@@ -15,7 +15,7 @@ public class AnyCCTest {
     protected ISeleniumHelper driver
     public TangAssert tangAssert
     private final static DEFAULT_BROWSER = "Firefox"
-    private SettingsHelper settingsHelper = new SettingsHelper()
+    private SettingsHelper settingsHelper = SettingsHelper.getInstance()
     private settings = settingsHelper.settings
 
     public void setup(String browser, String outputDiretory) {

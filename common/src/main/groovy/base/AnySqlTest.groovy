@@ -19,7 +19,7 @@ public class AnySqlTest {
     protected String database
     private String testBrowser
     public TangDbAssert tangAssert
-    SettingsHelper settingsHelper = new SettingsHelper()
+    SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
     def applicationConf = settingsHelper.applicationConf
 
@@ -87,7 +87,7 @@ public class AnySqlTest {
 
     public getDbResult(message, dbRunType, query, dbRecordLine) {
         if (settingsHelper == null) {
-            settingsHelper = new SettingsHelper()
+            settingsHelper = SettingsHelper.getInstance()
             settings = settingsHelper.settings
         }
         Reporter.log("$message")

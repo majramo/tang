@@ -26,13 +26,13 @@ import static corebase.GlobalConstants.WEB_DRIVER
 
 public class AnyTest {
 
-    private final static Logger log = Logger.getLogger("AT   ")
+    private final static Logger log = Logger.getLogger("AnT  ")
     protected final static ReporterHelper reporterHelper = new ReporterHelper()
 
     protected ISeleniumHelper driver
     private String testBrowser
     public TangAssert tangAssert
-    SettingsHelper settingsHelper = new SettingsHelper()
+    SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
     def applicationConf = settingsHelper.applicationConf
 
@@ -147,7 +147,7 @@ public class AnyTest {
 
     public getDbResult(message, dbRunType, query, ins, dbName) {
         if (settingsHelper == null) {
-            settingsHelper = new SettingsHelper()
+            settingsHelper = SettingsHelper.getInstance()
             settings = settingsHelper.settings
         }
         SqlHelper sqlHelper = new SqlHelper(null, log, "mySqlDb", settings.dbRun, settings)

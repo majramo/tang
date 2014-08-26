@@ -35,7 +35,7 @@ PeceptualDiff image1.tif image2.tif
 
 
 class ImageHelper {
-    protected SettingsHelper settingsHelper = new SettingsHelper()
+    protected SettingsHelper settingsHelper = SettingsHelper.getInstance()
     protected settings = settingsHelper.settings
 
     private static counter = 1
