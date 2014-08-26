@@ -20,7 +20,7 @@ public class SqlHelper {
 	private  jdbcConnections = [:]
 	private static dbRecordLine
 	private File sqlFile
-    private final static Logger logger = Logger.getLogger("SH   ")
+    private final static Logger logger = Logger.getLogger("SqH  ")
 
 	public SqlHelper(File sqlFile, log, dbName, dbRun, settings){
 		this.dbRun = dbRun

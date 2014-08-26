@@ -168,4 +168,6 @@ public interface ISeleniumHelper {
 
     public ISeleniumHelper changeBrowserToInternetExplorer()
     public ISeleniumHelper restartBrowser()
+
+    public void sleep(long milliseconds )
 }
