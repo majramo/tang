@@ -15,7 +15,7 @@ import org.testng.SkipException
 class SeleniumDummyHelper implements ISeleniumHelper {
 
     public ISeleniumHelper init(String browser, String outputDir = "./", int defaultImplicitlyWait = 10, int defaultPageLoadTimeout = 60) throws MalformedURLException, SkipException {
-        Thread.sleep(1000)
+        Thread.sleep(111)
         return this
     }
 
@@ -390,6 +390,9 @@ class SeleniumDummyHelper implements ISeleniumHelper {
     }
 
     public ISeleniumHelper restartBrowser() {
+    }
+
+    public void sleep(long milliseconds ) {
     }
 
 }
