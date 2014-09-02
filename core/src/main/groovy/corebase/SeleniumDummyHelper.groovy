@@ -2,6 +2,7 @@ package corebase
 
 import org.openqa.selenium.Point
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.WebElement
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import org.testng.SkipException
 
@@ -354,12 +355,12 @@ class SeleniumDummyHelper implements ISeleniumHelper {
     }
 
 
-    void requireVisibleXpath(String xpath) {
+    WebElement requireVisibleXpath(String xpath) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
 
-    void requireVisibleXpath(String xpath, int changedImplicitlyWait) {
+    WebElement requireVisibleXpath(String xpath, int changedImplicitlyWait) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

@@ -488,13 +488,13 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
     private void resetImplicitTime() {
-        log.info getCurrentMethodName()
+        log.debug getCurrentMethodName()
         changeImplicitTimeToSeconds(this.defaultImplicitlyWait)
     }
 
     private void changeImplicitTimeToSeconds(long changedImplicitlyWait) {
         def methodName =  getCurrentMethodName()
-        log.info methodName + " changedImplicitlyWait<$changedImplicitlyWait>"
+        log.debug methodName + " changedImplicitlyWait<$changedImplicitlyWait>"
         try{
             driver.manage().timeouts().implicitlyWait(changedImplicitlyWait, TimeUnit.SECONDS)
         }catch(org.openqa.selenium.NoSuchWindowException e){
@@ -653,8 +653,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     public boolean click(final String element) {
         log.info getCurrentMethodName() + " element<$element>>"
 
-        requireVisibleXpath(element)
-        final WebElement we = findElementByXpathOrId(element)
+        final WebElement we = requireVisibleXpath(element)
         if (we == null) {
             return false
         }
@@ -683,9 +682,8 @@ public class SeleniumHelper implements ISeleniumHelper {
 
     public boolean doubleClick(String element) {
         log.info getCurrentMethodName() + " element<$element>"
-        requireVisibleXpath(element)
         Actions actions = new Actions(driver);
-        WebElement webElement = findElementByXpathOrId(element, true);
+        WebElement webElement =  requireVisibleXpath(element)
         new Actions(driver).doubleClick(webElement).perform();
        // actions.moveToElement(webElement);
         return true
@@ -802,8 +800,8 @@ public class SeleniumHelper implements ISeleniumHelper {
 
     public boolean type(final String element, text) {
         log.info getCurrentMethodName() + " element<$element> text<$text>"
-        requireVisibleXpath(element)
-        final WebElement we = findElementByXpathOrId(element)
+
+        final WebElement we =  requireVisibleXpath(element)
         if (we == null) {
             return false
         }
@@ -1224,8 +1222,8 @@ public class SeleniumHelper implements ISeleniumHelper {
     public void switchToFrame(String frameElement) {
         log.info getCurrentMethodName() + " frameElement<$frameElement>"
         driver.switchTo().defaultContent()
-        requireVisibleXpath(frameElement)
-        WebElement frame = findElementByXpathOrId(frameElement, true)
+
+        WebElement frame =  requireVisibleXpath(frameElement)
         driver.switchTo().frame(frame);
     }
 
@@ -1244,14 +1242,15 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
 
-    public void requireXpath(String element, int changedImplicitlyWait) {
+    public WebElement requireXpath(String element, int changedImplicitlyWait) {
         log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
         changeImplicitTimeToSeconds(changedImplicitlyWait)
-        requireXpath(element)
+        WebElement webElement = requireXpath(element)
        resetImplicitTime()
+        return webElement
     }
 
-    public void requireVisibleXpath(String element) {
+    public WebElement requireVisibleXpath(String element) {
         log.info getCurrentMethodName() + " element<$element>"
         WebElement webElement = findElementByXpathOrId(element, false)
         for (int second = 0; ; second++) {
@@ -1260,7 +1259,7 @@ public class SeleniumHelper implements ISeleniumHelper {
             }
             try {
                 if (!webElement.isDisplayed()){
-                    threadSleep(1001)
+                    threadSleep(999)
                     webElement = findElementByXpathOrId(element, false)
                 } else {
                     break
@@ -1268,13 +1267,15 @@ public class SeleniumHelper implements ISeleniumHelper {
             } catch (Exception e) {
             }
         }
+        return webElement
     }
 
-    public void requireVisibleXpath(String element, int changedImplicitlyWait) {
+    public WebElement requireVisibleXpath(String element, int changedImplicitlyWait) {
         log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
         changeImplicitTimeToSeconds(changedImplicitlyWait)
-        requireVisibleXpath(element)
-       resetImplicitTime()
+        WebElement webElement = requireVisibleXpath(element)
+        resetImplicitTime()
+        return webElement
     }
 
     public boolean isDisplayed(String element, int changedImplicitlyWait) {
