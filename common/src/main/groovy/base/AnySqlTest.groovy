@@ -136,8 +136,7 @@ public class AnySqlTest {
     }
 
     public void setSqlHelper(ITestContext testContext, SqlHelper driver) {
-        testContext.setAttribute(SQL_HELPER, driver)
         this.driver = (SqlHelper) testContext.getAttribute(SQL_HELPER)
-
+        database = (String) testContext.getAttribute(DATABASE)
     }
 }
