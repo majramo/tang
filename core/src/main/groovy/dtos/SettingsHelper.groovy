@@ -5,12 +5,17 @@ import org.testng.SkipException
 
 public class SettingsHelper {
 
-    public settings
-    private timeStamp
-    public applicationConf = null
-    private final static Logger log = Logger.getLogger("SeH  ")
+    public static settings
+    private static timeStamp
+    public static applicationConf = null
+    private final static Logger log = Logger.getLogger("StH  ")
+    private static final INSTANCE = new SettingsHelper()
+    private static int count = 1
+    static getInstance() {
+        log.debug ("## Count <" + count++ +">")
+        return INSTANCE }
 
-    SettingsHelper() {
+    private SettingsHelper() {
         def settingsFile = "/configFiles/settings.groovy"
         log.info "reading settingsFile <$settingsFile>"
         InputStream inputStream = this.getClass().getResourceAsStream(settingsFile);

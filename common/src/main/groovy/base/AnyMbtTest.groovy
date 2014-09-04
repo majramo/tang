@@ -12,8 +12,8 @@ import org.testng.Reporter
 public class AnyMbtTest extends org.graphwalker.multipleModels.ModelAPI {
 
     public ISeleniumHelper driver
-    public static TangAssert vemAssert
-    SettingsHelper settingsHelper = new SettingsHelper()
+    public static TangAssert tangAssert
+    SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
     private final static Logger log = Logger.getLogger("AMT  ")
 
@@ -24,7 +24,7 @@ public class AnyMbtTest extends org.graphwalker.multipleModels.ModelAPI {
         } else {
             driver = new SeleniumDummyHelper().init("", "")
         }
-        vemAssert = new TangAssert(driver);
+        tangAssert = new TangAssert(driver);
         driver.setTestName(AnyMbtTest.class.getSimpleName())
     }
 
@@ -46,7 +46,7 @@ public class AnyMbtTest extends org.graphwalker.multipleModels.ModelAPI {
 
     public getDbResult(message, dbRunType, query, ins, dbName) {
         if (settingsHelper == null) {
-            settingsHelper = new SettingsHelper()
+            settingsHelper = SettingsHelper.getInstance()
             settings = settingsHelper.settings
         }
         SqlHelper sqlHelper = new SqlHelper(null, log, "mySqlDb", settings.dbRun, settings)

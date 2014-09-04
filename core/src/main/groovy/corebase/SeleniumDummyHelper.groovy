@@ -2,6 +2,7 @@ package corebase
 
 import org.openqa.selenium.Point
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.WebElement
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import org.testng.SkipException
 
@@ -15,7 +16,7 @@ import org.testng.SkipException
 class SeleniumDummyHelper implements ISeleniumHelper {
 
     public ISeleniumHelper init(String browser, String outputDir = "./", int defaultImplicitlyWait = 10, int defaultPageLoadTimeout = 60) throws MalformedURLException, SkipException {
-        Thread.sleep(1000)
+        Thread.sleep(111)
         return this
     }
 
@@ -354,12 +355,12 @@ class SeleniumDummyHelper implements ISeleniumHelper {
     }
 
 
-    void requireVisibleXpath(String xpath) {
+    WebElement requireVisibleXpath(String xpath) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
 
-    void requireVisibleXpath(String xpath, int changedImplicitlyWait) {
+    WebElement requireVisibleXpath(String xpath, int changedImplicitlyWait) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -387,6 +388,12 @@ class SeleniumDummyHelper implements ISeleniumHelper {
     }
 
     public ISeleniumHelper changeBrowserToInternetExplorer() {
+    }
+
+    public ISeleniumHelper restartBrowser() {
+    }
+
+    public void sleep(long milliseconds ) {
     }
 
 }

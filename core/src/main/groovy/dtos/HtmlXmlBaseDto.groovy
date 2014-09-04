@@ -33,7 +33,7 @@ class HtmlXmlBaseDto {
     protected sqlFile
     protected htmlXmlSourceFile
     def comment = ""
-    protected SettingsHelper settingsHelper = new SettingsHelper()
+    protected SettingsHelper settingsHelper = SettingsHelper.getInstance()
     protected settings = settingsHelper.settings
     protected timeStamp = settingsHelper.timeStamp
     protected SprintPath = settings.SprintPath

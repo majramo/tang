@@ -20,7 +20,7 @@ public class SqlHelper {
 	private  jdbcConnections = [:]
 	private static dbRecordLine
 	private File sqlFile
-    private final static Logger logger = Logger.getLogger("SH   ")
+    private final static Logger logger = Logger.getLogger("SqH  ")
 
 	public SqlHelper(File sqlFile, log, dbName, dbRun, settings){
 		this.dbRun = dbRun
@@ -62,8 +62,8 @@ public class SqlHelper {
     }
 
 	private sqlConRun(dbLoggInfo, dbRunType ,dbQueryRun, dbRecordLine=-1, dbName){
-        log.info "HTM 6 dbName $dbName"
-        log.info "HTM 6 $dbLoggInfo\n$dbQueryRun"
+        log.info "dbName $dbName"
+        log.debug "$dbLoggInfo\n$dbQueryRun"
 		this.dbRecordLine = dbRecordLine
         JdbcConnection jDbcConnection = jdbcConnections [dbName]
 		if(jDbcConnection != null){
@@ -189,8 +189,8 @@ public class SqlHelper {
 		dbResult = [:]
         String dbInsertStatement = dbQuery.replaceAll("SELECT \\* FROM" , "INSERT INTO").replaceAll(" WHERE", "")
         dbInsertStatement += getInsertValues() + "\n"
-        log.info dbQueryRun
-        log.info dbInsertStatement
+        log.debug dbQueryRun
+        log.debug dbInsertStatement
         if(sqlFile != null && sqlFile.exists()){
             sqlFile.append(dbQueryRun)
             sqlFile.append(dbInsertStatement)

@@ -2,6 +2,7 @@ package corebase
 
 import org.openqa.selenium.Point
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.WebElement
 
 import java.lang.reflect.Method
 
@@ -119,9 +120,9 @@ public interface ISeleniumHelper {
 
     void requireXpath(String xpath)
 
-    void requireVisibleXpath(String xpath)
+    WebElement requireVisibleXpath(String xpath)
 
-    void requireVisibleXpath(String xpath, int changedImplicitlyWait)
+    WebElement requireVisibleXpath(String xpath, int changedImplicitlyWait)
 
     public void hover(String xpath)
 
@@ -167,4 +168,7 @@ public interface ISeleniumHelper {
     public ISeleniumHelper changeBrowserToSafari()
 
     public ISeleniumHelper changeBrowserToInternetExplorer()
+    public ISeleniumHelper restartBrowser()
+
+    public void sleep(long milliseconds )
 }
