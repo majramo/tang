@@ -38,6 +38,7 @@ public class SqlHelper {
             sqlHelperMock = true
 
         }else{
+            this.log.info "##Init dbName $dbName"
             this.log.info jdbcConnections
             this.log.info jdbcConnections [dbName]
             try{
@@ -45,6 +46,7 @@ public class SqlHelper {
                 if(!jdbcConnections [dbName]){
                     settings."$dbName".with {
                         jDbcConnection  = new JdbcConnection(dbUrl, dbDriverName, dbUserName, dbPassword, dbTestDataBase, dbDriver)
+                        this.log.info "##Init jDbcConnection $jDbcConnection"
                     }
                     jdbcConnections [dbName] = jDbcConnection
                 }
@@ -62,11 +64,13 @@ public class SqlHelper {
     }
 
 	private sqlConRun(dbLoggInfo, dbRunType ,dbQueryRun, dbRecordLine=-1, dbName){
-        log.info "dbName $dbName"
+        this.log.info "##Run dbName $dbName"
         log.debug "$dbLoggInfo\n$dbQueryRun"
 		this.dbRecordLine = dbRecordLine
         JdbcConnection jDbcConnection = jdbcConnections [dbName]
-		if(jDbcConnection != null){
+        this.log.info "##Run jDbcConnection $jDbcConnection"
+
+        if(jDbcConnection != null){
 			if(sqlHelperMock){
 				dbResult[DB_MOCK_DATA] =  DB_MOCK_DATA
                 return null
