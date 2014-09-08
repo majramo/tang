@@ -95,6 +95,8 @@ public class AnySqlTest {
         Reporter.log("dbRecordLine: $dbRecordLine")
         def dbResult = driver.sqlConRun(message, dbRunType, query, dbRecordLine, database)
 //        Reporter.log("\nResult\n###")
+        tangAssert.assertNotNull(dbResult, "sqlConRun", "Can't get result from DB")
+
         Reporter.log("dbResult size<" + dbResult.size() + ">")
         return dbResult
     }

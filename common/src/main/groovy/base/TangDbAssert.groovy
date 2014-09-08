@@ -15,7 +15,7 @@ public class TangDbAssert {
     public void assertNotNull(Object object, String assertOn, String message = "") {
         Reporter.log("AssertingNotNull (" + assertOn + ")")
         if (object == null) {
-            assertNotNull(object, message.replaceAll("&LT", "<").replaceAll("&GT", ">"))
+            Assert.assertNotNull(object, message.replaceAll("&LT", "<").replaceAll("&GT", ">"))
         }
     }
 
