@@ -5,6 +5,7 @@ import org.apache.poi.hssf.record.formula.functions.Row
 import org.apache.poi.hssf.usermodel.HSSFRow
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.testng.Reporter
 
 /**
  * This class reads an Excel file and creates an ExcelData object that contains all rows and columns from the first sheet
@@ -45,6 +46,7 @@ public class ExcelFileReader {
 
 
     private ExcelData getDataFromFile() {
+        Reporter.log("Reading file: $fileName")
         try {
             URL is = this.getClass().getResource(fileName);
             if (is == null) {
