@@ -95,6 +95,8 @@ public class AnySqlTest {
         Reporter.log("dbRecordLine: $dbRecordLine")
         def dbResult = driver.sqlConRun(message, dbRunType, query, dbRecordLine, database)
 //        Reporter.log("\nResult\n###")
+        tangAssert.assertNotNull(dbResult, "sqlConRun", "Can't get result from DB")
+
         Reporter.log("dbResult size<" + dbResult.size() + ">")
         return dbResult
     }
@@ -109,8 +111,11 @@ public class AnySqlTest {
         HAVING COUNT(*) > 1;"""
         def dbResult = getDbResult("Checking duplicates of <$fieldsString> in table <$table> ", dbRunTypeRows, query, 0)
         int counter = 1
-        dbResult.each {
-            Reporter.log(counter++ + " " + it.toString())
+        if(dbResult.size()>0){
+            Reporter.log("Showing first item")
+            dbResult[0..0].each {
+                Reporter.log(counter++ + " " + it.toString())
+            }
         }
         tangAssert.assertTrue(dbResult.size() == 0, "No duplicates", "Result should have no duplicates")
     }
@@ -129,8 +134,11 @@ public class AnySqlTest {
         WHERE $field $value;"""
         def dbResult = getDbResult("Checking field <$field> with value <$value> in table <$table> ", dbRunTypeRows, query, 0)
         int counter = 1
-        dbResult.each {
-            Reporter.log(counter++ + " " + it.toString())
+        if(dbResult.size()>0){
+            Reporter.log("Showing first item")
+            dbResult[0..0].each {
+                Reporter.log(counter++ + " " + it.toString())
+            }
         }
         tangAssert.assertTrue(dbResult.size() == 0, "No value $value", "Result should have value $value")
     }
