@@ -1,4 +1,4 @@
-package excel
+package db
 
 import dtos.SettingsHelper
 import dtos.base.SqlHelper
@@ -36,7 +36,7 @@ class DbObjectProvider {
             values = []
             row.each { k, v ->
                 if (v != null ) {
-                    values.add(v)
+                    values.add((String) v)
                 }else{
                     values.add("N/A")
                 }
@@ -56,7 +56,7 @@ class DbObjectProvider {
             values = []
             row.each { k, v ->
                 if (v != null ) {
-                    values.add(v)
+                    values.add((String)v)
                 }else{
                     values.add("N/A")
                 }
