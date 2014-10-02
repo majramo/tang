@@ -17,7 +17,7 @@ public class SqlHelper {
 	def dbQueryExtension = ""
 	def dbResult = [:]
 	String dbQueryRun
-	private  jdbcConnections = [:]
+	private jdbcConnections = [:]
 	private static dbRecordLine
 	private File sqlFile
     private final static Logger logger = Logger.getLogger("SqH  ")
@@ -50,8 +50,10 @@ public class SqlHelper {
                         this.log.info "##Init jDbcConnection $jDbcConnection"
                     }
                     jdbcConnections [dbName] = jDbcConnection
+
+                    this.log.info "# JDbcConnection $jdbcConnections"
                     jdbcConnections.each {
-                        this.log.info "##jDbcConnections " + it
+                        this.log.info "# jDbcConnection " + it
                     }
                 }
 
