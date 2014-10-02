@@ -1,30 +1,15 @@
 package utils
 
-import org.testng.annotations.DataProvider
-import org.testng.annotations.Test
-
 class CalculateCheckDigit {
 
-
-    @Test(dataProvider = "ocrs")
-    public void checkDigitLuhnTest(String ocr) {
-        isDigitLuhnNumberCorrect(ocr)
-    }
-
-    @Test(dataProvider = "socialSecurityNumber")
-    public void checkSocialSecurityNumberTest(String soc) {
-        isSocialSecurityNumberCorrect(soc)
-    }
-
-
-    public boolean isDigitLuhnNumberCorrect(String digits) {
+    public static boolean isDigitLuhnNumberCorrect(String digits) {
         def checkDigit = Integer.parseInt(digits[-1])
         def rest = digits[0..-2]
         def luhnCheckDigit = calculateCheckDigitForLuhn(rest)
         assert (checkDigit == luhnCheckDigit)
     }
 
-    public boolean isSocialSecurityNumberCorrect(String digits) {
+    public static boolean isSocialSecurityNumberCorrect(String digits) {
         def checkDigit = Integer.parseInt(digits[-1])
         def rest = digits[0..-2]
         def ssnCheckDigit = calculateCheckDigitForSocialSecurityNumber(rest)
@@ -32,7 +17,7 @@ class CalculateCheckDigit {
 
     }
 
-    def calculateCheckDigitForLuhn(String digits) {
+    public static int calculateCheckDigitForLuhn(String digits) {
         ArrayList<String> all = new ArrayList<String>()
 
         int sum = getSum(digits.reverse())
@@ -42,7 +27,7 @@ class CalculateCheckDigit {
     }
 
 
-    def calculateCheckDigitForSocialSecurityNumber(String digits) {
+    public static int calculateCheckDigitForSocialSecurityNumber(String digits) {
         ArrayList<String> all = new ArrayList<String>()
 
         int sum = getSum(digits)
@@ -51,7 +36,7 @@ class CalculateCheckDigit {
         return reminder
     }
 
-    private int getSum(String digits) {
+    private static int getSum(String digits) {
         int sum = 0
         boolean multiplier = true
         digits.each {
@@ -69,37 +54,6 @@ class CalculateCheckDigit {
         sum
     }
 
-    @DataProvider(name = "ocrs")
-    public Object[][] ocrs() {
-        [
-                ["3221579"],
-                ["860442020567338"],
-                ["1009109500132"],
-                ["125"],
-//                ["264526771"],
-//                ["264627069"],
-//                ["265351785"],
-//                ["265467047"],
-//                ["266314333"],
-//                ["266423244"]
-        ] as Object[][]
-    }
-
-    @DataProvider(name = "socialSecurityNumber")
-    public Object[][] socialSecurityNumber() {
-        [
-                ["8112189876"],
-                ["6906123077"],
-                ["5206062043"],
-                ["2907118893"],
-                ["2412243921"],
-                ["2007174507"],
-                ["2107224327"],
-                ["2112132127"],
-                ["2205163906"],
-                ["2211053927"],
-        ] as Object[][]
-    }
 
 }
 
