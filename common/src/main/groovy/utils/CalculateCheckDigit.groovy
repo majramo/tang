@@ -1,11 +1,20 @@
 package utils
 
+import org.apache.log4j.Logger
+import org.testng.Reporter
+
 class CalculateCheckDigit {
+
+    private final static Logger logger = Logger.getLogger("CCD ")
 
     public static boolean isDigitLuhnNumberCorrect(String digits) {
         def checkDigit = Integer.parseInt(digits[-1])
         def rest = digits[0..-2]
         def luhnCheckDigit = calculateCheckDigitForLuhn(rest)
+        if(checkDigit != luhnCheckDigit){
+            logger.error("$digits should have Luhn check digit ==> $luhnCheckDigit <== and not $checkDigit")
+            Reporter.log("$digits should have Luhn check digit ==> $luhnCheckDigit <== and not $checkDigit")
+        }
         assert (checkDigit == luhnCheckDigit)
     }
 
@@ -13,6 +22,10 @@ class CalculateCheckDigit {
         def checkDigit = Integer.parseInt(digits[-1])
         def rest = digits[0..-2]
         def ssnCheckDigit = calculateCheckDigitForSocialSecurityNumber(rest)
+        if(checkDigit != ssnCheckDigit){
+            logger.error( "$digits should have SSN check digit ==> $ssnCheckDigit <== and not $checkDigit")
+            Reporter.log("$digits should have SSN check digit ==> $ssnCheckDigit <== and not $checkDigit")
+        }
         assert (checkDigit == ssnCheckDigit)
 
     }
@@ -32,8 +45,10 @@ class CalculateCheckDigit {
 
         int sum = getSum(digits)
         int reminder = 10 - (sum % 10)
-
-        return reminder
+        if(reminder < 10){
+            return reminder
+        }
+        return 0
     }
 
     private static int getSum(String digits) {

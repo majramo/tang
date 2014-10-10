@@ -78,6 +78,7 @@ public class SqlHelper {
         log.debug "$dbLoggInfo\n$dbQueryRun"
 		this.dbRecordLine = dbRecordLine
         JdbcConnection jDbcConnection = jdbcConnections [dbName]
+        this.log.info "$dbLoggInfo $dbQueryRun "
         this.log.info "##Run jDbcConnection $jDbcConnection"
         dbResult = null
 

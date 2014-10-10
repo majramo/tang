@@ -53,15 +53,15 @@ class DbObjectProvider {
         def values = []
         def row = objects[-1]
 
-            values = []
-            row.each { k, v ->
-                if (v != null ) {
-                    values.add((String)v)
-                }else{
-                    values.add("N/A")
-                }
+        values = []
+        row.each { k, v ->
+            if (v != null) {
+                values.add((String) v)
+            } else {
+                values.add("N/A")
             }
-            valueList.add(values)
+        }
+        valueList.add(values)
 
 
         return valueList
