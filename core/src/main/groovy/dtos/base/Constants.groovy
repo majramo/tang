@@ -3,6 +3,7 @@ package dtos.base
 
 public class Constants {
 
+    public static final String TEST_STATUS = "TEST_STATUS";
     public static final String ICONS = "ICONS";
     public static final String BROWSER = "DEFAULT_BROWSER";
     public static final String BROWSER_ICON = "BROWSER_ICON";
@@ -90,6 +91,7 @@ public class Constants {
     public static final DESCRIPTION = "DESCRIPTION"
     public static final String SQL_HELPER = "SQL_HELPER"
     public static final String DATABASE = "DATABASE"
+    public static final String DATABASE_VENDOR = "DATABASE_VENDOR"
 
     public static final String EXCEL_BODY_ROW_NUMBER = "EXCEL_BODY_ROW_NUMBER"
 

@@ -46,13 +46,13 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
     @Override
     void onConfigurationFailure(ITestResult testResult) {
         log.debug("onConfigurationFailure: " + testResult.getMethod().getMethodName() + CLASS_NAME + testResult.getMethod().getTestClass())
-        takeScreenShotAndAddToReport(testResult, "onConfigurationFailure")
+        takeScreenShotAndAddToReport(testResult, "Configuration failed")
     }
 
     @Override
     void onConfigurationSkip(ITestResult testResult) {
         log.debug("onConfigurationSkip: " + testResult.getMethod().getMethodName() + CLASS_NAME + testResult.getMethod().getTestClass())
-        takeScreenShotAndAddToReport(testResult, "onConfigurationSkip")
+        takeScreenShotAndAddToReport(testResult, "Configuration skipped")
     }
 
     @Override
@@ -61,26 +61,28 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
         String environment = testResult.getTestContext().getAttribute(ENVIRONMENT)
         String browser = testResult.getTestContext().getAttribute(BROWSER)
         String browserIcon = testResult.getTestContext().getAttribute(BROWSER_ICON)
+        String databaseIcon = testResult.getTestContext().getAttribute(DATABASE_VENDOR)
         String description = testResult.getMethod().getDescription()
 
 
         testResult.setAttribute(ENVIRONMENT, environment)
         testResult.setAttribute(BROWSER, browser)
 
-        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon?.toLowerCase(), environment?.toLowerCase()))
+        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon?.toLowerCase(),databaseIcon?.toLowerCase(), environment?.toLowerCase()))
     }
 
     @Override
     void onTestSuccess(ITestResult testResult) {
         log.debug("onTestSuccess: " + testResult.getMethod().getMethodName())
-        reporterHelper.addPassedIcon()
+        testResult.setAttribute(TEST_STATUS, reporterHelper.getIconsString("passedTest"))
     }
 
     @Override
     void onTestFailure(ITestResult testResult) {
         log.debug("onTestFailure: " + testResult.getMethod().getMethodName())
-        takeScreenShotAndAddToReport(testResult, "onTestFailure")
-        reporterHelper.addFaildIcon()
+        takeScreenShotAndAddToReport(testResult, "Test failed")
+        testResult.setAttribute(TEST_STATUS, reporterHelper.addIcons("failedTest"))
+
     }
 
     @Override
@@ -93,8 +95,8 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
             testResult.setThrowable(throwable)
         }
         log.debug("onTestSkipped: " + testResult.getMethod().getMethodName() + CLASS_NAME + testResult.getMethod().getTestClass())
-        takeScreenShotAndAddToReport(testResult, "onTestSkipped")
-        reporterHelper.addSkippedIcon()
+        takeScreenShotAndAddToReport(testResult, "Test skipped")
+        testResult.setAttribute(TEST_STATUS, reporterHelper.addIcons("skippedTest"))
 
     }
 

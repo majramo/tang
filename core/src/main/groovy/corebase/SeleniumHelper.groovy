@@ -139,7 +139,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         }
         browser = browser.trim()
         this.browser = browser
-        System.setProperty(REPORT_NG_ESCAPE_OUTPUT_PROPERTY, "true")
+        System.setProperty(REPORT_NG_ESCAPE_OUTPUT_PROPERTY, "false")
         System.setProperty(REPORT_NG_REPORTING_TITLE, "Test Automation NG")
         System.setProperty(OUTPUT_DIRECTORY_PROPERTY, outputDirectory)
         System.setProperty(IMAGE_DIRECTORY_PROPERTY, outputDirectory + IMAGE_DIRECTORY)
@@ -904,8 +904,8 @@ public class SeleniumHelper implements ISeleniumHelper {
             log.warn "$methodName webElement not found"
             if (!skipError) {
                 log.error("xpath: " + skipError + " " + xpath)
-                Reporter.log("xpath: " + skipError + " " + xpath)
-                takeScreenShot("Couldn't find xpath: " + xpath)
+                Reporter.log("Required xpath ($xpath) was not found")
+//                takeScreenShot("Couldn't find xpath: " + xpath)
                 throw new ScreenshotException("Required xpath ($xpath) was not found")
             } else {
                 log.debug(e)
@@ -1077,7 +1077,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         def str = '<br/>page source: ' +
                 "<a href=\"" + filePath + "\" target=\"_blank\">" +
                 fileName + "<br>" +
-                "<img src=\"" + fileIcon + "\" border=\"2\" width=\"48\" height=\"40\" hspace=\"10\" /></a><br/>"
+                "<img src=\"" + fileIcon + "\"   border=\"2\" width=\"60\" height=\"60\" hspace=\"10\" /></a><br/>"
         return str
     }
 

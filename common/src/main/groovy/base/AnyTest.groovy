@@ -20,11 +20,14 @@ import static corebase.GlobalConstants.OPERA
 import static corebase.GlobalConstants.SAFARI
 import static dtos.base.Constants.BROWSER
 import static dtos.base.Constants.BROWSER_ICON
+import static dtos.base.Constants.DATABASE
+import static dtos.base.Constants.DATABASE_VENDOR
 import static dtos.base.Constants.ENVIRONMENT
 import static corebase.GlobalConstants.SELENIUM_HELPER
 import static corebase.GlobalConstants.WEB_DRIVER
+import static dtos.base.Constants.dbRunTypeRows
 
-public class AnyTest {
+public class /**/AnyTest {
 
     private final static Logger log = Logger.getLogger("AnT  ")
     protected final static ReporterHelper reporterHelper = new ReporterHelper()
@@ -140,8 +143,9 @@ public class AnyTest {
     }
 
     public void takeScreenshot(String message) {
+        Reporter.log("<br>")
         driver.takeScreenShot(message)
-        Reporter.log(message)
+//        Reporter.log(message)
     }
 
 
@@ -150,9 +154,41 @@ public class AnyTest {
             settingsHelper = SettingsHelper.getInstance()
             settings = settingsHelper.settings
         }
-        SqlHelper sqlHelper = new SqlHelper(null, log, "mySqlDb", settings.dbRun, settings)
+        if(dbName == ""){
+            dbName = settings.defaultDatabase
+        }
+        SqlHelper sqlHelper = new SqlHelper(null, log, dbName, settings.dbRun, settings)
         def dbResult = sqlHelper.sqlConRun(message, dbRunType, query, ins, dbName)
         return dbResult
+    }
+
+    public getDbResult(ITestContext testContext, dbName, query, message) {
+        if (settingsHelper == null) {
+            settingsHelper = SettingsHelper.getInstance()
+            settings = settingsHelper.settings
+        }
+        if(dbName == ""){
+            dbName = settings.defaultDatabase
+        }
+        testContext.setAttribute(DATABASE, dbName)
+        String databaseToRun = settings."$dbName".dbDriverName
+        if(databaseToRun != ""){
+            databaseToRun = databaseToRun.replaceAll(".*:", "")
+        }
+        Reporter.log("<br>" + reporterHelper.addIcons(databaseToRun))
+        Reporter.log("Query: $query")
+        SqlHelper sqlHelper = new SqlHelper(null, log, dbName, settings.dbRun, settings)
+        def dbResult = sqlHelper.sqlConRun(message, dbRunTypeRows, query, 0, dbName)
+        return dbResult
+    }
+
+    public getDbResult(ITestContext testContext, query, message) {
+
+        if (settingsHelper == null) {
+            settingsHelper = SettingsHelper.getInstance()
+            settings = settingsHelper.settings
+        }
+        return getDbResult(testContext, settings.defaultDatabase, query, message)
     }
 
 }

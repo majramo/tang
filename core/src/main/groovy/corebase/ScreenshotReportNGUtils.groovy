@@ -22,20 +22,25 @@ public class ScreenshotReportNGUtils extends ReportNGUtils {
     }
     private static List<String> addTestAttributes(ITestResult result, List<String> outputIn) {
         List<String> outputOut = new ArrayList<String>();
+        String out = ""
+        if (StringUtils.isNotBlank((String) result.getAttribute(TEST_STATUS))) {
+            out += result.getAttribute(TEST_STATUS)
+        }
         if (StringUtils.isNotBlank((String) result.getAttribute(ICONS))) {
-            outputOut.add(result.getAttribute(ICONS));
+            out += result.getAttribute(ICONS)
         }
 
         if (StringUtils.isNotBlank((String) result.getAttribute(DESCRIPTION))) {
-            outputOut.add("Description: " + result.getAttribute(DESCRIPTION));
+            out += "<br>Description: " + result.getAttribute(DESCRIPTION)
         }
         if (StringUtils.isNotBlank((String) result.getAttribute(ENVIRONMENT))) {
-            outputOut.add("Environment: " + result.getAttribute(ENVIRONMENT));
+            out += "<br>Environment: " + result.getAttribute(ENVIRONMENT)
         }
         if (StringUtils.isNotBlank((String) result.getAttribute(BROWSER))) {
-            outputOut.add("Browser: " + result.getAttribute(BROWSER));
+            out += "<br>Browser: " + result.getAttribute(BROWSER)
         }
 
+        outputOut.addAll(out)
         outputOut.addAll(outputIn)
         return outputOut
     }
