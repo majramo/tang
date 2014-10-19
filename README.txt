@@ -23,6 +23,7 @@ mvn clean test
 
 Test with reportyng example
 mvn clean test -DtestFile=dummyTestng -P tang site org.reportyng:reporty-ng:1.2:reportyng
+file:///Users/majidaram/dev/tang-examples/target/test-classes/site/tang-examples/index.html
 
 Examples and Help
 https://github.com/majramo/tang
