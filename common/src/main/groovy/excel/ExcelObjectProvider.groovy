@@ -2,22 +2,25 @@ package excel
 
 class ExcelObjectProvider {
 
-
+    //Java
     public static Object[][] getObject(file, int line, String[] columns) {
         Iterator<Object[]> objectsFromExcel = new ExcelFileObjectReader(file).getBodyRowObject(line)
         return getExcelObjects(objectsFromExcel, columns)
     }
 
+    //Groovy
     public static Object[][] getObjects(file, int lines, columns) {
         Iterator<Object[]> objectsFromExcel = new ExcelFileObjectReader(file).getBodyRowObjects(lines)
         return getExcelObjects(objectsFromExcel, columns)
     }
 
+    //Groovy
     public static Object[][] getObject(file, int line, columns) {
         Iterator<Object[]> objectsFromExcel = new ExcelFileObjectReader(file).getBodyRowObject(line)
         return getExcelObjects(objectsFromExcel, columns)
     }
 
+    //Java
     public static Object[][] getObjects(file, int lines, String[] columns) {
         Iterator<Object[]> objectsFromExcel = new ExcelFileObjectReader(file).getBodyRowObjects(lines)
         return getExcelObjects(objectsFromExcel, columns)

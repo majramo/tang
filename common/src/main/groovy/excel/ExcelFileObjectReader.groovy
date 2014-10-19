@@ -26,6 +26,8 @@ public class ExcelFileObjectReader {
  */
     public ExcelFileObjectReader(String fileName) {
         builder.setName("Gdc");
+        Reporter.log("Reading excel file <$fileName>")
+        log.info("Reading excel file <$fileName>")
         this.fileName = fileName
     }
 
