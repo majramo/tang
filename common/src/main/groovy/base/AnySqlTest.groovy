@@ -69,6 +69,7 @@ public class AnySqlTest {
             testContext.setAttribute(SQL_HELPER, driver)
             //tangAssert = new TangAssert(driver)
         } catch (Exception skipException) {
+            Reporter.log("Connection to db <$database> failed")
             log.error(skipException)
             throw new SkipException(skipException.toString())
         }
@@ -96,7 +97,7 @@ public class AnySqlTest {
             settings = settingsHelper.settings
         }
         Reporter.log("$message")
-        Reporter.log("Query: $query")
+        Reporter.log("Query<$database>: $query")
         Reporter.log("dbRecordLine: $dbRecordLine")
         def dbResult = driver.sqlConRun(message, dbRunType, query, dbRecordLine, database)
 //        Reporter.log("\nResult\n###")
