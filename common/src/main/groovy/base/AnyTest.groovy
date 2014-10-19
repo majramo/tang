@@ -157,6 +157,7 @@ public class /**/AnyTest {
         if(dbName == ""){
             dbName = settings.defaultDatabase
         }
+        Reporter.log("Query<$dbName>: $query")
         SqlHelper sqlHelper = new SqlHelper(null, log, dbName, settings.dbRun, settings)
         def dbResult = sqlHelper.sqlConRun(message, dbRunType, query, ins, dbName)
         return dbResult
@@ -171,6 +172,7 @@ public class /**/AnyTest {
             dbName = settings.defaultDatabase
         }
         testContext.setAttribute(DATABASE, dbName)
+        Reporter.log("Query<$dbName>: $query")
         String databaseToRun = settings."$dbName".dbDriverName
         if(databaseToRun != ""){
             databaseToRun = databaseToRun.replaceAll(".*:", "")
