@@ -21,7 +21,6 @@ import static corebase.GlobalConstants.SAFARI
 import static dtos.base.Constants.BROWSER
 import static dtos.base.Constants.BROWSER_ICON
 import static dtos.base.Constants.DATABASE
-import static dtos.base.Constants.DATABASE_VENDOR
 import static dtos.base.Constants.ENVIRONMENT
 import static corebase.GlobalConstants.SELENIUM_HELPER
 import static corebase.GlobalConstants.WEB_DRIVER

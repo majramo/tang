@@ -2,7 +2,6 @@ package reports
 
 import corebase.ISeleniumHelper
 import corebase.ScreenshotReportNGUtils
-import org.apache.commons.lang.StringUtils
 import org.apache.log4j.Logger
 import org.apache.velocity.VelocityContext
 import org.testng.*
@@ -61,14 +60,15 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
         String environment = testResult.getTestContext().getAttribute(ENVIRONMENT)
         String browser = testResult.getTestContext().getAttribute(BROWSER)
         String browserIcon = testResult.getTestContext().getAttribute(BROWSER_ICON)
-        String databaseIcon = testResult.getTestContext().getAttribute(DATABASE_VENDOR)
+        String databaseIcon1 = testResult.getTestContext().getAttribute(DATABASE_VENDOR_1)
+        String databaseIcon2 = testResult.getTestContext().getAttribute(DATABASE_VENDOR_2)
         String description = testResult.getMethod().getDescription()
 
 
         testResult.setAttribute(ENVIRONMENT, environment)
         testResult.setAttribute(BROWSER, browser)
 
-        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon?.toLowerCase(),databaseIcon?.toLowerCase(), environment?.toLowerCase()))
+        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon?.toLowerCase(),databaseIcon1?.toLowerCase(), databaseIcon2?.toLowerCase(), environment?.toLowerCase()))
     }
 
     @Override
