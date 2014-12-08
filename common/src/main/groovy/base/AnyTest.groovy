@@ -13,6 +13,8 @@ import org.testng.SkipException
 import org.testng.annotations.*
 import reports.ReporterHelper
 
+import org.apache.log4j.Logger
+
 import static corebase.GlobalConstants.CHROME
 import static corebase.GlobalConstants.FIREFOX
 import static corebase.GlobalConstants.INTERNET_EXPLORER

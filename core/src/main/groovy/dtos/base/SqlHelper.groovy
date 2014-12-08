@@ -22,14 +22,14 @@ public class SqlHelper {
 	private File sqlFile
     private final static Logger logger = Logger.getLogger("SqH  ")
 
-	public SqlHelper(File sqlFile, log, dbName, dbRun, settings){
+	public SqlHelper(File sqlFile, incomingLog, dbName, dbRun, settings){
 		this.dbRun = dbRun
 		this.dbName = dbName
         this.sqlFile = sqlFile
-        if(log == null){
+        if(incomingLog == null){
             this.log = logger
         }else{
-            this.log = log
+            this.log = incomingLog
         }
         if(dbRun == false){
             if(!jdbcConnections [dbName]){
@@ -38,54 +38,56 @@ public class SqlHelper {
             sqlHelperMock = true
 
         }else{
-            this.log.info "##SqlHelper " + this
-            this.log.info "##Init dbName $dbName"
-            this.log.info jdbcConnections
-            this.log.info jdbcConnections [dbName]
+            log.info "##SqlHelper " + this
+            log.info "##Init dbName $dbName"
+            if(jdbcConnections.size()) {
+                log.info jdbcConnections
+                log.info jdbcConnections[dbName]
+            }
             try{
                 JdbcConnection jDbcConnection =null
                 if(!jdbcConnections [dbName]){
                     settings."$dbName".with {
                         jDbcConnection  = new JdbcConnection(dbUrl, dbDriverName, dbUserName, dbPassword, dbTestDataBase, dbDriver)
-                        this.log.info "##Init jDbcConnection $jDbcConnection"
+                        log.info "##Init jDbcConnection $jDbcConnection"
                     }
                     jdbcConnections [dbName] = jDbcConnection
 
-                    this.log.info "# JDbcConnection $jdbcConnections"
+                    log.info "# JDbcConnection $jdbcConnections"
                     jdbcConnections.each {
-                        this.log.info "# jDbcConnection " + it
+                        log.info "# jDbcConnection " + it
                     }
                 }
 
             }catch (RuntimeException e){
-                this.log.error ("Can't get connection")
+                log.error ("Can't get connection")
                 throw e
             }
         }
 	}
     public boolean isConnectionOk(){
         JdbcConnection jDbcConnection = jdbcConnections [dbName]
-        this.log.info "### jDbcConnection <" + jDbcConnection
+        log.info "### jDbcConnection <" + jDbcConnection
         return jDbcConnection.isConnectionOk()
     }
 
     public boolean isConnectionOk(dbName){
         JdbcConnection jDbcConnection = jdbcConnections [dbName]
-        this.log.info "### jDbcConnection <" + jDbcConnection
+        log.info "### jDbcConnection <" + jDbcConnection
         return jDbcConnection.isConnectionOk()
     }
 
 	private sqlConRun(dbLoggInfo, dbRunType ,dbQueryRun, dbRecordLine=-1, dbName){
-        this.log.info "##SqlHelper " + this
-        this.log.info "##Run dbName $dbName"
+        log.info "##SqlHelper " + this
+        log.info "##Run dbName $dbName"
         jdbcConnections.each {
-             this.log.info "##jDbcConnections " + it
+             log.info "##jDbcConnections " + it
         }
         log.debug "$dbLoggInfo\n$dbQueryRun"
 		this.dbRecordLine = dbRecordLine
         JdbcConnection jDbcConnection = jdbcConnections [dbName]
-        this.log.info "$dbLoggInfo $dbQueryRun "
-        this.log.info "##Run jDbcConnection $jDbcConnection"
+        log.info "$dbLoggInfo $dbQueryRun "
+        log.info "##Run jDbcConnection $jDbcConnection"
         dbResult = null
 
         if(jDbcConnection != null){

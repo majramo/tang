@@ -23,23 +23,27 @@ public class ClassPathSearcher {
     public Map<String, InputStream> findFilesInClassPath(String fileNamePattern, boolean show) {
         this.show = show;
         Map<String, InputStream> result = new TreeMap<String, InputStream>();
+//        String classPath = ClassPathSearcher.class.getResource("/").getPath();
         String classPath = System.getProperty("java.class.path");
         String[] pathElements = classPath.split(System
                 .getProperty("path.separator"));
         for (String element : pathElements) {
-            if(show){
-                log.debug(element);
-            }
-            try {
-                File newFile = new File(element);
-                if (newFile.isDirectory()) {
-                    result.putAll(findResourceInDirectory(newFile,
-                            fileNamePattern));
-                } else {
-                    result.putAll(findResourceInFile(newFile, fileNamePattern));
+         //   System.out.println(element);
+            if(element.contains("classes")) {
+                if (show) {
+                    log.debug(element);
                 }
-            } catch (IOException e) {
-                log.error("Exception:", e);
+                try {
+                    File newFile = new File(element);
+                    if (newFile.isDirectory()) {
+                        result.putAll(findResourceInDirectory(newFile,
+                                fileNamePattern));
+                    } else {
+                        result.putAll(findResourceInFile(newFile, fileNamePattern));
+                    }
+                } catch (IOException e) {
+                    log.error("Exception:", e);
+                }
             }
         }
         return result;

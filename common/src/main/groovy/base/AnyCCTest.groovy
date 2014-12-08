@@ -48,7 +48,7 @@ public class AnyCCTest {
         return "<a href='$fileName'>$fileName</a><br/>"
     }
 
-    public void takeScreenshot(boolean take = true) {
+    public void takeScreenShot(boolean take = true) {
         if (take) {
             takeScreenShot("")
         }
@@ -56,15 +56,15 @@ public class AnyCCTest {
 
     public void takeScreenShot(String message) {
         driver.takeScreenShot(message)
-        Reporter.log(message)
+        reportLog(message)
     }
 
     public void reportLog(message) {
-        Reporter.log(message)
+        Reporter.log("<BR>$message")
     }
 
     @AfterMethod
-    public void teardown() throws Exception {
+    public void tearDown() throws Exception {
         driver.quit()
     }
 }

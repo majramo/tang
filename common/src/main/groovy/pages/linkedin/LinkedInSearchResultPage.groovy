@@ -7,7 +7,7 @@ public class LinkedInSearchResultPage extends AnyPage {
     private final static String SEACRHED_PERSON_FIRST_NAME = "//*[@id='name']/span/span[1]"
     private final static String SEACRHED_PERSON_LAST_NAME = "//*[@id='name']/span/span[2]"
     private final static String SEACRHED_PERSONS_LIST = "//*[@id='result-set']/li"
-    private final static String SEACRHED_RESULT = "//*[@id='content']/ul/li "
+    private final static String SEACRHED_RESULT = "//*[@id='result-set']/li "
     private final static String USER_AGREEMENT = "//*[@id='nav-legal']/li[1]/a"
     private final static String SEARCH_RESULTS = "//*[@id='result-set']/li"
     private final static String SEARCH_STRING_IN_RESULT = SEARCH_RESULTS + "//dl/*[descendant::text()[contains(.,'%s')]]   /../..//strong/a"
@@ -39,9 +39,7 @@ public class LinkedInSearchResultPage extends AnyPage {
 
     public int getNumberOfFoundPersons() {
         driver.isTagAvailable(SEACRHED_RESULT)
-        String result = driver.getText(SEACRHED_RESULT)
-        result = result.replaceAll(/.* (of|av) /, '').replaceAll(/ profile(s|r).*/, '').replaceAll(/ /, '').replaceAll(/,/, '')
-        return result.toInteger()
+        return driver.getXpathCount(SEACRHED_RESULT)
     }
 
     public String getTextOfFoundPersons() {
