@@ -109,7 +109,7 @@ public class AnySqlTest {
 
     public void checkDuplicateOfRowsRegardingFieldsInTableQuery(String table, String[] fields) {
         String fieldsString = fields.join(",")
-        String query = "SELECT $fieldsString, COUNT(*) FROM $table \n"
+        String query = "SELECT $fieldsString, COUNT(*) count FROM $table \n"
         if (!fieldsString.contains(",")) {
             query += "WHERE  NOT $fieldsString IS NULL \n"
         }

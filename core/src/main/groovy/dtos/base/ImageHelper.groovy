@@ -56,8 +56,10 @@ class ImageHelper {
         switch (OS) {
             case ~/^win.*/:
                 os = WIN
+                break
             case ~/^mac.*/:
                 os = MAC
+                break
         }
         url = this.class.getResource(settings.pkdiff[os]);
 
