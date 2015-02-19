@@ -46,7 +46,7 @@ public class AnySqlTest {
         if(databaseToRun != ""){
             databaseToRun = databaseToRun.replaceAll(".*:", "")
         }
-        testContext.setAttribute(DATABASE_VENDOR_1, databaseToRun)
+        testContext.setAttribute(DATABASE_VENDOR, databaseToRun)
         testContext.setAttribute(ENVIRONMENT, environment)
         println testContext.getName()
 

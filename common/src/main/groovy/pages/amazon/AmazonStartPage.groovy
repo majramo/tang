@@ -11,7 +11,7 @@ public class AmazonStartPage extends AnyPage {
     private static final String PAGE_URL = "http://www.amazon.com"
     private static final String ADD_BOOK_TO_CART = "//*[@id = 'bb_atc_button']"
     private static final String SEARCH_INPUT_FIELD = "//*[@id='twotabsearchtextbox']"
-    private static final String SEARCH_BUTTON = "//*[@id='nav-bar-inner']//input[@type='submit']"
+    private static final String SEARCH_BUTTON = "//*[@id='nav-bar-inner']/div/form/div[2]/input"
     private static final String SEARCH_RESUTLS = "//*[contains(@id,'result_')]//h3/a"
     private static final String CUSTOMER_WHO_BOUGHT = "//*[@id='hlb-upsell']/div/h2/i"
     private static final String SHOPPING_CART_LINK = "//*[@id=\"nav-cart\"]"
@@ -64,7 +64,7 @@ public class AmazonStartPage extends AnyPage {
      */
     public void e_SearchBook() {
         driver.type(SEARCH_INPUT_FIELD, MBT_BOOK_NAME)
-        driver.click(SEARCH_BUTTON, 40)
+        driver.click(SEARCH_BUTTON)
 
     }
 

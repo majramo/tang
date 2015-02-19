@@ -1,7 +1,7 @@
 package corebase
 
 public class GlobalConstants {
-	public final static String HTML_UNIT = "HTML_UNIT"
+	public final static String HTMLUNIT = "htmlunit"
     public final static String FIREFOX = "FIREFOX"
     public final static String FF_BROWSER = "FF_BROWSER"
     public final static String INTERNET_EXPLORER = "INTERNETEXPLORER"
@@ -54,6 +54,7 @@ public class GlobalConstants {
     public static final String LOCAL_CHROME = "LOCAL_CHROME"
     public static final String LOCAL_INTERNET_EXPLORER = "LOCAL_INTERNET_EXPLORER"
     public static final String LOCAL = "LOCAL"
+    public static final String LOCAL_HTML_UNIT = "LOCAL_HTML_UNIT"
     public static final String COMPANY_HUB = "COMPANY_HUB"
     public static final String SAUCELABS_HUB = "SAUCELABS_HUB"
     public static final String OPERA = "OPERA"

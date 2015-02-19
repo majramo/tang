@@ -13,16 +13,16 @@ import org.testng.SkipException
 import org.testng.annotations.*
 import reports.ReporterHelper
 
-import org.apache.log4j.Logger
-
 import static corebase.GlobalConstants.CHROME
 import static corebase.GlobalConstants.FIREFOX
+import static corebase.GlobalConstants.HTMLUNIT
 import static corebase.GlobalConstants.INTERNET_EXPLORER
 import static corebase.GlobalConstants.OPERA
 import static corebase.GlobalConstants.SAFARI
 import static dtos.base.Constants.BROWSER
 import static dtos.base.Constants.BROWSER_ICON
 import static dtos.base.Constants.DATABASE
+import static dtos.base.Constants.DATABASE_VENDOR
 import static dtos.base.Constants.ENVIRONMENT
 import static corebase.GlobalConstants.SELENIUM_HELPER
 import static corebase.GlobalConstants.WEB_DRIVER
@@ -79,6 +79,12 @@ public class /**/AnyTest {
             case ~/.*safari.*/:
                 browserIcon = SAFARI
                 break
+            case ~/.*htmlunit.*/:
+                browserIcon = HTMLUNIT
+                break
+            default:
+                browserIcon = FIREFOX
+
         }
         return browserIcon
     }
