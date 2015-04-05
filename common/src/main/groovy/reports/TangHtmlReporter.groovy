@@ -67,7 +67,8 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
         File destination = new File(destinationDirectory + "")
         log.debug("Test is started: " + testResult.getMethod().getMethodName())
         log.debug("Copying folder icons: " + testResult.getMethod().getMethodName())
-        copyFolder(source, destination)
+        copyFolder(settings.iconsSourceDir, destinationDirectory)
+//        copyFolder(source, destination)
 
         String environment = testResult.getTestContext().getAttribute(ENVIRONMENT)
         String browser = testResult.getTestContext().getAttribute(BROWSER)
@@ -79,7 +80,7 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
         testResult.setAttribute(ENVIRONMENT, environment)
         testResult.setAttribute(BROWSER, browser)
 
-        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon?.toLowerCase(),databaseIcon?.toLowerCase(), environment?.toLowerCase()))
+        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon?.toLowerCase(), databaseIcon?.toLowerCase(), environment?.toLowerCase()))
     }
 
     @Override
@@ -149,65 +150,14 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
         testResult.setAttribute(DESCRIPTION, testResult.getMethod().getDescription())
     }
 
-    private static void copyFolder(File source, File destination){
+    private static void copyFolder(String sourceDir, String destinationDir) {
 
-        if (source.isDirectory())
-        {
-            if (!destination.exists())
-            {
-                destination.mkdirs();
-            }
-
-           source.list().each {file->
-                File srcFile = new File(source, file);
-                File destFile = new File(destination, file);
-
-                copyFolder(srcFile, destFile);
+        new AntBuilder().copy(todir: destinationDir) {
+            fileset(dir: sourceDir) {
+                exclude(name: "*.DS_Store")
             }
         }
-        else
-        {
-            if (!destination.exists()){
 
-                InputStream srcFile = null;
-                OutputStream destFile = null;
-
-                try
-                {
-                    srcFile = new FileInputStream(source);
-                    destFile = new FileOutputStream(destination);
-
-                    byte[] buffer = new byte[1024];
-
-                    int length;
-                    while ((length = srcFile.read(buffer)) > 0)
-                    {
-                        destFile.write(buffer, 0, length);
-                    }
-                }
-                catch (Exception e)
-                {
-                    try
-                    {
-                        srcFile.close();
-                    }
-                    catch (IOException e1)
-                    {
-                        e1.printStackTrace();
-                    }
-
-                    try
-                    {
-                        destFile.close();
-                    }
-                    catch (IOException e1)
-                    {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-
-        }
     }
 
 }
