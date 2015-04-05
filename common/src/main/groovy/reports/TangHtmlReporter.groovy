@@ -2,12 +2,13 @@ package reports
 
 import corebase.ISeleniumHelper
 import corebase.ScreenshotReportNGUtils
-import org.apache.commons.lang.StringUtils
+import dtos.SettingsHelper
 import org.apache.log4j.Logger
 import org.apache.velocity.VelocityContext
 import org.testng.*
 import org.uncommons.reportng.HTMLReporter
 
+import static corebase.GlobalConstants.ICONS_DIRECTORY_PROPERTY
 import static corebase.GlobalConstants.SELENIUM_HELPER
 import static dtos.base.Constants.*
 
@@ -23,6 +24,8 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
     private final static String CLASS_NAME = this.getSimpleName() + ": "
     private final static Logger log = Logger.getLogger(getClass())
     protected final static ReporterHelper reporterHelper = new ReporterHelper()
+    SettingsHelper settingsHelper = SettingsHelper.getInstance()
+    def settings = settingsHelper.settings
 
     public TangHtmlReporter() {
     }
@@ -57,7 +60,15 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
 
     @Override
     void onTestStart(ITestResult testResult) {
+        //copy folder icons to outputdir
+        def destinationDirectory = System.getProperty(ICONS_DIRECTORY_PROPERTY)
+
+        File source = new File(settings.iconsSourceDir)
+        File destination = new File(destinationDirectory + "")
         log.debug("Test is started: " + testResult.getMethod().getMethodName())
+        log.debug("Copying folder icons: " + testResult.getMethod().getMethodName())
+        copyFolder(source, destination)
+
         String environment = testResult.getTestContext().getAttribute(ENVIRONMENT)
         String browser = testResult.getTestContext().getAttribute(BROWSER)
         String browserIcon = testResult.getTestContext().getAttribute(BROWSER_ICON)
@@ -136,6 +147,67 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
             seleniumHelper.takeScreenShotAndSource()
         }
         testResult.setAttribute(DESCRIPTION, testResult.getMethod().getDescription())
+    }
+
+    private static void copyFolder(File source, File destination){
+
+        if (source.isDirectory())
+        {
+            if (!destination.exists())
+            {
+                destination.mkdirs();
+            }
+
+           source.list().each {file->
+                File srcFile = new File(source, file);
+                File destFile = new File(destination, file);
+
+                copyFolder(srcFile, destFile);
+            }
+        }
+        else
+        {
+            if (!destination.exists()){
+
+                InputStream srcFile = null;
+                OutputStream destFile = null;
+
+                try
+                {
+                    srcFile = new FileInputStream(source);
+                    destFile = new FileOutputStream(destination);
+
+                    byte[] buffer = new byte[1024];
+
+                    int length;
+                    while ((length = srcFile.read(buffer)) > 0)
+                    {
+                        destFile.write(buffer, 0, length);
+                    }
+                }
+                catch (Exception e)
+                {
+                    try
+                    {
+                        srcFile.close();
+                    }
+                    catch (IOException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+
+                    try
+                    {
+                        destFile.close();
+                    }
+                    catch (IOException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+
+        }
     }
 
 }

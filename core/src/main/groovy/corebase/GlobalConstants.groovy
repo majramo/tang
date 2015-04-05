@@ -42,9 +42,11 @@ public class GlobalConstants {
 
     public static final String IMAGE_DIRECTORY = "/images"
     public static final String SOURCE_DIRECTORY = "/source"
+    public static final String ICONS_DIRECTORY = "/icons"
 
     public static final String OUTPUT_DIRECTORY_PROPERTY = "outputDirectory"
     public static final String IMAGE_DIRECTORY_PROPERTY = "imageDirectory"
+    public static final String ICONS_DIRECTORY_PROPERTY = "iconsDirectory"
     public static final String SOURCE_DIRECTORY_PROPERTY = "sourceDirectory"
     public static final String REPORT_NG_ESCAPE_OUTPUT_PROPERTY = "org.uncommons.reportng.escape-output"
     public static final String REPORT_NG_REPORTING_TITLE = "org.uncommons.reportng.title"

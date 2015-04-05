@@ -144,6 +144,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         System.setProperty(OUTPUT_DIRECTORY_PROPERTY, outputDirectory)
         System.setProperty(IMAGE_DIRECTORY_PROPERTY, outputDirectory + IMAGE_DIRECTORY)
         System.setProperty(SOURCE_DIRECTORY_PROPERTY, outputDirectory + SOURCE_DIRECTORY)
+        System.setProperty(ICONS_DIRECTORY_PROPERTY, outputDirectory + ICONS_DIRECTORY)
         createDir(outputDir)
         createDir(outputDirectory)
         createDir(outputDirectory + IMAGE_DIRECTORY)
@@ -1016,7 +1017,8 @@ public class SeleniumHelper implements ISeleniumHelper {
                 tempScreenShotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE)
                 tempScreenShotFile.renameTo(destinationFile)
                 log.info(getHtmlImgTag (destinationFile.getAbsolutePath(), fileName))
-                Reporter.log(getHtmlImgTag(destinationFile.getAbsolutePath(), fileName) )
+//                Reporter.log(getHtmlImgTag(destinationFile.getAbsolutePath(), fileName) ) //Absolute path
+                Reporter.log(getHtmlImgTag(IMAGE_DIRECTORY.replace("/","../") + "/" + fileName, fileName) )  //Relative path
                 return destinationFile
         } catch (IOException e) {
                 Reporter.log("Can't move screenShot. Exists here: " + tempScreenShotFile)
@@ -1044,7 +1046,9 @@ public class SeleniumHelper implements ISeleniumHelper {
             bufferedWriter.write(driver.getPageSource())
             bufferedWriter.close()
             log.debug("Page source generated: " + destinationFile.getName())
-            Reporter.log(getHtmlSourceTag(destinationFile.getAbsolutePath(), fileName) )
+//            Reporter.log(getHtmlSourceTag(destinationFile.getAbsolutePath(), fileName) )                 //Absolut path
+            Reporter.log(getHtmlImgTag(SOURCE_DIRECTORY.replace("/","../") + "/" + fileName, fileName) )  //Relative path
+
         } catch (GroovyRuntimeException e) {
             log.error("Error generating page source: " + e)
         }
