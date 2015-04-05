@@ -8,7 +8,7 @@
     <artifactId>tang</artifactId>
     <packaging>pom</packaging>
     <name>tang</name>
-    <version>0.0.87-SNAPSHOT</version>
+    <version>0.0.88-SNAPSHOT</version>
     <modules>
         <module>core</module>
         <module>common</module>
@@ -218,11 +218,6 @@
                 <groupId>com.microsoft.sqlserver</groupId>
                 <artifactId>sqljdbc4</artifactId>
                 <version>3.0</version>
-            </dependency>
-            <dependency>
-                <groupId>jautomate</groupId>
-                <artifactId>JAutomate</artifactId>
-                <version>1</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
