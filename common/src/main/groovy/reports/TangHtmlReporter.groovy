@@ -8,6 +8,7 @@ import org.apache.velocity.VelocityContext
 import org.testng.*
 import org.uncommons.reportng.HTMLReporter
 
+import static corebase.GlobalConstants.ICONS_DIRECTORY
 import static corebase.GlobalConstants.ICONS_DIRECTORY_PROPERTY
 import static corebase.GlobalConstants.SELENIUM_HELPER
 import static dtos.base.Constants.*
@@ -61,7 +62,11 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
     @Override
     void onTestStart(ITestResult testResult) {
         //copy folder icons to outputdir
-        def destinationDirectory = System.getProperty(ICONS_DIRECTORY_PROPERTY)
+        String outputDir = testResult.getTestContext().getOutputDirectory()
+        String outputDirectory = outputDir.substring(0, outputDir.lastIndexOf(File.separator))
+
+        def destinationDirectory = outputDirectory + ICONS_DIRECTORY
+        System.setProperty(ICONS_DIRECTORY_PROPERTY, destinationDirectory)
 
         File source = new File(settings.iconsSourceDir)
         File destination = new File(destinationDirectory + "")
@@ -73,7 +78,7 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
         String environment = testResult.getTestContext().getAttribute(ENVIRONMENT)
         String browser = testResult.getTestContext().getAttribute(BROWSER)
         String browserIcon = testResult.getTestContext().getAttribute(BROWSER_ICON)
-        String databaseIcon = testResult.getTestContext().getAttribute(DATABASE_VENDOR)
+        String databaseIcon = testResult.getTestContext().getAttribute(DATABASE_VENDOR_1)
         String description = testResult.getMethod().getDescription()
 
 
