@@ -71,7 +71,7 @@ class ImageHelper {
                 throw new SkipException(e)
             }
         } else {
-            throw new SkipException("Can't find url <$url>")
+            throw new SkipException("Can't find url <settings.pkdiff[os]>")
 
         }
     }

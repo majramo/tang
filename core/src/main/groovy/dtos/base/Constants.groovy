@@ -91,8 +91,7 @@ public class Constants {
     public static final DESCRIPTION = "DESCRIPTION"
     public static final String SQL_HELPER = "SQL_HELPER"
     public static final String DATABASE = "DATABASE"
-    public static final String DATABASE_VENDOR_1 = "DATABASE_VENDOR_1"
-    public static final String DATABASE_VENDOR_2 = "DATABASE_VENDOR_2"
+    public static final String DATABASE_VENDOR = "DATABASE_VENDOR"
 
     public static final String EXCEL_BODY_ROW_NUMBER = "EXCEL_BODY_ROW_NUMBER"
 

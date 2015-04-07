@@ -2,11 +2,13 @@ package reports
 
 import corebase.ISeleniumHelper
 import corebase.ScreenshotReportNGUtils
+import dtos.SettingsHelper
 import org.apache.log4j.Logger
 import org.apache.velocity.VelocityContext
 import org.testng.*
 import org.uncommons.reportng.HTMLReporter
 
+import static corebase.GlobalConstants.ICONS_DIRECTORY_PROPERTY
 import static corebase.GlobalConstants.SELENIUM_HELPER
 import static dtos.base.Constants.*
 
@@ -22,6 +24,8 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
     private final static String CLASS_NAME = this.getSimpleName() + ": "
     private final static Logger log = Logger.getLogger(getClass())
     protected final static ReporterHelper reporterHelper = new ReporterHelper()
+    SettingsHelper settingsHelper = SettingsHelper.getInstance()
+    def settings = settingsHelper.settings
 
     public TangHtmlReporter() {
     }
@@ -56,19 +60,27 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
 
     @Override
     void onTestStart(ITestResult testResult) {
+        //copy folder icons to outputdir
+        def destinationDirectory = System.getProperty(ICONS_DIRECTORY_PROPERTY)
+
+        File source = new File(settings.iconsSourceDir)
+        File destination = new File(destinationDirectory + "")
         log.debug("Test is started: " + testResult.getMethod().getMethodName())
+        log.debug("Copying folder icons: " + testResult.getMethod().getMethodName())
+        copyFolder(settings.iconsSourceDir, destinationDirectory)
+//        copyFolder(source, destination)
+
         String environment = testResult.getTestContext().getAttribute(ENVIRONMENT)
         String browser = testResult.getTestContext().getAttribute(BROWSER)
         String browserIcon = testResult.getTestContext().getAttribute(BROWSER_ICON)
-        String databaseIcon1 = testResult.getTestContext().getAttribute(DATABASE_VENDOR_1)
-        String databaseIcon2 = testResult.getTestContext().getAttribute(DATABASE_VENDOR_2)
+        String databaseIcon = testResult.getTestContext().getAttribute(DATABASE_VENDOR)
         String description = testResult.getMethod().getDescription()
 
 
         testResult.setAttribute(ENVIRONMENT, environment)
         testResult.setAttribute(BROWSER, browser)
 
-        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon?.toLowerCase(),databaseIcon1?.toLowerCase(), databaseIcon2?.toLowerCase(), environment?.toLowerCase()))
+        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon?.toLowerCase(), databaseIcon?.toLowerCase(), environment?.toLowerCase()))
     }
 
     @Override
@@ -136,6 +148,16 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
             seleniumHelper.takeScreenShotAndSource()
         }
         testResult.setAttribute(DESCRIPTION, testResult.getMethod().getDescription())
+    }
+
+    private static void copyFolder(String sourceDir, String destinationDir) {
+
+        new AntBuilder().copy(todir: destinationDir) {
+            fileset(dir: sourceDir) {
+                exclude(name: "*.DS_Store")
+            }
+        }
+
     }
 
 }

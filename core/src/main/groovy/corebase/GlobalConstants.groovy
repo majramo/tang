@@ -1,7 +1,7 @@
 package corebase
 
 public class GlobalConstants {
-	public final static String HTML_UNIT = "HTML_UNIT"
+	public final static String HTMLUNIT = "htmlunit"
     public final static String FIREFOX = "FIREFOX"
     public final static String FF_BROWSER = "FF_BROWSER"
     public final static String INTERNET_EXPLORER = "INTERNETEXPLORER"
@@ -42,9 +42,11 @@ public class GlobalConstants {
 
     public static final String IMAGE_DIRECTORY = "/images"
     public static final String SOURCE_DIRECTORY = "/source"
+    public static final String ICONS_DIRECTORY = "/icons"
 
     public static final String OUTPUT_DIRECTORY_PROPERTY = "outputDirectory"
     public static final String IMAGE_DIRECTORY_PROPERTY = "imageDirectory"
+    public static final String ICONS_DIRECTORY_PROPERTY = "iconsDirectory"
     public static final String SOURCE_DIRECTORY_PROPERTY = "sourceDirectory"
     public static final String REPORT_NG_ESCAPE_OUTPUT_PROPERTY = "org.uncommons.reportng.escape-output"
     public static final String REPORT_NG_REPORTING_TITLE = "org.uncommons.reportng.title"
@@ -54,6 +56,7 @@ public class GlobalConstants {
     public static final String LOCAL_CHROME = "LOCAL_CHROME"
     public static final String LOCAL_INTERNET_EXPLORER = "LOCAL_INTERNET_EXPLORER"
     public static final String LOCAL = "LOCAL"
+    public static final String LOCAL_HTML_UNIT = "LOCAL_HTML_UNIT"
     public static final String COMPANY_HUB = "COMPANY_HUB"
     public static final String SAUCELABS_HUB = "SAUCELABS_HUB"
     public static final String OPERA = "OPERA"

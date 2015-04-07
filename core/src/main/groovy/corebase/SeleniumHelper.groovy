@@ -78,7 +78,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     public static final String INTERNETEXPLORER = "internetexplorer";
     public static final String OPERA = "opera";
     public static final String SAFARI = "safari";
-    public static final String HTMLUNIT = "htmlunit";
+//    public static final String HTMLUNIT = "htmlunit";
     private static final String FIREFOX_PROFILE = "firefox_profile";
     LinkedList<String> windowHandler = new LinkedList<String>()
     boolean macDriver
@@ -89,11 +89,11 @@ public class SeleniumHelper implements ISeleniumHelper {
     private static long sleepTimeInMilliseconds = 0
 
     public void printWindows(){
-        println "   ### windowHandler"
+        log.info("### windowHandler")
         windowHandler.each {
-            println "   ### windowHandler $it"
+            log.info("### windowHandler $it")
         }
-        println driver.getWindowHandle()
+        log.info(driver.getWindowHandle())
     }
 
 
@@ -144,6 +144,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         System.setProperty(OUTPUT_DIRECTORY_PROPERTY, outputDirectory)
         System.setProperty(IMAGE_DIRECTORY_PROPERTY, outputDirectory + IMAGE_DIRECTORY)
         System.setProperty(SOURCE_DIRECTORY_PROPERTY, outputDirectory + SOURCE_DIRECTORY)
+        System.setProperty(ICONS_DIRECTORY_PROPERTY, outputDirectory + ICONS_DIRECTORY)
         createDir(outputDir)
         createDir(outputDirectory)
         createDir(outputDirectory + IMAGE_DIRECTORY)
@@ -217,38 +218,38 @@ public class SeleniumHelper implements ISeleniumHelper {
         return this
     }
 
-    private static boolean addExtentionToFirefox(FirefoxProfile firefoxProfile, FireFoxAddon firefoxAddon) {
+    private static boolean addExtensionToFirefox(FirefoxProfile firefoxProfile, FireFoxAddon fireFoxAddOn) {
         File file;
-        String path = firefoxAddon.getFullPath();
+        String path = fireFoxAddOn.getFullPath();
         if (path == null) {
-            log.warn("Firefox addon path can not be null");
+            log.warn("Firefox AddOn path can not be null");
             return false;
         }
         URL url = this.class.getResource(path);
         if (url == null) {
-            log.warn("Firefox addon URL can not be null");
+            log.warn("Firefox AddOn URL can not be null");
             return false;
         }
         try {
             file  = new File(url.toURI());
         } catch (URISyntaxException e) {
-            log.warn("Failed to generate Firefox addon file: " + e);
+            log.warn("Failed to generate Firefox AddOn file: " + e);
             return false;
         }
         try {
             firefoxProfile.addExtension(file);
         } catch (IOException e) {
-            log.warn("Failed to load Firefox addon: " + e);
+            log.warn("Failed to load Firefox AddOn: " + e);
             return false;
         }
-        if (firefoxAddon.getName().equalsIgnoreCase("firebug")) {
+        if (fireFoxAddOn.getName().equalsIgnoreCase("firebug")) {
             firefoxProfile.setPreference("extensions.firebug.showFirstRunPage", false);
             firefoxProfile.setPreference("extensions.firebug.console.enableSites", true);
             firefoxProfile.setPreference("extensions.firebug.net.enableSites", true);
             firefoxProfile.setPreference("extensions.firebug.showNetworkErrors", false);
         }
 
-        if (firefoxAddon.getName().equalsIgnoreCase("modify_headers")) {
+        if (fireFoxAddOn.getName().equalsIgnoreCase("modify_headers")) {
             firefoxProfile.setPreference("modifyheaders.config.active", true);
             firefoxProfile.setPreference("modifyheaders.config.alwaysOn", true);
             firefoxProfile.setPreference("modifyheaders.headers.count", 1);
@@ -323,6 +324,9 @@ public class SeleniumHelper implements ISeleniumHelper {
             Reporter.log("capability $capability")
             Reporter.log("")
             throw new SkipException("Can't set up driver $browser")
+        }catch(Exception e1){
+            log.info System.getProperty(e1)
+
         }
         return driver
     }
@@ -1013,7 +1017,8 @@ public class SeleniumHelper implements ISeleniumHelper {
                 tempScreenShotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE)
                 tempScreenShotFile.renameTo(destinationFile)
                 log.info(getHtmlImgTag (destinationFile.getAbsolutePath(), fileName))
-                Reporter.log(getHtmlImgTag(destinationFile.getAbsolutePath(), fileName) )
+//                Reporter.log(getHtmlImgTag(destinationFile.getAbsolutePath(), fileName) ) //Absolute path
+                Reporter.log(getHtmlImgTag(IMAGE_DIRECTORY.replace("/","../") + "/" + fileName, fileName) )  //Relative path
                 return destinationFile
         } catch (IOException e) {
                 Reporter.log("Can't move screenShot. Exists here: " + tempScreenShotFile)
@@ -1041,7 +1046,9 @@ public class SeleniumHelper implements ISeleniumHelper {
             bufferedWriter.write(driver.getPageSource())
             bufferedWriter.close()
             log.debug("Page source generated: " + destinationFile.getName())
-            Reporter.log(getHtmlSourceTag(destinationFile.getAbsolutePath(), fileName) )
+//            Reporter.log(getHtmlSourceTag(destinationFile.getAbsolutePath(), fileName) )                 //Absolut path
+            Reporter.log(getHtmlImgTag(SOURCE_DIRECTORY.replace("/","../") + "/" + fileName, fileName) )  //Relative path
+
         } catch (GroovyRuntimeException e) {
             log.error("Error generating page source: " + e)
         }
@@ -1164,7 +1171,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
     private static boolean isBrowserHtmlUnit(String browser) {
-        return (StringUtils.isNotEmpty(browser) && browser.contains(HTML_UNIT))
+        return (StringUtils.isNotEmpty(browser) && browser.contains(HTMLUNIT))
     }
 
     public Point getPoint() {

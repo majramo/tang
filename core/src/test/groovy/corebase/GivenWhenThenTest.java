@@ -2,6 +2,7 @@ package corebase;
 
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
+import static corebase.GlobalConstants.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,12 +17,12 @@ public class GivenWhenThenTest {
 
 
     public void setUpFireFoxWithNoRunnableDriver() throws Exception {
-        driver = new SeleniumDummyHelper().init("Firefox");
+        driver = new SeleniumDummyHelper().init(LOCAL_FIREFOX);
         givenWhenThen = new GivenWhenThen(driver);
     }
 
     public void setUpFireFoxWithRunnableDriver() throws Exception {
-        driver = new SeleniumHelper().init("Firefox", "./");
+        driver = new SeleniumHelper().init(LOCAL_FIREFOX, "./");
         givenWhenThen = new GivenWhenThen(driver);
     }
 
@@ -51,29 +52,29 @@ public class GivenWhenThenTest {
     }
 
 
-    @Test
-    public void testVerifyTrueWithRunnableDriver() throws Exception {
-        setUpFireFoxWithRunnableDriver();
-        givenWhenThen.verify(true, "");
-    }
-
-    @Test
-    public void testVerifyFalseWithRunnableDriver() throws Exception {
-        setUpFireFoxWithRunnableDriver();
-        givenWhenThen.verify(true, "");
-    }
-
-    @Test
-    public void testGetDriverWithRunnableDriver() throws Exception {
-        setUpFireFoxWithRunnableDriver();
-        assert (givenWhenThen.driver == driver);
-    }
-
-    @Test
-    public void testSetDriverWithRunnableDriver() throws Exception {
-        setUpFireFoxWithRunnableDriver();
-        assert (givenWhenThen.driver == driver);
-    }
+//    @Test
+//    public void testVerifyTrueWithRunnableDriver() throws Exception {
+//        setUpFireFoxWithRunnableDriver();
+//        givenWhenThen.verify(true, "");
+//    }
+//
+//    @Test
+//    public void testVerifyFalseWithRunnableDriver() throws Exception {
+//        setUpFireFoxWithRunnableDriver();
+//        givenWhenThen.verify(true, "");
+//    }
+//
+//    @Test
+//    public void testGetDriverWithRunnableDriver() throws Exception {
+//        setUpFireFoxWithRunnableDriver();
+//        assert (givenWhenThen.driver == driver);
+//    }
+//
+//    @Test
+//    public void testSetDriverWithRunnableDriver() throws Exception {
+//        setUpFireFoxWithRunnableDriver();
+//        assert (givenWhenThen.driver == driver);
+//    }
 
     @AfterMethod
     private void afterMethod() {

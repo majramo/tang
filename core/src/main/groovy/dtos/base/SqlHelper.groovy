@@ -63,15 +63,9 @@ public class SqlHelper {
             }
         }
 	}
-    public boolean isConnectionOk(){
-        JdbcConnection jDbcConnection = jdbcConnections [dbName]
-        this.log.info "### jDbcConnection <" + jDbcConnection
-        return jDbcConnection.isConnectionOk()
-    }
 
     public boolean isConnectionOk(dbName){
         JdbcConnection jDbcConnection = jdbcConnections [dbName]
-        this.log.info "### jDbcConnection <" + jDbcConnection
         return jDbcConnection.isConnectionOk()
     }
 

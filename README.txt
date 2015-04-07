@@ -14,6 +14,7 @@ The validations could be done during test run with WebDriver, when running RestD
 In order to build the project you need to install several jar files which maven can't find on Internet:
 mvn install:install-file -Dfile=JAutomate.jar -DgroupId=jautomate -DartifactId=Jautomate -Dversion=1 -Dpackaging=jar
 mvn install:install-file -Dfile=sqljdbc4.jar -DgroupId=com.microsoft.sqlserver -DartifactId=sqljdbc4 -Dversion=3.0 -Dpackaging=jar
+mvn install:install-file -Dfile=htmlunit-2.13.jar -DgroupId= htmlunit -DartifactId= htmlunit -Dversion=2.13 -Dpackaging=jar
 
 Build
 mvn clean install
@@ -30,7 +31,7 @@ https://github.com/majramo/tang
 
 
 License
-Copyright 2014 Majid Aram
+Copyright 2015 Majid Aram
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, 
