@@ -283,7 +283,10 @@ public class SeleniumHelper implements ISeleniumHelper {
                     if ((settings.firefoxProfileFolder).size()) {
                         String firefoxProfileFolder = settings.firefoxProfileFolder
                         if (firefoxProfileFolder != null && firefoxProfileFolder != "") {
-                            firefoxProfile = new FirefoxProfile(new File(firefoxProfileFolder));
+                            File ffPFile = new File(firefoxProfileFolder)
+                            if(ffPFile.exists()){
+                                firefoxProfile = new FirefoxProfile(new File(firefoxProfileFolder));
+                            }
                         };
                     }
                     setFirefoxProfileAddOns(firefoxProfile);
