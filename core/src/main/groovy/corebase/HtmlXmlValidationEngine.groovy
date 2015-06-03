@@ -24,7 +24,7 @@ public class HtmlXmlValidationEngine {
         return true
     }
 
-    public String returnAsserttionFile() {
+    public String returnAssertFile() {
         if (hxDto != null) {
             hxDto.gatherXmlResult()
             return hxDto.xmlMarkupFileWithUtfHeader
@@ -69,14 +69,14 @@ public class HtmlXmlValidationEngine {
 
             hxDto.returnAssertResult()
             return this
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException exception1) {
             log.error "Can't find class <$dtoNamePath>"
-            log.error(e)
-            throw e
-        } catch (GroovyRuntimeException e) {
+            log.error(exception1)
+            throw exception1
+        } catch (GroovyRuntimeException exception2) {
             log.error "Can't init class  <$dtoNamePath>"
-            log.error(e)
-            throw e
+            log.error(exception2)
+            throw exception2
         }
     }
 }
