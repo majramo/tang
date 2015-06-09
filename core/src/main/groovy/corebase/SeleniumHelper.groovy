@@ -88,6 +88,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     private String browser
     private static String os
     private static long sleepTimeInMilliseconds = 0
+    private static String CR = "<BR>"
 
     public void printWindows() {
         log.info("### windowHandler")
@@ -1361,5 +1362,106 @@ public class SeleniumHelper implements ISeleniumHelper {
     private getCurrentMethodName() {
         def marker = new Throwable()
         return StackTraceUtils.sanitize(marker).stackTrace[1].methodName
+    }
+
+    public List findAllLinksByXpath(String[] xpaths) {
+        List<WebElement> webElements = new ArrayList();
+        xpaths.each { xpath ->
+            webElements.addAll(findElementsByXpath(xpath))
+        }
+
+        return webElements;
+    }
+
+    public List analyseLinksByXpath(String[] xpaths) {
+        reporterLogLn(CR)
+        reporterLogLn("Searching links: $xpaths")
+
+        List<WebElement> foundWebElements = findAllLinksByXpath(xpaths)
+        reporterLogLn("Searching links count: ${foundWebElements.size()}")
+
+        List webElementsWithoutHref = new ArrayList(); ;
+        List webElementsWithJavascriptHref = new ArrayList(); ;
+        List webElementsWithMailToHref = new ArrayList(); ;
+        List webElementsWithHref = new ArrayList(); ;
+        foundWebElements.each { WebElement webElement ->
+            def href = webElement.getAttribute("href")
+            switch (href){
+                case [null, ""]:
+                    webElementsWithoutHref.add(webElement.getTagName() + " " + webElement.getText())
+                    break
+                case ~/mailto:.*/:
+                    webElementsWithMailToHref.add(href)
+                    break
+                case ~/javascript:.*/:
+                    webElementsWithJavascriptHref.add(href)
+                    break
+                default:
+                    webElementsWithHref.add(webElement);
+            }
+        }
+
+        printLinkShortInfo(webElementsWithoutHref, "Elements without HREF", "")
+        printLinkShortInfo(webElementsWithMailToHref, "Elements with EmailTo HREF", "")
+        printLinkShortInfo(webElementsWithJavascriptHref, "Elements with JavaScript HREF", "")
+
+        def webElementsWithHrefOk = [:]
+        def webElementsWithHrefNotOk = [:]
+        int count = 1
+        webElementsWithHref.each { WebElement webElement ->
+            def href = webElement.getAttribute("href").toString()
+            try {
+
+                URL url = new URL(href)
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection()
+                try {
+                    connection.connect();
+                    def response = connection.getResponseMessage();
+                    connection.disconnect();
+                    if(response.toString().contains("Not Found")){
+                        webElementsWithHrefNotOk["${count++} $href"] = "error: ${response.toString()}";
+                    }else{
+                        webElementsWithHrefOk["${count++} $href"] = response.toString();
+                    }
+                } catch (Exception exp2) {
+                    webElementsWithHrefNotOk["${count++} $href"] = "error: ${exp2.getMessage()}";
+                }
+            } catch (Exception exp1) {
+                webElementsWithHrefNotOk["${count++} $href"] = "error: ${exp1.getMessage()}";
+            }
+
+
+        }
+
+        printLinkLongInfo(webElementsWithHrefNotOk, "Elements with bad response", "")
+        printLinkLongInfo(webElementsWithHrefOk, "Elements with good response", "")
+        return foundWebElements
+    }
+
+    private void printLinkLongInfo(LinkedHashMap linkedHashMap, String header, String line) {
+        int count = 1
+        reporterLogLn()
+        reporterLogLn("$header count: ${linkedHashMap.size()}")
+        linkedHashMap.each {
+            log.info "$count $it"
+            Reporter.log("${count++} HREF<");
+            Reporter.log(it.key);
+            Reporter.log("> Response<");
+            Reporter.log(it.value);
+            reporterLogLn(">")        }
+    }
+
+    private void printLinkShortInfo(List list, String header, String line) {
+        int count = 1
+        reporterLogLn()
+        reporterLogLn("$header count: ${list.size()}")
+        list.each { text ->
+            log.info "$count $text"
+            reporterLogLn("${count++} $line: " + text);
+        }
+    }
+
+    public reporterLogLn(message = "") {
+        Reporter.log("$message$CR")
     }
 }

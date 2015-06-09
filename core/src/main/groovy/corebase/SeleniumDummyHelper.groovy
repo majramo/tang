@@ -396,4 +396,7 @@ class SeleniumDummyHelper implements ISeleniumHelper {
     public void sleep(long milliseconds ) {
     }
 
+    @Override
+    List analyseLinksByXpath(String[] xpaths) {
+    }
 }

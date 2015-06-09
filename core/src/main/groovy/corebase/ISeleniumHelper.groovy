@@ -171,4 +171,6 @@ public interface ISeleniumHelper {
     public ISeleniumHelper restartBrowser()
 
     public void sleep(long milliseconds )
-}
+    public List analyseLinksByXpath(String[] xpaths)
+
+ }
