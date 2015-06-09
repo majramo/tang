@@ -1,4 +1,5 @@
 package corebase
+
 import dtos.SettingsHelper
 import org.apache.commons.lang3.StringUtils
 import org.apache.log4j.Logger
@@ -88,7 +89,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     private static String os
     private static long sleepTimeInMilliseconds = 0
 
-    public void printWindows(){
+    public void printWindows() {
         log.info("### windowHandler")
         windowHandler.each {
             log.info("### windowHandler $it")
@@ -116,11 +117,11 @@ public class SeleniumHelper implements ISeleniumHelper {
     public ISeleniumHelper changeBrowser(String browser) {
         return init(browser, outputDirectory + "/", defaultImplicitlyWait, defaultPageLoadTimeoutMilliSeconds)
     }
-   public ISeleniumHelper restartBrowser() {
+
+    public ISeleniumHelper restartBrowser() {
         driver.quit()
         return init(browser, outputDirectory + "/", defaultImplicitlyWait, defaultPageLoadTimeoutMilliSeconds)
     }
-
 
 
     public ISeleniumHelper init(String browser, String outputDir = "./", long implicitlyWait = defaultImplicitlyWait, long defaultPageLoadTimeout = defaultPageLoadTimeoutMilliSeconds) throws MalformedURLException, SkipException {
@@ -134,7 +135,7 @@ public class SeleniumHelper implements ISeleniumHelper {
                 os = MAC
         }
         outputDirectory = ""
-        if(outputDir.contains(File.separator)){
+        if (outputDir.contains(File.separator)) {
             outputDirectory = outputDir.substring(0, outputDir.lastIndexOf(File.separator))
         }
         browser = browser.trim()
@@ -204,7 +205,7 @@ public class SeleniumHelper implements ISeleniumHelper {
 
         if (!browser.toString().contains("CH_") && !browser.toString().contains("CHROME") && !browser.toString().contains("SAFARI")) {
             try {
-               changeImplicitTimeToSeconds(this.defaultImplicitlyWait)
+                changeImplicitTimeToSeconds(this.defaultImplicitlyWait)
             } catch (GroovyRuntimeException e) {
                 log.debug("Driver $browser can't set implicitlyWait " + e)
             }
@@ -231,7 +232,7 @@ public class SeleniumHelper implements ISeleniumHelper {
             return false;
         }
         try {
-            file  = new File(url.toURI());
+            file = new File(url.toURI());
         } catch (URISyntaxException e) {
             log.warn("Failed to generate Firefox AddOn file: " + e);
             return false;
@@ -262,11 +263,10 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
 
-
     private static boolean setFirefoxProfileAddOns(FirefoxProfile firefoxProfile) {
-        File addOnFile = new File( "/Users/majidaram/dev/tang/firebug@software.joehewitt.com.xpi" );
-        if(addOnFile.exists()){
-            firefoxProfile.addExtension( addOnFile );
+        File addOnFile = new File("/Users/majidaram/dev/tang/firebug@software.joehewitt.com.xpi");
+        if (addOnFile.exists()) {
+            firefoxProfile.addExtension(addOnFile);
         }
     }
 
@@ -284,7 +284,7 @@ public class SeleniumHelper implements ISeleniumHelper {
                         String firefoxProfileFolder = settings.firefoxProfileFolder
                         if (firefoxProfileFolder != null && firefoxProfileFolder != "") {
                             File ffPFile = new File(firefoxProfileFolder)
-                            if(ffPFile.exists()){
+                            if (ffPFile.exists()) {
                                 firefoxProfile = new FirefoxProfile(new File(firefoxProfileFolder));
                             }
                         };
@@ -327,7 +327,7 @@ public class SeleniumHelper implements ISeleniumHelper {
             Reporter.log("capability $capability")
             Reporter.log("")
             throw new SkipException("Can't set up driver $browser")
-        }catch(Exception e1){
+        } catch (Exception e1) {
             log.info System.getProperty(e1)
 
         }
@@ -432,14 +432,14 @@ public class SeleniumHelper implements ISeleniumHelper {
         driver.get(url)
     }
 
-    public void sleep(long milliseconds ) {
-        sleepTimeInMilliseconds +=  milliseconds
+    public void sleep(long milliseconds) {
+        sleepTimeInMilliseconds += milliseconds
         log.info(getCurrentMethodName() + " sleepTimeInMilliseconds $sleepTimeInMilliseconds <$milliseconds>")
         driver.sleep(milliseconds)
     }
 
-    public void threadSleep(long milliseconds ) {
-        sleepTimeInMilliseconds +=  milliseconds
+    public void threadSleep(long milliseconds) {
+        sleepTimeInMilliseconds += milliseconds
         log.info(getCurrentMethodName() + " threadsleepTimeInMilliseconds $sleepTimeInMilliseconds <$milliseconds>")
         driver.sleep(milliseconds)
     }
@@ -500,12 +500,12 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
     private void changeImplicitTimeToSeconds(long changedImplicitlyWait) {
-        def methodName =  getCurrentMethodName()
+        def methodName = getCurrentMethodName()
         log.debug methodName + " changedImplicitlyWait<$changedImplicitlyWait>"
-        try{
+        try {
             driver.manage().timeouts().implicitlyWait(changedImplicitlyWait, TimeUnit.SECONDS)
-        }catch(org.openqa.selenium.NoSuchWindowException e){
-             log.error("$methodName $e")
+        } catch (org.openqa.selenium.NoSuchWindowException e) {
+            log.error("$methodName $e")
         }
     }
 
@@ -533,9 +533,9 @@ public class SeleniumHelper implements ISeleniumHelper {
     public boolean isTagUnavailable(final String element) {
         log.info getCurrentMethodName() + " element<$element>"
         if (!"".equals(element)) {
-           changeImplicitTimeToSeconds(IMPLICT_WAIT)
+            changeImplicitTimeToSeconds(IMPLICT_WAIT)
             final WebElement we = findElementByXpathOrId(element, true)
-           resetImplicitTime()
+            resetImplicitTime()
             if (we == null) {
                 return true
             }
@@ -584,7 +584,7 @@ public class SeleniumHelper implements ISeleniumHelper {
 
         switchToNextWindow()
         requireVisibleXpath(elementOneToWaitFor)
-        if(!elementTwoToWaitFor.isEmpty()){
+        if (!elementTwoToWaitFor.isEmpty()) {
             requireVisibleXpath(elementTwoToWaitFor)
         }
     }
@@ -607,7 +607,7 @@ public class SeleniumHelper implements ISeleniumHelper {
                 data = data.toString()
                 if (!"".equals(data)) {
 
-                        we.sendKeys(data)
+                    we.sendKeys(data)
 
                 }
             }
@@ -650,7 +650,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         thread1 = null;
 
         switchToNextWindow()
-        if(currentWindow.equals( driver.getWindowHandle())){
+        if (currentWindow.equals(driver.getWindowHandle())) {
             switchToPreviousWindow()
             return false
         }
@@ -682,7 +682,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
         changeImplicitTimeToSeconds(changedImplicitlyWait)
         boolean result = doubleClick(element)
-       resetImplicitTime()
+        resetImplicitTime()
         return result
     }
 
@@ -690,9 +690,9 @@ public class SeleniumHelper implements ISeleniumHelper {
     public boolean doubleClick(String element) {
         log.info getCurrentMethodName() + " element<$element>"
         Actions actions = new Actions(driver);
-        WebElement webElement =  requireVisibleXpath(element)
+        WebElement webElement = requireVisibleXpath(element)
         new Actions(driver).doubleClick(webElement).perform();
-       // actions.moveToElement(webElement);
+        // actions.moveToElement(webElement);
         return true
     }
 
@@ -773,25 +773,25 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
     void selectAllAndTypeAndExpectError(String element, String text, Exception e) {
-        typeAndSwitchToModalWindows(element, text, "//*[@id='caption']/img[contains(@src, 'warn')]", "btOk" )
+        typeAndSwitchToModalWindows(element, text, "//*[@id='caption']/img[contains(@src, 'warn')]", "btOk")
     }
 
 
-    void selectAll(String element){
+    void selectAll(String element) {
         final WebElement we = findElementByXpathOrId(element)
         we.click()
-        if(macDriver){
+        if (macDriver) {
             we.sendKeys(Keys.chord(Keys.COMMAND, "a"))
-        }else{
+        } else {
             we.sendKeys(Keys.chord(Keys.CONTROL, "a"))
         }
     }
 
-    void selectAll(WebElement we){
+    void selectAll(WebElement we) {
         we.click()
-        if(macDriver){
+        if (macDriver) {
             we.sendKeys(Keys.chord(Keys.COMMAND, "a"))
-        }else{
+        } else {
             we.sendKeys(Keys.chord(Keys.CONTROL, "a"))
         }
     }
@@ -808,7 +808,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     public boolean type(final String element, text) {
         log.info getCurrentMethodName() + " element<$element> text<$text>"
 
-        final WebElement we =  requireVisibleXpath(element)
+        final WebElement we = requireVisibleXpath(element)
         if (we == null) {
             return false
         }
@@ -849,9 +849,9 @@ public class SeleniumHelper implements ISeleniumHelper {
 
 
     private WebElement findElementByXpathOrId(final String element, final boolean skipError) {
-        if(element.startsWith("/") || element.startsWith("\\./") ){
+        if (element.startsWith("/") || element.startsWith("\\./")) {
             return findElementByXpath(element, skipError)
-        }else{
+        } else {
             return findElementById(element, skipError)
         }
     }
@@ -860,9 +860,9 @@ public class SeleniumHelper implements ISeleniumHelper {
         findElementByXpathOrId(element, false)
     }
 
-   private WebElement findElementById(final String id, final boolean skipError) {
-       def methodName = getCurrentMethodName()
-       log.info "$methodName id<$id> skipError<$skipError>"
+    private WebElement findElementById(final String id, final boolean skipError) {
+        def methodName = getCurrentMethodName()
+        log.info "$methodName id<$id> skipError<$skipError>"
         try {
             if (!"".equals(id)) {
                 slowDown()
@@ -1016,19 +1016,19 @@ public class SeleniumHelper implements ISeleniumHelper {
         String fileName = getFileName(testName, ".png")
         File tempScreenShotFile = null
         try {
-                File destinationFile = createDestinationFile(destinationDirectory, fileName)
-                tempScreenShotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE)
-                tempScreenShotFile.renameTo(destinationFile)
-                log.info(getHtmlImgTag (destinationFile.getAbsolutePath(), fileName))
+            File destinationFile = createDestinationFile(destinationDirectory, fileName)
+            tempScreenShotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE)
+            tempScreenShotFile.renameTo(destinationFile)
+            log.info(getHtmlImgTag(destinationFile.getAbsolutePath(), fileName))
 //                Reporter.log(getHtmlImgTag(destinationFile.getAbsolutePath(), fileName) ) //Absolute path
-                Reporter.log(getHtmlImgTag(IMAGE_DIRECTORY.replace("/","../") + "/" + fileName, fileName) )  //Relative path
-                return destinationFile
+            Reporter.log(getHtmlImgTag(IMAGE_DIRECTORY.replace("/", "../") + "/" + fileName, fileName))  //Relative path
+            return destinationFile
         } catch (IOException e) {
-                Reporter.log("Can't move screenShot. Exists here: " + tempScreenShotFile)
-                Reporter.log(getHtmlImgTag(tempScreenShotFile.getAbsoluteFile().getAbsolutePath(), tempScreenShotFile))
-                log.error("Moving screenshot file failed. " + e)
+            Reporter.log("Can't move screenShot. Exists here: " + tempScreenShotFile)
+            Reporter.log(getHtmlImgTag(tempScreenShotFile.getAbsoluteFile().getAbsolutePath(), tempScreenShotFile))
+            log.error("Moving screenshot file failed. " + e)
         } catch (ClassCastException e) {
-                log.error("WebDriver does not support screenShots: " + e)
+            log.error("WebDriver does not support screenShots: " + e)
         }
     }
 
@@ -1050,7 +1050,8 @@ public class SeleniumHelper implements ISeleniumHelper {
             bufferedWriter.close()
             log.debug("Page source generated: " + destinationFile.getName())
 //            Reporter.log(getHtmlSourceTag(destinationFile.getAbsolutePath(), fileName) )                 //Absolut path
-            Reporter.log(getHtmlImgTag(SOURCE_DIRECTORY.replace("/","../") + "/" + fileName, fileName) )  //Relative path
+            Reporter.log(getHtmlImgTag(SOURCE_DIRECTORY.replace("/", "../") + "/" + fileName, fileName))
+            //Relative path
 
         } catch (GroovyRuntimeException e) {
             log.error("Error generating page source: " + e)
@@ -1083,7 +1084,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
     private static String getHtmlSourceTag(final String filePath, fileName = "") {
-        def fileIcon =  this.class.getResource("/icons/html.jpg")
+        def fileIcon = this.class.getResource("/icons/html.jpg")
         def str = '<br/>page source: ' +
                 "<a href=\"" + filePath + "\" target=\"_blank\">" +
                 fileName + "<br>" +
@@ -1106,29 +1107,29 @@ public class SeleniumHelper implements ISeleniumHelper {
     public void switchToNextWindow() {
         //Store the current window handle
         def methodName = getCurrentMethodName()
-        log.info("$methodName saved windowHandler size<" + windowHandler.size() + ">" )
+        log.info("$methodName saved windowHandler size<" + windowHandler.size() + ">")
         windowHandler.each {
-            log.info( "$methodName saved windowHandler<$it>")
+            log.info("$methodName saved windowHandler<$it>")
         }
-        log.info("$methodName actual getWindowHandles size<" +  driver.getWindowHandles().size() + ">" )
+        log.info("$methodName actual getWindowHandles size<" + driver.getWindowHandles().size() + ">")
 
-        while(driver.getWindowHandles().size() <= windowHandler.size()){
-            log.info("$methodName Waiting getWindowHandles<" + driver.getWindowHandles().size()+ "> windowHandler<" + windowHandler.size() + ">")
+        while (driver.getWindowHandles().size() <= windowHandler.size()) {
+            log.info("$methodName Waiting getWindowHandles<" + driver.getWindowHandles().size() + "> windowHandler<" + windowHandler.size() + ">")
             sleep(1002)
         }
         def currentWindow = driver.getWindowHandle()
-        log.info( "actual $currentWindow")
+        log.info("actual $currentWindow")
 
         windowHandler.push(currentWindow)
         windowHandler.each {
-            log.info( "After push windowHandler $it")
+            log.info("After push windowHandler $it")
         }
-        def nextWindow= driver.getWindowHandles()[driver.getWindowHandles().size()-1]
-        log.info( "nextWindow $nextWindow")
+        def nextWindow = driver.getWindowHandles()[driver.getWindowHandles().size() - 1]
+        log.info("nextWindow $nextWindow")
 
         driver.switchTo().window(nextWindow);
         //Perform the click operation that opens new window
-        log.info("After   W " + driver.getWindowHandles().size()+ " H: " + windowHandler.size())
+        log.info("After   W " + driver.getWindowHandles().size() + " H: " + windowHandler.size())
 
         //Switch to new window opened
         resetImplicitTime()
@@ -1137,17 +1138,17 @@ public class SeleniumHelper implements ISeleniumHelper {
 
     public void switchToPreviousWindow() {
         def methodName = getCurrentMethodName()
-        log.info("$methodName saved windowHandler size<" + windowHandler.size() + ">" )
+        log.info("$methodName saved windowHandler size<" + windowHandler.size() + ">")
         windowHandler.each {
-            log.info( "$methodName saved windowHandler<$it>")
+            log.info("$methodName saved windowHandler<$it>")
         }
         def previuosWindow = windowHandler.pop()
-        log.info( "previuosWindow $previuosWindow")
+        log.info("previuosWindow $previuosWindow")
         driver.switchTo().window(previuosWindow)
         windowHandler.each {
-            log.info( "After pop windowHandler $it")
+            log.info("After pop windowHandler $it")
         }
-        log.info("After  pop windowHandler size: " + windowHandler.size() )
+        log.info("After  pop windowHandler size: " + windowHandler.size())
         resetImplicitTime()
         waitForPageReadyStateComplete()
     }
@@ -1218,9 +1219,9 @@ public class SeleniumHelper implements ISeleniumHelper {
 
     String requireTitle(String title = "") {
         int wait = defaultImplicitlyWait * 1000
-         while (wait > 0){
+        while (wait > 0) {
             String pageTitle = getTitle()
-            if(pageTitle.contains(title)){
+            if (pageTitle.contains(title)) {
                 return pageTitle
             }
             wait -= HUNDRED_MILLI_SECONDS
@@ -1233,7 +1234,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         log.info getCurrentMethodName() + " frameElement<$frameElement>"
         driver.switchTo().defaultContent()
 
-        WebElement frame =  requireVisibleXpath(frameElement)
+        WebElement frame = requireVisibleXpath(frameElement)
         driver.switchTo().frame(frame);
     }
 
@@ -1256,7 +1257,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
         changeImplicitTimeToSeconds(changedImplicitlyWait)
         WebElement webElement = requireXpath(element)
-       resetImplicitTime()
+        resetImplicitTime()
         return webElement
     }
 
@@ -1268,7 +1269,7 @@ public class SeleniumHelper implements ISeleniumHelper {
                 throw new ScreenshotException("Required Xpath is not visible")
             }
             try {
-                if (!webElement.isDisplayed()){
+                if (!webElement.isDisplayed()) {
                     threadSleep(999)
                     webElement = findElementByXpathOrId(element, false)
                 } else {
@@ -1292,14 +1293,14 @@ public class SeleniumHelper implements ISeleniumHelper {
         log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
         changeImplicitTimeToSeconds(changedImplicitlyWait)
         return isDisplayed(element)
-       resetImplicitTime()
+        resetImplicitTime()
     }
 
 
     public boolean isDisplayed(String element) {
         log.info getCurrentMethodName() + " element<$element>"
         WebElement webElement = findElementByXpathOrId(element, true)
-        if(webElement != null){
+        if (webElement != null) {
             return webElement.isDisplayed()
         }
         return false
@@ -1344,7 +1345,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         }
     }
 
-    public String getAlertTextAndAccept(){
+    public String getAlertTextAndAccept() {
         try {
             WebDriverWait wait = new WebDriverWait(driver, 2);
             wait.until(ExpectedConditions.alertIsPresent());
@@ -1357,7 +1358,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         }
     }
 
-    private getCurrentMethodName(){
+    private getCurrentMethodName() {
         def marker = new Throwable()
         return StackTraceUtils.sanitize(marker).stackTrace[1].methodName
     }
