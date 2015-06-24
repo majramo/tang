@@ -97,7 +97,9 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
     @Override
     void onTestFailure(ITestResult testResult) {
         log.debug("onTestFailure: " + testResult.getMethod().getMethodName())
-        takeScreenShotAndAddToReport(testResult, "Test failed")
+        if (!testResult.getMethod().toString().contains("NoScreenShot")) {
+            takeScreenShotAndAddToReport(testResult, "Test failed")
+        }
         testResult.setAttribute(TEST_STATUS, reporterHelper.addIcons("failedTest"))
 
     }
