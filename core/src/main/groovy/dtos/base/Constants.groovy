@@ -73,7 +73,7 @@ public class Constants {
     public static final String ASSERT = "Assert"
     public static final String TAG_ONLY = true
     public static final TABB = "\t"
-    public static final CR = "\n"
+    public static final CR = "<BR>"
     public static final FLOAT_COMPARISON_SKIP_IF_SUT_VALUE_NULL = "FLOAT_COMPARISON_SKIP_IF_SUT_VALUE_NULL"
     public static final FLOAT_COMPARISON_SKIP_IF_EXPECTED_VALUE_NULL = "FLOAT_COMPARISON_SKIP_IF_EXPECTED_VALUE_NULL"
     public static final INT_PERCENT_RANGE = "INT_PERCENT_RANGE_"

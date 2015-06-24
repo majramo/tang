@@ -88,7 +88,6 @@ public class SeleniumHelper implements ISeleniumHelper {
     private String browser
     private static String os
     private static long sleepTimeInMilliseconds = 0
-    private static String CR = "<BR>"
 
     public void printWindows() {
         log.info("### windowHandler")

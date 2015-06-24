@@ -73,4 +73,6 @@ public class GlobalConstants {
 
     public static String SELENIUM_HELPER = "SeleniumHelper"
     public static String WEB_DRIVER = "WEB_DRIVER"
+    public static String CR = "<BR>"
+
 }
