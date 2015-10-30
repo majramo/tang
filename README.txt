@@ -10,11 +10,6 @@ By using static verification, semi dynamic verification or dynamic verification 
 
 The verification could be done during test run with WebDriver or could be called from external application like SoapUI by calling the jar file.
 
-Todo: Remove dependency to SqlJdbc
-In order to build the project you need to install a jar files which maven can't find on Internet:
-Find sqljdbc4.jar in internet and download localy and run:
-mvn install:install-file -Dfile=sqljdbc4.jar -DgroupId=com.microsoft.sqlserver -DartifactId=sqljdbc4 -Dversion=3.0 -Dpackaging=jar
-
 Build
 mvn clean install
 
