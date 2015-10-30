@@ -118,8 +118,9 @@ public class AnySqlTest {
         def dbResult = getDbResult("Checking duplicates of <$fieldsString> in table <$table> ", dbRunTypeRows, query, 0)
         int counter = 1
         if(dbResult.size()>0){
-            Reporter.log("Showing first item")
-            dbResult[0..0].each {
+            int dbResultsToPrint = dbResult.size() < MAX_DB_RESULTS_TO_PRINT ? dbResult.size():MAX_DB_RESULTS_TO_PRINT
+            Reporter.log("Showing first item $dbResultsToPrint")
+            dbResult[0..dbResultsToPrint-1].each {
                 Reporter.log(counter++ + " " + it.toString())
             }
         }
@@ -141,8 +142,9 @@ public class AnySqlTest {
         def dbResult = getDbResult("Checking field <$field> with value <$value> in table <$table> ", dbRunTypeRows, query, 0)
         int counter = 1
         if(dbResult.size()>0){
-            Reporter.log("Showing first item")
-            dbResult[0..0].each {
+            int dbResultsToPrint = dbResult.size() < MAX_DB_RESULTS_TO_PRINT ? dbResult.size():MAX_DB_RESULTS_TO_PRINT
+            Reporter.log("Showing first item $dbResultsToPrint")
+            dbResult[0..dbResultsToPrint-1].each {
                 Reporter.log(counter++ + " " + it.toString())
             }
         }

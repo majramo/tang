@@ -56,8 +56,6 @@ public class Constants {
     public static final String DB_DEFAULT = "defaultDatabase"
     public static final String DB_DB2Server_1 = "Db2tFtDb_1"
     public static final String DB_DB2Server_2 = "Db2tFtDb_2"
-    public static final String DB_SQLSERVER_1 = "asetTestDb"
-    public static final String DB_SQLSERVER_2 = "asetDevDb"
     public static final String DB_LOCAL_1 = "localDb_1"
     public static final String DB_LOCAL_2 = "localDb_2"
     public static final String DB_MYSQL = "mySqlDb"
@@ -96,6 +94,7 @@ public class Constants {
 
     public static final String EXCEL_BODY_ROW_NUMBER = "EXCEL_BODY_ROW_NUMBER"
 
+    public static final int MAX_DB_RESULTS_TO_PRINT = 50
 
 }
 
