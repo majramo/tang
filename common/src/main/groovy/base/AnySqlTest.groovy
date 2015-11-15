@@ -119,7 +119,7 @@ public class AnySqlTest {
         int counter = 1
         if(dbResult.size()>0){
             int dbResultsToPrint = dbResult.size() < MAX_DB_RESULTS_TO_PRINT ? dbResult.size():MAX_DB_RESULTS_TO_PRINT
-            Reporter.log("Showing first item $dbResultsToPrint")
+            Reporter.log("Showing first $dbResultsToPrint items")
             dbResult[0..dbResultsToPrint-1].each {
                 Reporter.log(counter++ + " " + it.toString())
             }
@@ -143,7 +143,7 @@ public class AnySqlTest {
         int counter = 1
         if(dbResult.size()>0){
             int dbResultsToPrint = dbResult.size() < MAX_DB_RESULTS_TO_PRINT ? dbResult.size():MAX_DB_RESULTS_TO_PRINT
-            Reporter.log("Showing first item $dbResultsToPrint")
+            Reporter.log("Showing first $dbResultsToPrint items ")
             dbResult[0..dbResultsToPrint-1].each {
                 Reporter.log(counter++ + " " + it.toString())
             }
