@@ -72,6 +72,7 @@ public class GlobalConstants {
     public static String FEMALE = "Female"
 
     public static String SELENIUM_HELPER = "SeleniumHelper"
+    public static String AUTOIT_HELPER = "AutoItHelper"
     public static String WEB_DRIVER = "WEB_DRIVER"
     public static String CR = "<BR>"
 
