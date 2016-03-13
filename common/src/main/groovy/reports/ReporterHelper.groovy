@@ -52,14 +52,14 @@ public class ReporterHelper extends Reporter {
         File file = fileUtilsHelper.loadResourceFileIfExists(resource)
         if (file != null) {
 //            def str = "<img src=\"" + file.getPath() + "\" width=\"60\" height=\"60\" hspace=\"10\" />" //Absolute path
-            def str = "<img src=\"" + getIconPath(it) + "\" width=\"60\" height=\"60\" hspace=\"10\" />"   //Relative path
+            def str = "<img src=\"" + getIconPath(resource) + "\" width=\"60\" height=\"60\" hspace=\"10\" />"   //Relative path
             Reporter.log(str)
         }
     }
 
     private String getIconsString(String[] resources) {
         def str = ""
-        resources.each {
+        resources.each {it->
             File file = fileUtilsHelper.loadResourceFileIfExists("/icons/${it}.jpg")
             if (file != null) {
                 str += "<img src=\"" + getIconPath(it) + "\" width=\"60\" height=\"60\" hspace=\"10\" /> "
