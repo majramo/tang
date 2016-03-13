@@ -44,7 +44,11 @@ public class AnySqlTest {
         testContext.setAttribute(DATABASE, database)
         String databaseToRun = settings."$database".dbDriverName
         if(databaseToRun != ""){
-            databaseToRun = databaseToRun.replaceAll(".*:", "")
+            if(databaseToRun.contains("oracle")){
+                databaseToRun = "oracle"
+            }else{
+                databaseToRun = databaseToRun.replaceAll(".*:", "")
+            }
         }
         testContext.setAttribute(DATABASE_VENDOR_1, databaseToRun)
         testContext.setAttribute(ENVIRONMENT, environment)
