@@ -18,14 +18,17 @@ public class JdbcConnection {
     }
 
     public JdbcConnection(dbUrl, dbDriverName, dbUserName, dbPassword,  dbTestDataBase, dbDriver ) {
+        String connnectionString
         if ( (null != dbUrl) && (null != dbDriverName) && (null != dbUserName) && (null != dbPassword)&& (null != dbDriver) ){
             try {
                 if(dbDriverName  == settings.jdbcSqlDriverName || dbDriverName  == settings.jdbcJtdsSqlDriverName){
-                    log.info dbDriverName + ":" + dbUrl + DB_NAME + dbTestDataBase + " " + dbUserName + " "   + dbDriver
-                    jDbcConnection= Sql.newInstance(dbDriverName + ":" + dbUrl + DB_NAME + dbTestDataBase, dbUserName, dbPassword, dbDriver)
+                    connnectionString = dbDriverName + ":" + dbUrl + DB_NAME + dbTestDataBase + " " + dbUserName + " "   + dbDriver
+                    log.info connnectionString + " " + dbUserName + " "   + dbDriver
+                    jDbcConnection= Sql.newInstance(connnectionString, dbUserName, dbPassword, dbDriver)
                 }else{
-                    log.info dbDriverName + ":" + dbUrl + "/" + dbTestDataBase + " " + dbUserName + " "   + dbDriver
-                    jDbcConnection= Sql.newInstance(dbDriverName + ":" + dbUrl + "/" + dbTestDataBase, dbUserName, dbPassword, dbDriver)
+                    connnectionString = dbDriverName + ":" + dbUrl + "/" + dbTestDataBase
+                    log.info connnectionString + " " + dbUserName + " "   + dbDriver
+                    jDbcConnection= Sql.newInstance(connnectionString, dbUserName, dbPassword, dbDriver)
                 }
 
             } catch (ClassNotFoundException e) {
