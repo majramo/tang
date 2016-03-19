@@ -44,7 +44,5 @@ velocity.log
 images/*
 log/*
 target/*
-
-
-
-
+target
+.gitignore
