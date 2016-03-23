@@ -6,6 +6,7 @@ public class Constants {
     public static final String TEST_STATUS = "TEST_STATUS";
     public static final String ICONS = "ICONS";
     public static final String BROWSER = "DEFAULT_BROWSER";
+    public static final String APPLICATION = "APPLICATION";
     public static final String BROWSER_ICON = "BROWSER_ICON";
     public static final String ENVIRONMENT = "ENVIRONMENT";
 
