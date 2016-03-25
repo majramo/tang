@@ -8,12 +8,14 @@ import org.testng.ITestContext
 import org.testng.Reporter
 import org.testng.SkipException
 import org.testng.annotations.*
+import reports.ReporterHelper
 
 import static dtos.base.Constants.*
 
 public class AnySqlTest {
 
     private final static Logger log = Logger.getLogger("AT   ")
+    protected final static ReporterHelper reporterHelper = new ReporterHelper()
 
     protected SqlHelper driver
     protected String database
@@ -64,18 +66,22 @@ public class AnySqlTest {
         tangAssert = new TangDbAssert()
         Reporter.log("environment $environment")
         Reporter.log("DATABASE $database")
-        Reporter.log(database)
-        try {
-            log.info(testContext.getOutputDirectory())
-            driver = new SqlHelper(null, log, database, settings.dbRun, settings)
-            tangAssert.assertTrue(driver.isConnectionOk(database), "Connection $database is not working")
+        if (database == "" || database == null) {
+            Reporter.log("Default database is empty <$database>")
+        }else{
+            try {
+                Reporter.log("Default database <$database>")
+                log.info(testContext.getOutputDirectory())
+                driver = new SqlHelper(null, log, database, settings.dbRun, settings)
+                tangAssert.assertTrue(driver.isConnectionOk(database), "Connection $database is not working")
 
-            testContext.setAttribute(SQL_HELPER, driver)
-            //tangAssert = new TangAssert(driver)
-        } catch (Exception skipException) {
-            Reporter.log("Connection to db <$database> failed")
-            log.error(skipException)
-            throw new SkipException(skipException.toString())
+                testContext.setAttribute(SQL_HELPER, driver)
+                //tangAssert = new TangAssert(driver)
+            } catch (Exception skipException) {
+                Reporter.log("Connection to db <$database> failed")
+                log.error(skipException)
+                throw new SkipException(skipException.toString())
+            }
         }
     }
 
