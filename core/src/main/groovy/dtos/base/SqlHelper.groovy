@@ -65,6 +65,9 @@ public class SqlHelper {
 	}
 
     public boolean isConnectionOk(dbName){
+        if(!dbRun){
+            return true
+        }
         JdbcConnection jDbcConnection = jdbcConnections [dbName]
         return jDbcConnection.isConnectionOk()
     }
