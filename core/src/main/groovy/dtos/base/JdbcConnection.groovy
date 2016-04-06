@@ -24,7 +24,7 @@ public class JdbcConnection {
                 if(dbDriverName  == settings.jdbcSqlDriverName || dbDriverName  == settings.jdbcJtdsSqlDriverName){
                     connnectionString = dbDriverName + ":" + dbUrl + DB_NAME + dbTestDataBase + " " + dbUserName + " "   + dbDriver
                     log.info connnectionString + " " + dbUserName + " "   + dbDriver
-                    jDbcConnection= Sql.newInstance(connnectionString, dbUserName, dbPassword, dbDriver)
+                    jDbcConnection= Sql.newInstance(dbDriverName + ":" + dbUrl + DB_NAME + dbTestDataBase, dbUserName, dbPassword, dbDriver)
                 }else{
                     connnectionString = dbDriverName + ":" + dbUrl + "/" + dbTestDataBase
                     log.info connnectionString + " " + dbUserName + " "   + dbDriver
