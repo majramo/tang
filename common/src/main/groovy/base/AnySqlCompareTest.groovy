@@ -206,4 +206,5 @@ public class AnySqlCompareTest {
         targetSqlDriver = new SqlHelper(null, log, dbName, settings.dbRun, settings)
         testContext.setAttribute(TARGET_SQL_HELPER, targetSqlDriver)
     }
+
 }
