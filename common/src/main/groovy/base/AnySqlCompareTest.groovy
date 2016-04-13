@@ -10,8 +10,7 @@ import org.testng.annotations.*
 import reports.ReporterHelper
 
 import static corebase.GlobalConstants.REPORT_NG_REPORTING_TITLE
-import static dtos.base.Constants.SOURCE_SQL_HELPER
-import static dtos.base.Constants.TARGET_SQL_HELPER
+import static dtos.base.Constants.*
 
 public class AnySqlCompareTest {
     private final static Logger log = Logger.getLogger("ASC   ")
@@ -47,7 +46,7 @@ public class AnySqlCompareTest {
         log.info("BeforeClass " + testContext.getName())
         tangAssert = new TangDbAssert()
         sourceSqlDriver = (SqlHelper) testContext.getAttribute(SOURCE_SQL_HELPER)
-        sourceSqlDriver = (SqlHelper) testContext.getAttribute(TARGET_SQL_HELPER)
+        targetSqlDriver = (SqlHelper) testContext.getAttribute(TARGET_SQL_HELPER)
         log.info("BeforeClass " + testContext.getName())
 
     }
@@ -110,11 +109,11 @@ public class AnySqlCompareTest {
     protected void compareAllFromDb1InDb2(String sourceSql, String targetSql, threshold) {
         def sourceResult = getSourceDbRowsResult(sourceSql)
         def targetResult = getTargetDbRowsResult(targetSql)
-        reporterLogLn("Source <${sourceSqlDriver.dbName}> ");
-        reporterLogLn("Target <$targetSqlDriver.dbName> ");
-        reporterLogLn("Source Sql <$sourceSql> ");
-        reporterLogLn("Target Sql <$targetSql> ");
-        reporterLogLn("Threshold <$threshold %> ");
+        reporterLogLn("Source: <${sourceSqlDriver.dbName}> ");
+        reporterLogLn("Target: <$targetSqlDriver.dbName> ");
+        reporterLogLn("Source Sql: <$sourceSql> ");
+        reporterLogLn("Target Sql: <$targetSql> ");
+        reporterLogLn("Threshold: <$threshold %> ");
         equals(sourceResult, targetResult, threshold, "ska vara lika")
 
     }
@@ -122,8 +121,14 @@ public class AnySqlCompareTest {
 
     protected void equals(ArrayList sourceMap, ArrayList targetMap, threshold, msg ="") {
         boolean diffLessThanThreshold = true
-        int diffCount = sourceMap.size() - targetMap.size()
-        float tmpSizeDiffProc = 100 * (diffCount) / (sourceMap.size() + targetMap.size())
+        def diffCount = sourceMap.size() - targetMap.size()
+        def totalCount = sourceMap.size() + targetMap.size()
+        float tmpSizeDiffProc = 0
+        try{
+            tmpSizeDiffProc = 100 * diffCount / totalCount
+        }catch (Exception e){
+            tmpSizeDiffProc = 100
+        }
         float diffSizeProc = tmpSizeDiffProc.trunc(2)
         reporterLogLn("");
         reporterLogLn("Source size: <${sourceMap.size()}>");
@@ -148,16 +153,22 @@ public class AnySqlCompareTest {
         } catch (Exception e) {
         }
 
-        float tmpDataDiffProc = 100 * (diffDataCounter) / (sourceMap.size() + targetMap.size()).abs()
+        float tmpDataDiffProc = 0
+        try{
+            tmpDataDiffProc = 100 * diffDataCounter / totalCount
+        }catch (Exception e){
+            tmpDataDiffProc = 100
+        }
         float diffDataCounterProc = tmpDataDiffProc.trunc(2)
 
-        if(diffSizeProc > threshold || diffDataCounterProc > threshold){
+        if(diffSizeProc.abs() > threshold || diffDataCounterProc.abs() > threshold){
             diffLessThanThreshold = false
         }
         reporterLogLn ""
         reporterLogLn "####################"
-        reporterLogLn("Diff size: <$diffCount)> <%$diffSizeProc>");
+        reporterLogLn("Diff size: <$diffCount> <%$diffSizeProc>");
         reporterLogLn("Diff data: <$diffDataCounter)> <%$diffDataCounterProc>");
+        reporterLogLn("Threshold: <$threshold %> ");
 
         reporterLogLn ""
         tangAssert.assertTrue(diffLessThanThreshold, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc %> <Data $diffDataCounter: $diffDataCounterProc>");
