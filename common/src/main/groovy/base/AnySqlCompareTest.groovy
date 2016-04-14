@@ -136,7 +136,7 @@ public class AnySqlCompareTest {
         reporterLogLn("Target size: <${targetMap.size()}>");
         reporterLogLn("");
 
-        if(diffCount>0){
+        if(diffCount != 0){
             reporterLogLn("Showing max no of diff: " + settings.maxDiffsToShow)
         }
 
@@ -148,11 +148,25 @@ public class AnySqlCompareTest {
                 }
                 if (!targetMap.contains(it)) {
                     diffDataCounter++
-                    reporterLogLn "  Missing $diffDataCounter:$index <$it>"
+                    reporterLogLn "  Missing in target: $diffDataCounter:$index <$it>"
                 }
             }
         } catch (Exception e) {
         }
+
+        try {
+            targetMap.eachWithIndex { it, index ->
+                if (diffDataCounter >= settings.maxDiffsToShow) {//maxAyyaySizeToWorkWith
+                    throw new Exception(BREAK_CLOSURE)
+                }
+                if (!sourceMap.contains(it)) {
+                    diffDataCounter++
+                    reporterLogLn "  Missing in source: $diffDataCounter:$index <$it>"
+                }
+            }
+        } catch (Exception e) {
+        }
+
 
         float tmpDataDiffProc = 0
         try{
