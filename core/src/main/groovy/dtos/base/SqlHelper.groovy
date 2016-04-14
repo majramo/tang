@@ -1,6 +1,8 @@
 package dtos.base
 
 import org.apache.log4j.Logger
+import org.testng.Reporter
+import org.testng.SkipException
 
 import static dtos.base.Constants.*
 
@@ -69,6 +71,11 @@ public class SqlHelper {
             return true
         }
         JdbcConnection jDbcConnection = jdbcConnections [dbName]
+        if(jDbcConnection == null){
+            Reporter.log("Can't connect to db: $dbName")
+            throw new SkipException("Can't connect to db: $dbName")
+
+        }
         return jDbcConnection.isConnectionOk()
     }
 
@@ -204,6 +211,7 @@ public class SqlHelper {
 
 
 	protected getDb_result(dbName){
+        isConnectionOk(dbName)
 		def queryConditions = getQueryConditions()
 		dbQueryRun = "$dbQuery\n $queryConditions\n "
 		dbResult = [:]
