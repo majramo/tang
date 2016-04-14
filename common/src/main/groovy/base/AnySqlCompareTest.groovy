@@ -6,6 +6,7 @@ import dtos.base.SqlHelper
 import org.apache.log4j.Logger
 import org.testng.ITestContext
 import org.testng.Reporter
+import org.testng.SkipException
 import org.testng.annotations.*
 import reports.ReporterHelper
 
@@ -216,6 +217,32 @@ public class AnySqlCompareTest {
     protected void setTargetSqlHelper(ITestContext testContext, dbName) {
         targetSqlDriver = new SqlHelper(null, log, dbName, settings.dbRun, settings)
         testContext.setAttribute(TARGET_SQL_HELPER, targetSqlDriver)
+    }
+
+    public void skipTest(msg) {
+        reporterLogLn("Test is skipped: $msg")
+        throw new SkipException("Test is skipped: $msg")
+    }
+
+    protected String getDbTypeToRun(dbName){
+        String databaseToRun = settings."$dbName"
+        String icon = ""
+        switch (databaseToRun.toLowerCase()) {
+            case ~/.*oracle.*/:
+                icon = "oracle"
+                break
+            case ~/.*sqlserver.*/:
+                icon = "sqlserver"
+                break
+            case ~/.*mysql.*/:
+                icon = "mysql"
+                break
+            case ~/.*db2.*/:
+                icon = "sb2"
+                break
+        }
+        return icon
+
     }
 
 }
