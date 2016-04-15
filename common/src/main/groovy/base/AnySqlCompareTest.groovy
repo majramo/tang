@@ -20,8 +20,6 @@ public class AnySqlCompareTest {
 
     protected SqlHelper sourceSqlDriver = null
     protected SqlHelper targetSqlDriver = null
-    protected String sourceDb
-    protected String targetDb
     public TangDbAssert tangAssert
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
@@ -92,19 +90,6 @@ public class AnySqlCompareTest {
 
     protected void compareSourceEqualsTarget(sourceSql, targetSql, threshold) {
         compareAllFromDb1InDb2(sourceSql, targetSql, threshold)
-    }
-
-
-    protected void compareSourceHasMoreThanTarget(String sourceSqlArbetsGivare, String targetSqlArbetsGivare, threshold) {
-        compareAllFromDb1InDb2(sourceSqlArbetsGivare, targetSqlArbetsGivare, threshold)
-    }
-
-    protected void compareSourceMapHasEqualTarget(String sourceSqlArbetsGivare, String targetSqlArbetsGivare, threshold) {
-        compareAllFromDb1InDb2(sourceSqlArbetsGivare, targetSqlArbetsGivare, threshold)
-    }
-
-    protected void compareSourceHasLessThanTarget(String sourceSqlArbetsGivare, String targetSqlArbetsGivare, threshold) {
-        compareAllFromDb1InDb2(sourceSqlArbetsGivare, targetSqlArbetsGivare, threshold)
     }
 
     protected void compareAllFromDb1InDb2(String sourceSql, String targetSql, threshold) {
