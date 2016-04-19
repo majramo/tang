@@ -154,10 +154,12 @@ public class AnySqlCompareTest {
 
 
         float tmpDataDiffProc = 0
-        try{
-            tmpDataDiffProc = 100 * diffDataCounter / totalCount
-        }catch (Exception e){
-            tmpDataDiffProc = 100
+        if(totalCount>0) {
+            try {
+                tmpDataDiffProc = 100 * diffDataCounter / totalCount
+            } catch (Exception e) {
+                tmpDataDiffProc = 100
+            }
         }
         float diffDataCounterProc = tmpDataDiffProc.trunc(2)
 
@@ -171,6 +173,7 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$threshold %> ");
 
         reporterLogLn ""
+        tangAssert.assertTrue(totalCount > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$totalCount>");
         tangAssert.assertTrue(diffLessThanThreshold, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc %> <Data $diffDataCounter: $diffDataCounterProc>");
     }
 
@@ -202,7 +205,7 @@ public class AnySqlCompareTest {
 
     }
 
-    public reporterLogLn(message = "") {
+    public void reporterLogLn(message = "") {
         Reporter.log("$message")
 //        Reporter.log("$message")
     }
@@ -223,10 +226,10 @@ public class AnySqlCompareTest {
         throw new SkipException("Test is skipped: $msg")
     }
 
-    protected String getDbTypeToRun(dbName){
-        String databaseToRun = settings."$dbName"
+    public String getDbIcon(dbName){
+        String dbDriverName = settings."$dbName".dbDriverName
         String icon = ""
-        switch (databaseToRun.toLowerCase()) {
+        switch (dbDriverName.toLowerCase()) {
             case ~/.*oracle.*/:
                 icon = "oracle"
                 break
@@ -237,7 +240,7 @@ public class AnySqlCompareTest {
                 icon = "mysql"
                 break
             case ~/.*db2.*/:
-                icon = "sb2"
+                icon = "db2"
                 break
         }
         return icon
