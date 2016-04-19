@@ -93,13 +93,13 @@ public class AnySqlCompareTest {
     }
 
     protected void compareAllFromDb1InDb2(String sourceSql, String targetSql, threshold) {
-        def sourceResult = getSourceDbRowsResult(sourceSql)
-        def targetResult = getTargetDbRowsResult(targetSql)
         reporterLogLn("Source: <${sourceSqlDriver.dbName}> ");
         reporterLogLn("Target: <$targetSqlDriver.dbName> ");
         reporterLogLn("Source Sql: <$sourceSql> ");
         reporterLogLn("Target Sql: <$targetSql> ");
         reporterLogLn("Threshold: <$threshold %> ");
+        def sourceResult = getSourceDbRowsResult(sourceSql)
+        def targetResult = getTargetDbRowsResult(targetSql)
         equals(sourceResult, targetResult, threshold, "ska vara lika")
 
     }
