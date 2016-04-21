@@ -127,7 +127,7 @@ public class AnySqlCompareTest {
         int diffDataCounter = 0
         try {
             sourceMap.eachWithIndex { it, index ->
-                if (diffDataCounter >= settings.maxDiffsToShow) {//maxAyyaySizeToWorkWith
+                if (diffDataCounter >= settings.maxDiffsToShow) {
                     throw new Exception(BREAK_CLOSURE)
                 }
                 if (!targetMap.contains(it)) {
@@ -140,7 +140,7 @@ public class AnySqlCompareTest {
 
         try {
             targetMap.eachWithIndex { it, index ->
-                if (diffDataCounter >= settings.maxDiffsToShow) {//maxAyyaySizeToWorkWith
+                if (diffDataCounter >= settings.maxDiffsToShow) {
                     throw new Exception(BREAK_CLOSURE)
                 }
                 if (!sourceMap.contains(it)) {
@@ -184,7 +184,7 @@ public class AnySqlCompareTest {
 
         try {
             map1.eachWithIndex { key, value, index ->
-                if (diffCounter >= settings.maxDiffsToShow) {//maxAyyaySizeToWorkWith
+                if (diffCounter >= settings.maxDiffsToShow) {
                     throw new Exception(BREAK_CLOSURE)
                 }
                 try {
