@@ -101,7 +101,6 @@ public class AnySqlCompareTest {
         reporterLogLn("Target Sql: <$targetSql> ");
         reporterLogLn("Threshold: <$threshold %> ");
         equals(sourceResult, targetResult, threshold, "ska vara lika")
-
     }
 
 
