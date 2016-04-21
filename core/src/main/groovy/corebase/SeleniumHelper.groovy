@@ -131,8 +131,10 @@ public class SeleniumHelper implements ISeleniumHelper {
         switch (OS) {
             case ~/^win.*/:
                 os = WIN
+                break
             case ~/^mac.*/:
                 os = MAC
+                break
         }
         outputDirectory = ""
         if (outputDir.contains(File.separator)) {
