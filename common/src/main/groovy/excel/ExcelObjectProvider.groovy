@@ -15,6 +15,12 @@ class ExcelObjectProvider {
     }
 
     //Groovy
+    public static Object[][] getGdcObjects(file, int lines, columns) {
+        Iterator<Object[]> objectsFromExcel = new ExcelFileObjectReader(file).getBodyRowObjects(lines)
+        return getExcelGdcObjects(objectsFromExcel, columns)
+    }
+
+    //Groovy
     public static Object[][] getObject(file, int line, columns) {
         Iterator<Object[]> objectsFromExcel = new ExcelFileObjectReader(file).getBodyRowObject(line)
         return getExcelObjects(objectsFromExcel, columns)
@@ -35,6 +41,16 @@ class ExcelObjectProvider {
                 values.add(row."$column")
             }
             valueList.add(values)
+        }
+        return valueList
+    }
+
+    private static ArrayList<Object[][]> getExcelGdcObjects(objects, columns) {
+        ArrayList<Object[][]> valueList = new ArrayList<Object[][]>()
+        def values = [:]
+        objects.each { row ->
+
+            valueList.add(row)
         }
         return valueList
     }
