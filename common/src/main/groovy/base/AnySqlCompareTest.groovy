@@ -37,7 +37,7 @@ public class AnySqlCompareTest {
     @BeforeTest(alwaysRun = true)
     public void beforeTest(ITestContext testContext, @Optional String environment, @Optional String database) {
         log.info("BeforeTest " + testContext.getName())
-        System.setProperty(REPORT_NG_REPORTING_TITLE, "Crm Sql Test Compare")
+        System.setProperty(REPORT_NG_REPORTING_TITLE, "Db Compare")
     }
 
 
