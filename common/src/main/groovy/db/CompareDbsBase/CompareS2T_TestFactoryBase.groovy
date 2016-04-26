@@ -1,6 +1,5 @@
-package db.CompareDbs
+package db.CompareDbsBase
 
-import db.CompareDbs.DbCompareProperties
 import dtos.SettingsHelper
 
 import static excel.ExcelObjectProvider.getGdcObjects

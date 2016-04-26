@@ -1,4 +1,4 @@
-package db.CompareDbs
+package db.CompareDbsBase
 
 import static org.apache.commons.lang3.StringUtils.isBlank
 

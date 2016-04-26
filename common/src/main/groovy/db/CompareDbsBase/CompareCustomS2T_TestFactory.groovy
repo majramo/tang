@@ -1,4 +1,4 @@
-package db.CompareDbs
+package db.CompareDbsBase
 
 import org.testng.annotations.Factory
 import org.testng.annotations.Parameters
