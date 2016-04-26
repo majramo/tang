@@ -170,8 +170,8 @@ public class AnySqlCompareTest {
         reporterLogLn ""
         reporterLogLn "####################"
         reporterLogLn("Diff size: <$diffCount> <%$diffSizeProc>");
-        reporterLogLn("Diff data: <$diffDataCounter)> <%$diffDataCounterProc>");
-        reporterLogLn("Threshold: <$threshold %> ");
+        reporterLogLn("Diff data: <$diffDataCounter> <%$diffDataCounterProc>");
+        reporterLogLn("Threshold: <$threshold%> ");
 
         reporterLogLn ""
         tangAssert.assertTrue(totalCount > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$totalCount>");
