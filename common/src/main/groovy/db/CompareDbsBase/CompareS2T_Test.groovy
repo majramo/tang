@@ -15,6 +15,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
     private DbCompareProperties dbCompareProperties
 
     public CompareS2T_Test(DbCompareProperties dbCompareProperties) {
+        super.setup()
         row = dbCompareProperties.row
         sourceDb = dbCompareProperties.sourceDb
         targetDb = dbCompareProperties.targetDb

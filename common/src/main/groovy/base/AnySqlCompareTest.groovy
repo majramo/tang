@@ -26,7 +26,7 @@ public class AnySqlCompareTest {
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
     def applicationConf = settingsHelper.applicationConf
-
+    private static boolean settingChanged
 
     @BeforeSuite(alwaysRun = true)
     public void beforeSuite(ITestContext testContext) {
@@ -248,7 +248,8 @@ public class AnySqlCompareTest {
 
     }
 
-    private void setup() {
+    public void setup() {
+        if(!settingChanged) {
             int COLUMN_DB_NAME = 0
             int COLUMN_OWNER = 1
             int COLUMN_DB_DRIVER_NAME = 2
@@ -288,5 +289,7 @@ public class AnySqlCompareTest {
                     settings."${dbName}" = dbSettings
                 }
             }
+            settingChanged = true
+        }
     }
 }
