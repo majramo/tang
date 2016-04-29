@@ -56,8 +56,6 @@ public class AnySqlCompareTest {
     public void beforeMethod(ITestContext testContext) {
         log.info("BeforeMethod " + testContext.getName())
 
-        log.info("BeforeMethod " + testContext.getName())
-
     }
 
     @AfterClass(alwaysRun = true)
@@ -111,10 +109,12 @@ public class AnySqlCompareTest {
         def diffCount = sourceMap.size() - targetMap.size()
         def totalCount = sourceMap.size() + targetMap.size()
         float tmpSizeDiffProc = 0
-        try{
-            tmpSizeDiffProc = 100 * diffCount / totalCount
-        }catch (Exception e){
-            tmpSizeDiffProc = 100
+        if(totalCount > 0){
+            try{
+                tmpSizeDiffProc = 100 * diffCount / totalCount
+            }catch (Exception e){
+                tmpSizeDiffProc = 100
+            }
         }
         float diffSizeProc = tmpSizeDiffProc.trunc(2)
         reporterLogLn("");
@@ -174,7 +174,6 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$threshold%> ");
 
         reporterLogLn ""
-        tangAssert.assertTrue(totalCount > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$totalCount>");
         tangAssert.assertTrue(diffLessThanThreshold, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc %> <Data $diffDataCounter: $diffDataCounterProc>");
     }
 
@@ -227,7 +226,7 @@ public class AnySqlCompareTest {
         throw new SkipException("Test is skipped: $msg")
     }
 
-    public String getDbIcon(dbName){
+    public String getDbType(dbName){
         String dbDriverName = settings."$dbName".dbDriverName
         String icon = ""
         switch (dbDriverName.toLowerCase()) {
@@ -245,7 +244,6 @@ public class AnySqlCompareTest {
                 break
         }
         return icon
-
     }
 
     public void setup() {

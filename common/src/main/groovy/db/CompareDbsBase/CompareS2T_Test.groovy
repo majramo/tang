@@ -44,7 +44,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
         }
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
-        reporterLogLn(reporterHelper.addIcons(getDbIcon(sourceDb), getDbIcon(targetDb)))
+        reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb), getDbType(targetDb)))
 
         compareSourceEqualsTarget(sourceSql, targetSql, threshold)
     }
