@@ -95,6 +95,7 @@ public class AnySqlCompareTest {
     }
 
     protected void compareAllFromDb1InDb2(String sourceSql, String targetSql, threshold) {
+        boolean isCountQuery
         reporterLogLn("Source: <${sourceSqlDriver.dbName}> ");
         reporterLogLn("Target: <$targetSqlDriver.dbName> ");
         reporterLogLn("Source Sql: <$sourceSql> ");
@@ -102,12 +103,16 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$threshold %> ");
         def sourceResult = getSourceDbRowsResult(sourceSql)
         def targetResult = getTargetDbRowsResult(targetSql)
-        equals(sourceResult, targetResult, threshold, "ska vara lika")
+        if (sourceSql.replace(" ", "").toLowerCase().contains("SELECT COUNT(1) COUNT_".replace(" ", "").toLowerCase())){
+            isCountQuery = true
+        }
+        equals(sourceResult, targetResult, threshold, isCountQuery, "ska vara lika")
     }
 
 
-    protected void equals(ArrayList sourceMap, ArrayList targetMap, threshold, msg ="") {
+    protected void equals(ArrayList sourceMap, ArrayList targetMap, threshold, isCountQuery = false, msg ="") {
         boolean diffLessThanThreshold = true
+
         def diffCount = sourceMap.size() - targetMap.size()
         def totalCount = sourceMap.size() + targetMap.size()
         float tmpSizeDiffProc = 0
@@ -120,6 +125,12 @@ public class AnySqlCompareTest {
         reporterLogLn("");
         reporterLogLn("Source size: <${sourceMap.size()}>");
         reporterLogLn("Target size: <${targetMap.size()}>");
+        if (isCountQuery){
+            reporterLogLn("Source result: <$sourceMap>");
+            reporterLogLn("Target result: <$targetMap>");
+        }
+
+
         reporterLogLn("");
 
         if(diffCount != 0){
