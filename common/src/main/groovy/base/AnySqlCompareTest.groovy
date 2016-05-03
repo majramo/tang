@@ -98,9 +98,12 @@ public class AnySqlCompareTest {
         boolean isCountQuery
         reporterLogLn("Source: <${sourceSqlDriver.dbName}> ");
         reporterLogLn("Target: <$targetSqlDriver.dbName> ");
-        reporterLogLn("Source Sql: <$sourceSql> ");
-        reporterLogLn("Target Sql: <$targetSql> ");
-        reporterLogLn("Threshold: <$threshold %> ");
+        reporterLogLn("Source Sql:");
+        reporterLogLn(sourceSql);
+        reporterLogLn("Target Sql:");
+        reporterLogLn("");
+        reporterLogLn(targetSql);
+        reporterLogLn("Threshold: <$threshold%> ");
         def sourceResult = getSourceDbRowsResult(sourceSql)
         def targetResult = getTargetDbRowsResult(targetSql)
         if (sourceSql.replace(" ", "").toLowerCase().contains("SELECT COUNT(1) COUNT_".replace(" ", "").toLowerCase())){
@@ -180,13 +183,13 @@ public class AnySqlCompareTest {
         }
         reporterLogLn ""
         reporterLogLn "####################"
-        reporterLogLn("Diff size: <$diffCount> <%$diffSizeProc>");
-        reporterLogLn("Diff data: <$diffDataCounter> <%$diffDataCounterProc>");
+        reporterLogLn("Diff size: <$diffCount> <$diffSizeProc%>");
+        reporterLogLn("Diff data: <$diffDataCounter> <$diffDataCounterProc%>");
         reporterLogLn("Threshold: <$threshold%> ");
 
         reporterLogLn ""
         tangAssert.assertTrue(totalCount > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$totalCount>");
-        tangAssert.assertTrue(diffLessThanThreshold, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc %> <Data $diffDataCounter: $diffDataCounterProc>");
+        tangAssert.assertTrue(diffLessThanThreshold, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc%> <Data $diffDataCounter: $diffDataCounterProc>");
     }
 
     protected int equals(String message, Map map1, Map map2) {
