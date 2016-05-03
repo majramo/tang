@@ -26,7 +26,7 @@ public class AnySqlCompareTest {
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
     def applicationConf = settingsHelper.applicationConf
-
+    private static boolean settingChanged
 
     @BeforeSuite(alwaysRun = true)
     public void beforeSuite(ITestContext testContext) {
@@ -54,8 +54,6 @@ public class AnySqlCompareTest {
 
     @BeforeMethod(alwaysRun = true)
     public void beforeMethod(ITestContext testContext) {
-        log.info("BeforeMethod " + testContext.getName())
-
         log.info("BeforeMethod " + testContext.getName())
 
     }
@@ -119,10 +117,12 @@ public class AnySqlCompareTest {
         def diffCount = sourceMap.size() - targetMap.size()
         def totalCount = sourceMap.size() + targetMap.size()
         float tmpSizeDiffProc = 0
-        try{
-            tmpSizeDiffProc = 100 * diffCount / totalCount
-        }catch (Exception e){
-            tmpSizeDiffProc = 100
+        if(totalCount > 0){
+            try{
+                tmpSizeDiffProc = 100 * diffCount / totalCount
+            }catch (Exception e){
+                tmpSizeDiffProc = 100
+            }
         }
         float diffSizeProc = tmpSizeDiffProc.trunc(2)
         reporterLogLn("");
@@ -188,8 +188,12 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$threshold%> ");
 
         reporterLogLn ""
+<<<<<<< HEAD
         tangAssert.assertTrue(totalCount > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$totalCount>");
         tangAssert.assertTrue(diffLessThanThreshold, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc%> <Data $diffDataCounter: $diffDataCounterProc>");
+=======
+        tangAssert.assertTrue(diffLessThanThreshold, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc %> <Data $diffDataCounter: $diffDataCounterProc>");
+>>>>>>> origin/master
     }
 
     protected int equals(String message, Map map1, Map map2) {
@@ -241,7 +245,7 @@ public class AnySqlCompareTest {
         throw new SkipException("Test is skipped: $msg")
     }
 
-    public String getDbIcon(dbName){
+    public String getDbType(dbName){
         String dbDriverName = settings."$dbName".dbDriverName
         String icon = ""
         switch (dbDriverName.toLowerCase()) {
@@ -259,10 +263,10 @@ public class AnySqlCompareTest {
                 break
         }
         return icon
-
     }
 
-    private void setup() {
+    public void setup() {
+        if(!settingChanged) {
             int COLUMN_DB_NAME = 0
             int COLUMN_OWNER = 1
             int COLUMN_DB_DRIVER_NAME = 2
@@ -302,5 +306,7 @@ public class AnySqlCompareTest {
                     settings."${dbName}" = dbSettings
                 }
             }
+            settingChanged = true
+        }
     }
 }

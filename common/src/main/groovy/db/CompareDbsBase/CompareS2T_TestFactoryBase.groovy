@@ -29,7 +29,7 @@ public class CompareS2T_TestFactoryBase {
     }
 
 
-    protected ArrayList runCustom(String inputFile, boolean onlyEnabled) {
+    protected ArrayList runCustom(String inputFile, boolean onlyEnabled, dbSourceRun) {
         def result = [];
         def columns = new DbCompareProperties().getCustomFieldNames()
         def excelBodyRows = getGdcObjects(inputFile, 0, columns)
@@ -44,8 +44,13 @@ public class CompareS2T_TestFactoryBase {
             def dbTarget = excelRow["targetDb"][0]
             def threshold = excelRow["threshold"][0]
             def comments = excelRow["comments"][0]
-
-            addObjectToList(result, onlyEnabled, row, dbSource, sourceSql, dbTarget, targetSql, threshold, comments, rowEnabled, rowLine)
+            if(dbSourceRun != "" ){
+                if(dbSourceRun == dbSource){
+                    addObjectToList(result, onlyEnabled, row, dbSource, sourceSql, dbTarget, targetSql, threshold, comments, rowEnabled, rowLine)
+                }
+            }else{
+                addObjectToList(result, onlyEnabled, row, dbSource, sourceSql, dbTarget, targetSql, threshold, comments, rowEnabled, rowLine)
+            }
         }
         return result;
     }
