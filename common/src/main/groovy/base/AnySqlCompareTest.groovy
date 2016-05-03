@@ -34,6 +34,7 @@ public class AnySqlCompareTest {
     }
 
     @Parameters(["environment", "sourceDb"])
+
     @BeforeTest(alwaysRun = true)
     public void beforeTest(ITestContext testContext, @Optional String environment, @Optional String database) {
         log.info("BeforeTest " + testContext.getName())
@@ -188,125 +189,122 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$threshold%> ");
 
         reporterLogLn ""
-<<<<<<< HEAD
         tangAssert.assertTrue(totalCount > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$totalCount>");
         tangAssert.assertTrue(diffLessThanThreshold, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc%> <Data $diffDataCounter: $diffDataCounterProc>");
-=======
-        tangAssert.assertTrue(diffLessThanThreshold, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc %> <Data $diffDataCounter: $diffDataCounterProc>");
->>>>>>> origin/master
-    }
 
-    protected int equals(String message, Map map1, Map map2) {
-        reporterLogLn "<Map>"
-        int diffCounter = 1
+}
 
-        reporterLogLn("Showing max no of diff: " + settings.maxDiffsToShow)
+        protected int equals(String message, Map map1, Map map2) {
+            reporterLogLn "<Map>"
+            int diffCounter = 1
 
-        try {
-            map1.eachWithIndex { key, value, index ->
-                if (diffCounter >= settings.maxDiffsToShow) {
-                    throw new Exception(BREAK_CLOSURE)
-                }
-                try {
-                    if (map2[key] != value) {
-                        diffCounter++
+            reporterLogLn("Showing max no of diff: " + settings.maxDiffsToShow)
+
+            try {
+                map1.eachWithIndex { key, value, index ->
+                    if (diffCounter >= settings.maxDiffsToShow) {
+                        throw new Exception(BREAK_CLOSURE)
+                    }
+                    try {
+                        if (map2[key] != value) {
+                            diffCounter++
+                            reporterLogLn "  Missing $diffCounter:$index <$key: $value>"
+                        }
+                    } catch (groovy.lang.MissingPropertyException e) {
                         reporterLogLn "  Missing $diffCounter:$index <$key: $value>"
                     }
-                } catch (groovy.lang.MissingPropertyException e) {
-                    reporterLogLn "  Missing $diffCounter:$index <$key: $value>"
+
                 }
-
+            } catch (Exception e) {
             }
-        } catch (Exception e) {
+            reporterLogLn ""
+            return diffCounter
+
         }
-        reporterLogLn ""
-        return diffCounter
 
-    }
-
-    public void reporterLogLn(message = "") {
-        Reporter.log("$message")
+        public void reporterLogLn(message = "") {
+            Reporter.log("$message")
 //        Reporter.log("$message")
-    }
-
-
-    protected void setSourceSqlHelper(ITestContext testContext, dbName) {
-        sourceSqlDriver = new SqlHelper(null, log, dbName, settings.dbRun, settings)
-        testContext.setAttribute(SOURCE_SQL_HELPER, sourceSqlDriver)
-    }
-
-    protected void setTargetSqlHelper(ITestContext testContext, dbName) {
-        targetSqlDriver = new SqlHelper(null, log, dbName, settings.dbRun, settings)
-        testContext.setAttribute(TARGET_SQL_HELPER, targetSqlDriver)
-    }
-
-    public void skipTest(msg) {
-        reporterLogLn("Test is skipped: $msg")
-        throw new SkipException("Test is skipped: $msg")
-    }
-
-    public String getDbType(dbName){
-        String dbDriverName = settings."$dbName".dbDriverName
-        String icon = ""
-        switch (dbDriverName.toLowerCase()) {
-            case ~/.*oracle.*/:
-                icon = "oracle"
-                break
-            case ~/.*sqlserver.*/:
-                icon = "sqlserver"
-                break
-            case ~/.*mysql.*/:
-                icon = "mysql"
-                break
-            case ~/.*db2.*/:
-                icon = "db2"
-                break
         }
-        return icon
-    }
 
-    public void setup() {
-        if(!settingChanged) {
-            int COLUMN_DB_NAME = 0
-            int COLUMN_OWNER = 1
-            int COLUMN_DB_DRIVER_NAME = 2
-            int COLUMN_DB_DRIVER = 3
-            int COLUMN_DB_URL = 4
-            int COLUMN_DB_USER_NAME = 5
-            int COLUMN_DB_PASSWORD = 6
-            int COLUMN_DB_TEST_DATABASE = 7
-            String[] columns = ["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "dbPassword", "dbTestDataBase"]
-            def databaseNamesFile = "/configFiles/databases.xls"
-            URL is = this.getClass().getResource(databaseNamesFile);
-            if (is == null) {
-                reporterLogLn("Resource " + databaseNamesFile + " is not found, ignored reading settings")
-                return
+
+        protected void setSourceSqlHelper(ITestContext testContext, dbName) {
+            sourceSqlDriver = new SqlHelper(null, log, dbName, settings.dbRun, settings)
+            testContext.setAttribute(SOURCE_SQL_HELPER, sourceSqlDriver)
+        }
+
+        protected void setTargetSqlHelper(ITestContext testContext, dbName) {
+            targetSqlDriver = new SqlHelper(null, log, dbName, settings.dbRun, settings)
+            testContext.setAttribute(TARGET_SQL_HELPER, targetSqlDriver)
+        }
+
+        public void skipTest(msg) {
+            reporterLogLn("Test is skipped: $msg")
+            throw new SkipException("Test is skipped: $msg")
+        }
+
+        public String getDbType(dbName){
+            String dbDriverName = settings."$dbName".dbDriverName
+            String icon = ""
+            switch (dbDriverName.toLowerCase()) {
+                case ~/.*oracle.*/:
+                    icon = "oracle"
+                    break
+                case ~/.*sqlserver.*/:
+                    icon = "sqlserver"
+                    break
+                case ~/.*mysql.*/:
+                    icon = "mysql"
+                    break
+                case ~/.*db2.*/:
+                    icon = "db2"
+                    break
             }
-            def databases = getObjects(databaseNamesFile, 0, columns)
-            databases.each {
-                def dbName = (it[COLUMN_DB_NAME]).toString().trim()
-                def dbOwner = (it[COLUMN_OWNER]).toString().trim()
-                def dbDriverName = (it[COLUMN_DB_DRIVER_NAME]).toString().trim()
-                def dbDriver = (it[COLUMN_DB_DRIVER]).toString().trim()
-                def dbUrl = (it[COLUMN_DB_URL]).toString().trim()
-                def dbUserName = (it[COLUMN_DB_USER_NAME]).toString().trim()
-                def dbPassword = (it[COLUMN_DB_PASSWORD]).toString().trim()
-                def dbDataBase = (it[COLUMN_DB_TEST_DATABASE]).toString().trim()
+            return icon
+        }
 
-                if (dbName != "" && dbName != null) {
-                    def dbSettings = [:]
-                    dbSettings['dbName'] = dbName
-                    dbSettings['owner'] = dbOwner
-                    dbSettings['dbDriverName'] = dbDriverName
-                    dbSettings['dbDriver'] = dbDriver
-                    dbSettings['dbUrl'] = dbUrl
-                    dbSettings['dbUserName'] = dbUserName
-                    dbSettings['dbPassword'] = dbPassword
-                    dbSettings['dbTestDataBase'] = dbDataBase
-                    settings."${dbName}" = dbSettings
+        public void setup() {
+            if(!settingChanged) {
+                int COLUMN_DB_NAME = 0
+                int COLUMN_OWNER = 1
+                int COLUMN_DB_DRIVER_NAME = 2
+                int COLUMN_DB_DRIVER = 3
+                int COLUMN_DB_URL = 4
+                int COLUMN_DB_USER_NAME = 5
+                int COLUMN_DB_PASSWORD = 6
+                int COLUMN_DB_TEST_DATABASE = 7
+                String[] columns = ["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "dbPassword", "dbTestDataBase"]
+                def databaseNamesFile = "/configFiles/databases.xls"
+                URL is = this.getClass().getResource(databaseNamesFile);
+                if (is == null) {
+                    reporterLogLn("Resource " + databaseNamesFile + " is not found, ignored reading settings")
+                    return
                 }
+                def databases = getObjects(databaseNamesFile, 0, columns)
+                databases.each {
+                    def dbName = (it[COLUMN_DB_NAME]).toString().trim()
+                    def dbOwner = (it[COLUMN_OWNER]).toString().trim()
+                    def dbDriverName = (it[COLUMN_DB_DRIVER_NAME]).toString().trim()
+                    def dbDriver = (it[COLUMN_DB_DRIVER]).toString().trim()
+                    def dbUrl = (it[COLUMN_DB_URL]).toString().trim()
+                    def dbUserName = (it[COLUMN_DB_USER_NAME]).toString().trim()
+                    def dbPassword = (it[COLUMN_DB_PASSWORD]).toString().trim()
+                    def dbDataBase = (it[COLUMN_DB_TEST_DATABASE]).toString().trim()
+
+                    if (dbName != "" && dbName != null) {
+                        def dbSettings = [:]
+                        dbSettings['dbName'] = dbName
+                        dbSettings['owner'] = dbOwner
+                        dbSettings['dbDriverName'] = dbDriverName
+                        dbSettings['dbDriver'] = dbDriver
+                        dbSettings['dbUrl'] = dbUrl
+                        dbSettings['dbUserName'] = dbUserName
+                        dbSettings['dbPassword'] = dbPassword
+                        dbSettings['dbTestDataBase'] = dbDataBase
+                        settings."${dbName}" = dbSettings
+                    }
+                }
+                settingChanged = true
             }
-            settingChanged = true
         }
     }
-}
