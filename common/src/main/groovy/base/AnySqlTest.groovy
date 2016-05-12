@@ -11,6 +11,7 @@ import org.testng.annotations.*
 import reports.ReporterHelper
 
 import static dtos.base.Constants.*
+import static excel.ExcelObjectProvider.getObjects
 
 public class AnySqlTest {
 
@@ -24,11 +25,13 @@ public class AnySqlTest {
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
     def applicationConf = settingsHelper.applicationConf
+    private static boolean settingChanged
 
     public Map<String, String> context = [:]
 
     @BeforeSuite(alwaysRun = true)
     public void beforeSuite(ITestContext testContext) {
+        setup()
 
     }
 
@@ -117,15 +120,14 @@ public class AnySqlTest {
         return dbResult
     }
 
-    public void checkDuplicateOfRowsRegardingFieldsInTableQuery(String table, String[] fields) {
-        String fieldsString = fields.join(",")
-        String query = "SELECT $fieldsString, COUNT(*) count FROM $table \n"
-        if (!fieldsString.contains(",")) {
-            query += "WHERE  NOT $fieldsString IS NULL \n"
+    public void checkDuplicateOfRowsRegardingFieldsInTableQuery(String table, String field) {
+        String query = "SELECT $field, COUNT(*) count FROM $table \n"
+        if (!field.contains(",")) {
+            query += "WHERE  NOT $field IS NULL \n"
         }
-        query += """GROUP BY $fieldsString
+        query += """GROUP BY $field
         HAVING COUNT(*) > 1;"""
-        def dbResult = getDbResult("Checking duplicates of <$fieldsString> in table <$table> ", dbRunTypeRows, query, 0)
+        def dbResult = getDbResult("Checking duplicates of <$field> in table <$table> ", dbRunTypeRows, query, 0)
         int counter = 1
         if(dbResult.size()>0){
             int dbResultsToPrint = dbResult.size() < MAX_DB_RESULTS_TO_PRINT ? dbResult.size():MAX_DB_RESULTS_TO_PRINT
@@ -164,5 +166,50 @@ public class AnySqlTest {
     public void setSqlHelper(ITestContext testContext, SqlHelper driver) {
         this.driver = (SqlHelper) testContext.getAttribute(SQL_HELPER)
         database = (String) testContext.getAttribute(DATABASE)
+    }
+
+    public void setup() {
+        if(!settingChanged) {
+            int COLUMN_DB_NAME = 0
+            int COLUMN_OWNER = 1
+            int COLUMN_DB_DRIVER_NAME = 2
+            int COLUMN_DB_DRIVER = 3
+            int COLUMN_DB_URL = 4
+            int COLUMN_DB_USER_NAME = 5
+            int COLUMN_DB_PASSWORD = 6
+            int COLUMN_DB_TEST_DATABASE = 7
+            String[] columns = ["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "dbPassword", "dbTestDataBase"]
+            def databaseNamesFile = "/configFiles/databases.xls"
+            URL is = this.getClass().getResource(databaseNamesFile);
+            if (is == null) {
+                reporterLogLn("Resource " + databaseNamesFile + " is not found, ignored reading settings")
+                return
+            }
+            def databases = getObjects(databaseNamesFile, 0, columns)
+            databases.each {
+                def dbName = (it[COLUMN_DB_NAME]).toString().trim()
+                def dbOwner = (it[COLUMN_OWNER]).toString().trim()
+                def dbDriverName = (it[COLUMN_DB_DRIVER_NAME]).toString().trim()
+                def dbDriver = (it[COLUMN_DB_DRIVER]).toString().trim()
+                def dbUrl = (it[COLUMN_DB_URL]).toString().trim()
+                def dbUserName = (it[COLUMN_DB_USER_NAME]).toString().trim()
+                def dbPassword = (it[COLUMN_DB_PASSWORD]).toString().trim()
+                def dbDataBase = (it[COLUMN_DB_TEST_DATABASE]).toString().trim()
+
+                if (dbName != "" && dbName != null) {
+                    def dbSettings = [:]
+                    dbSettings['dbName'] = dbName
+                    dbSettings['owner'] = dbOwner
+                    dbSettings['dbDriverName'] = dbDriverName
+                    dbSettings['dbDriver'] = dbDriver
+                    dbSettings['dbUrl'] = dbUrl
+                    dbSettings['dbUserName'] = dbUserName
+                    dbSettings['dbPassword'] = dbPassword
+                    dbSettings['dbTestDataBase'] = dbDataBase
+                    settings."${dbName}" = dbSettings
+                }
+            }
+            settingChanged = true
+        }
     }
 }
