@@ -36,7 +36,12 @@ public class CompareS2T_TestFactoryBase {
 
         excelBodyRows.eachWithIndex { excelRow, index ->
             def rowLine = index + 1
-            int row = Integer.parseInt(excelRow["row"][0].replaceAll(/\..*/, ''))
+            int row = 0
+            try {
+                 row = Integer.parseInt(excelRow["row"][0].replaceAll(/\..*/, ''))
+            } catch (java.lang.NumberFormatException e){
+                def a
+            }
             boolean rowEnabled = excelRow["enabled"][0] != null && excelRow["enabled"][0] == "true"
             def dbSource = excelRow["sourceDb"][0]
             def sourceSql = excelRow["sourceSql"][0]

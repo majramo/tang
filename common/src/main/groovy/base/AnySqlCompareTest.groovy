@@ -118,10 +118,10 @@ public class AnySqlCompareTest {
         def diffCount = sourceMap.size() - targetMap.size()
         def totalCount = sourceMap.size() + targetMap.size()
         float tmpSizeDiffProc = 0
-        if(totalCount > 0){
-            try{
+        if (totalCount > 0) {
+            try {
                 tmpSizeDiffProc = 100 * diffCount / totalCount
-            }catch (Exception e){
+            } catch (Exception e) {
                 tmpSizeDiffProc = 100
             }
         }
@@ -129,7 +129,7 @@ public class AnySqlCompareTest {
         reporterLogLn("");
         reporterLogLn("Source size: <${sourceMap.size()}>");
         reporterLogLn("Target size: <${targetMap.size()}>");
-        if (isCountQuery){
+        if (isCountQuery) {
             reporterLogLn("Source result: <$sourceMap>");
             reporterLogLn("Target result: <$targetMap>");
         }
@@ -137,7 +137,7 @@ public class AnySqlCompareTest {
 
         reporterLogLn("");
 
-        if(diffCount != 0){
+        if (diffCount != 0) {
             reporterLogLn("Showing max no of diff: " + settings.maxDiffsToShow)
         }
 
@@ -145,29 +145,41 @@ public class AnySqlCompareTest {
         try {
             sourceMap.eachWithIndex { it, index ->
                 if (diffDataCounter >= settings.maxDiffsToShow) {
-                    throw new Exception(BREAK_CLOSURE)
+                    throw new Exception(BREAK_CLOSURE, new Throwable(BREAK_CLOSURE))
                 }
                 if (!targetMap.contains(it)) {
                     diffDataCounter++
                     reporterLogLn "  Missing in target: $diffDataCounter:$index <$it>"
                 }
             }
-        } catch (Exception e) {
+        }catch (groovy.lang.MissingPropertyException e) {
+            Reporter.log("Source och target result måste ha samma kolumnnamn!")
+            throw new SkipException("Source och target result måste ha samma kolumnnamn")
+        }catch (Exception e) {
+            if(!e.cause.toString().contains(BREAK_CLOSURE)){
+                throw e
+            }
         }
 
+        diffDataCounter = 0
         try {
             targetMap.eachWithIndex { it, index ->
                 if (diffDataCounter >= settings.maxDiffsToShow) {
-                    throw new Exception(BREAK_CLOSURE)
+                    throw new Exception(BREAK_CLOSURE, new Throwable(BREAK_CLOSURE))
                 }
                 if (!sourceMap.contains(it)) {
                     diffDataCounter++
                     reporterLogLn "  Missing in source: $diffDataCounter:$index <$it>"
                 }
             }
-        } catch (Exception e) {
+        }catch (groovy.lang.MissingPropertyException e) {
+            Reporter.log("Source och target result måste ha samma kolumnnamn!")
+            throw new SkipException("Source och target result måste ha samma kolumnnamn")
+        }catch (Exception e) {
+            if(!e.cause.toString().contains(BREAK_CLOSURE)){
+                throw e
+            }
         }
-
 
         float tmpDataDiffProc = 0
         if(totalCount>0) {
@@ -216,6 +228,7 @@ public class AnySqlCompareTest {
 
                 }
             } catch (Exception e) {
+                def a
             }
             reporterLogLn ""
             return diffCounter
