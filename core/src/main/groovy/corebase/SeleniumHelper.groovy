@@ -698,6 +698,25 @@ public class SeleniumHelper implements ISeleniumHelper {
         return true
     }
 
+
+    public boolean clickAction(String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
+        boolean result = clickAction(element)
+        resetImplicitTime()
+        return result
+    }
+
+
+    public boolean clickAction(String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        Actions actions = new Actions(driver);
+        WebElement webElement = requireVisibleXpath(element)
+        new Actions(driver).click(webElement).perform();
+        // actions.moveToElement(webElement);
+        return true
+    }
+
     public boolean click(final String element, final String subXpath) {
         log.info getCurrentMethodName() + " element<$element> subXpath<$subXpath>"
         final WebElement we = findElementByXpathOrId(element)

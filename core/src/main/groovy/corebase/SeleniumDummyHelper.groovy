@@ -110,6 +110,15 @@ class SeleniumDummyHelper implements ISeleniumHelper {
         return true
     }
 
+    boolean clickAction(String xpath) {
+        return true
+    }
+
+
+    boolean clickAction(String xpath, int changedImplicitlyWait) {
+        return true
+    }
+
 
     boolean doubleClick(String xpath) {
         return true

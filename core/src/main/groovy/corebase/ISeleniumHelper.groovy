@@ -45,6 +45,10 @@ public interface ISeleniumHelper {
 
     public boolean click(final String xpath, int changedImplicitlyWait)
 
+    public boolean clickAction(final String xpath)
+
+    public boolean clickAction(final String xpath, int changedImplicitlyWait)
+
     public boolean doubleClick(final String xpath)
 
     public boolean doubleClick(final String xpath, int changedImplicitlyWait)
