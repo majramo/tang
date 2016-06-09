@@ -6,11 +6,12 @@ class ExcelObjectProvider {
 
     public ExcelObjectProvider(inputFile){
         this.inputFile = inputFile
-        HashMap excelCellList=[:]
+        excelCapabilities = [:]
+        inputFile = ""
 
     }
 
-    private static HashMap excelCapabilities = [:] 
+    private static HashMap excelCapabilities = [:]
     private static String inputFile = ""
 
 
