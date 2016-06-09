@@ -1,6 +1,7 @@
 package db.CompareDbsBase
 
 import base.AnySqlCompareTest
+import base.InitDbSettings
 import org.testng.ITestContext
 import org.testng.annotations.Test
 

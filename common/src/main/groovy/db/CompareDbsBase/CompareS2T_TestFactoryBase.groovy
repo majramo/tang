@@ -1,77 +1,95 @@
 package db.CompareDbsBase
 
 import dtos.SettingsHelper
+import excel.ExcelObjectProvider
 
 import static excel.ExcelObjectProvider.getGdcObjects
 
 public class CompareS2T_TestFactoryBase {
     static boolean settingsChanged
+    public static final String ENABLED = "enabled"
+    public static final String SOURCE_DB = "sourceDb"
+    public static final String SOURCE_SQL = "sourceSql"
+    public static final String TARGET_SQL = "targetSql"
+    public static final String TARGET_DB = "targetDb"
+    public static final String THRESHOLD = "threshold"
+    public static final String COMMENTS = "comments"
+    public static final String ROW = "row"
+    public static final String BY = "by"
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
 
-    protected ArrayList runCommon(String inputFile, String dbSource, String dbTarget, boolean onlyEnabled) {
+    protected ArrayList runCommon(String inputFile, String sourceDb, String targetDb, boolean enabledColumn, String byColumn) {
         def result = [];
-        def columns = new DbCompareProperties().getCommonFieldNames()
-        def excelBodyRows = getGdcObjects(inputFile, 0, columns)
-
-        excelBodyRows.eachWithIndex { excelRow, index ->
-            def rowLine = index + 1
-            int row = Integer.parseInt(excelRow["row"][0].replaceAll(/\..*/, ''))
-            boolean rowEnabled = excelRow["enabled"][0] != null && excelRow["enabled"][0] == "true"
-            def sourceSql = excelRow["sourceSql"][0]
-            def targetSql = excelRow["targetSql"][0]
-            def threshold = excelRow["threshold"][0]
-            def comments = excelRow["comments"][0]
-
-            addObjectToList(result, onlyEnabled, row, dbSource, sourceSql, dbTarget, targetSql, threshold, comments, rowEnabled, rowLine)
+        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
+        excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS])
+        if (enabledColumn) {
+            excelObjectProvider.addColumnsCapabiliteisToRetrive(ENABLED, "true")
         }
-        return result;
-    }
+        if (byColumn != "") {
+            excelObjectProvider.addColumnsCapabiliteisToRetrive(BY, byColumn)
+        }
 
+        def excelBodyRows = excelObjectProvider.getGdcObjects(0)
 
-    protected ArrayList runCustom(String inputFile, boolean onlyEnabled, dbSourceRun) {
-        def result = [];
-        def columns = new DbCompareProperties().getCustomFieldNames()
-        def excelBodyRows = getGdcObjects(inputFile, 0, columns)
 
         excelBodyRows.eachWithIndex { excelRow, index ->
             def rowLine = index + 1
             int row = 0
             try {
-                 row = Integer.parseInt(excelRow["row"][0].replaceAll(/\..*/, ''))
-            } catch (java.lang.NumberFormatException e){
-                def a
+                row = Integer.parseInt(excelRow[ROW].replaceAll(/\..*/, ''))
+            } catch (java.lang.NumberFormatException e) {
             }
-            boolean rowEnabled = excelRow["enabled"][0] != null && excelRow["enabled"][0] == "true"
-            def dbSource = excelRow["sourceDb"][0]
-            def sourceSql = excelRow["sourceSql"][0]
-            def targetSql = excelRow["targetSql"][0]
-            def dbTarget = excelRow["targetDb"][0]
-            def threshold = excelRow["threshold"][0]
-            def comments = excelRow["comments"][0]
-            if(dbSourceRun != "" ){
-                if(dbSourceRun == dbSource){
-                    addObjectToList(result, onlyEnabled, row, dbSource, sourceSql, dbTarget, targetSql, threshold, comments, rowEnabled, rowLine)
-                }
-            }else{
-                addObjectToList(result, onlyEnabled, row, dbSource, sourceSql, dbTarget, targetSql, threshold, comments, rowEnabled, rowLine)
-            }
+            def sourceSql = excelRow[SOURCE_SQL]
+            def targetSql = excelRow[TARGET_SQL]
+            def threshold = excelRow[THRESHOLD]
+            def comments = excelRow[COMMENTS]
+
+            addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine)
         }
         return result;
     }
 
-    protected void addObjectToList(result, onlyEnabled, row, dbSource, sourceSql, dbTarget, targetSql, threshold, comments, rowEnabled, rowLine) {
-        def dbCompareProperties
-        if (dbSource != "" && sourceSql != "") {
-            if (onlyEnabled) {
-                if (rowEnabled) {
-                    dbCompareProperties = new DbCompareProperties("$rowLine:$row", dbSource, sourceSql, dbTarget, targetSql, threshold, comments)
-                    result.add(new CompareS2T_Test(dbCompareProperties))
-                }
-            } else {
-                dbCompareProperties = new DbCompareProperties("$rowLine:$row", dbSource, sourceSql, dbTarget, targetSql, threshold, comments)
-                result.add(new CompareS2T_Test(dbCompareProperties))
+
+    protected ArrayList runCustom(String inputFile, boolean enabledColumn, byColumn, sourceDbColumn) {
+        def result = [];
+
+        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
+        excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_DB, TARGET_DB, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS])
+        if (enabledColumn) {
+            excelObjectProvider.addColumnsCapabiliteisToRetrive(ENABLED, "true")
+        }
+        if (byColumn != "") {
+            excelObjectProvider.addColumnsCapabiliteisToRetrive(BY, byColumn)
+        }
+        if (sourceDbColumn != "") {
+            excelObjectProvider.addColumnsCapabiliteisToRetrive(SOURCE_DB, sourceDbColumn)
+        }
+        def excelBodyRows = excelObjectProvider.getGdcObjects(0)
+
+        excelBodyRows.eachWithIndex { excelRow, index ->
+            def rowLine = index + 1
+            int row = 0
+            try {
+                row = Integer.parseInt(excelRow[ROW].replaceAll(/\..*/, ''))
+            } catch (java.lang.NumberFormatException e) {
             }
+            def sourceDb = excelRow[SOURCE_DB]
+            def sourceSql = excelRow[SOURCE_SQL]
+            def targetSql = excelRow[TARGET_SQL]
+            def targetDb = excelRow[TARGET_DB]
+            def threshold = excelRow[THRESHOLD]
+            def comments = excelRow[COMMENTS]
+            addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine)
+        }
+        return result;
+    }
+
+    protected void addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine) {
+        def dbCompareProperties
+        if (sourceDb != "" && sourceSql != "") {
+            dbCompareProperties = new DbCompareProperties("$rowLine:$row", sourceDb, sourceSql, targetDb, targetSql, threshold, comments)
+            result.add(new CompareS2T_Test(dbCompareProperties))
         }
     }
 }
