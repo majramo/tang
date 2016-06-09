@@ -246,6 +246,28 @@ public class SqlHelper {
             return jDbcConnection.execute (dbExecuteStatement)
         }
     }
+
+    protected executeAndSkipException(dbName, dbExecuteStatement, skipException){
+        log.info dbQueryRun
+        log.info dbExecuteStatement
+        if(sqlFile != null && sqlFile.exists()){
+            sqlFile.append(dbQueryRun)
+            sqlFile.append(dbExecuteStatement)
+        }
+        JdbcConnection jDbcConnection = jdbcConnections [dbName]
+        if(jDbcConnection != null){
+            try {
+                return jDbcConnection.execute (dbExecuteStatement)
+            } catch (java.sql.SQLSyntaxErrorException|java.sql.SQLException e) {
+                if(e.toString().contains(skipException)){
+                    Reporter.log("Error skipped: " + e.toString())
+                    throw new SkipException("Skip error: " + e.toString())
+                }
+                throw e
+            }
+        }
+    }
+
 	public boolean isQueryOk(){
 		return (queryConditionsTextList.size() || queryConditionsXmlList.size() || dbQuery != "")
 	}
