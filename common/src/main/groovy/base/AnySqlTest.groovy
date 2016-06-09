@@ -170,45 +170,7 @@ public class AnySqlTest {
 
     public void setup() {
         if(!settingChanged) {
-            int COLUMN_DB_NAME = 0
-            int COLUMN_OWNER = 1
-            int COLUMN_DB_DRIVER_NAME = 2
-            int COLUMN_DB_DRIVER = 3
-            int COLUMN_DB_URL = 4
-            int COLUMN_DB_USER_NAME = 5
-            int COLUMN_DB_PASSWORD = 6
-            int COLUMN_DB_TEST_DATABASE = 7
-            String[] columns = ["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "dbPassword", "dbTestDataBase"]
-            def databaseNamesFile = "/configFiles/databases.xls"
-            URL is = this.getClass().getResource(databaseNamesFile);
-            if (is == null) {
-                reporterLogLn("Resource " + databaseNamesFile + " is not found, ignored reading settings")
-                return
-            }
-            def databases = getObjects(databaseNamesFile, 0, columns)
-            databases.each {
-                def dbName = (it[COLUMN_DB_NAME]).toString().trim()
-                def dbOwner = (it[COLUMN_OWNER]).toString().trim()
-                def dbDriverName = (it[COLUMN_DB_DRIVER_NAME]).toString().trim()
-                def dbDriver = (it[COLUMN_DB_DRIVER]).toString().trim()
-                def dbUrl = (it[COLUMN_DB_URL]).toString().trim()
-                def dbUserName = (it[COLUMN_DB_USER_NAME]).toString().trim()
-                def dbPassword = (it[COLUMN_DB_PASSWORD]).toString().trim()
-                def dbDataBase = (it[COLUMN_DB_TEST_DATABASE]).toString().trim()
-
-                if (dbName != "" && dbName != null) {
-                    def dbSettings = [:]
-                    dbSettings['dbName'] = dbName
-                    dbSettings['owner'] = dbOwner
-                    dbSettings['dbDriverName'] = dbDriverName
-                    dbSettings['dbDriver'] = dbDriver
-                    dbSettings['dbUrl'] = dbUrl
-                    dbSettings['dbUserName'] = dbUserName
-                    dbSettings['dbPassword'] = dbPassword
-                    dbSettings['dbTestDataBase'] = dbDataBase
-                    settings."${dbName}" = dbSettings
-                }
-            }
+            new InitDbSettings().setupDatabases()
             settingChanged = true
         }
     }

@@ -3,7 +3,7 @@ package base
 import dtos.SettingsHelper
 import dtos.base.Constants
 import dtos.base.SqlHelper
-import exceptions.TangFileException
+import excel.ExcelObjectProvider
 import org.apache.log4j.Logger
 import org.testng.ITestContext
 import org.testng.Reporter
@@ -20,8 +20,8 @@ public class AnySqlCompareTest {
     protected final static ReporterHelper reporterHelper = new ReporterHelper()
     public static final String BREAK_CLOSURE = "BreakClosure"
 
-    protected SqlHelper sourceSqlDriver = null
-    protected SqlHelper targetSqlDriver = null
+    protected SqlHelper sourceDbSqlDriver = null
+    protected SqlHelper targetDbSqlDriver = null
     public TangDbAssert tangAssert
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
@@ -42,13 +42,12 @@ public class AnySqlCompareTest {
     }
 
 
-
     @BeforeClass(alwaysRun = true)
     public void beforeClass(ITestContext testContext) {
         log.info("BeforeClass " + testContext.getName())
         tangAssert = new TangDbAssert()
-        sourceSqlDriver = (SqlHelper) testContext.getAttribute(SOURCE_SQL_HELPER)
-        targetSqlDriver = (SqlHelper) testContext.getAttribute(TARGET_SQL_HELPER)
+        sourceDbSqlDriver = (SqlHelper) testContext.getAttribute(SOURCE_SQL_HELPER)
+        targetDbSqlDriver = (SqlHelper) testContext.getAttribute(TARGET_SQL_HELPER)
         log.info("BeforeClass " + testContext.getName())
 
     }
@@ -64,20 +63,20 @@ public class AnySqlCompareTest {
         log.info("afterClass " + testContext.getName())
     }
 
-    def getSourceDbRowsResult( String dbQuery) {
-        return getDbResult(sourceSqlDriver, dbQuery, Constants.dbRunTypeRows)
+    def getSourceDbRowsResult(String dbQuery) {
+        return getDbResult(sourceDbSqlDriver, dbQuery, Constants.dbRunTypeRows)
     }
 
     def getTargetDbRowsResult(String dbQuery) {
-        return getDbResult(targetSqlDriver, dbQuery, Constants.dbRunTypeRows)
+        return getDbResult(targetDbSqlDriver, dbQuery, Constants.dbRunTypeRows)
     }
 
-    def getSourceDbFirstRowResult( String dbQuery) {
-        return getDbResult(sourceSqlDriver, dbQuery, Constants.dbRunTypeFirstRow)
+    def getSourceDbFirstRowResult(String dbQuery) {
+        return getDbResult(sourceDbSqlDriver, dbQuery, Constants.dbRunTypeFirstRow)
     }
 
     def getTargetDbFirstRowResult(String dbQuery) {
-        return getDbResult(targetSqlDriver, dbQuery, Constants.dbRunTypeFirstRow)
+        return getDbResult(targetDbSqlDriver, dbQuery, Constants.dbRunTypeFirstRow)
     }
 
 
@@ -88,15 +87,14 @@ public class AnySqlCompareTest {
     }
 
 
-
     protected void compareSourceEqualsTarget(sourceSql, targetSql, threshold) {
         compareAllFromDb1InDb2(sourceSql, targetSql, threshold)
     }
 
     protected void compareAllFromDb1InDb2(String sourceSql, String targetSql, threshold) {
         boolean isCountQuery
-        reporterLogLn("Source: <${sourceSqlDriver.dbName}> ");
-        reporterLogLn("Target: <$targetSqlDriver.dbName> ");
+        reporterLogLn("Source: <${sourceDbSqlDriver.dbName}> ");
+        reporterLogLn("Target: <$targetDbSqlDriver.dbName> ");
         reporterLogLn("Source Sql:");
         reporterLogLn(sourceSql);
         reporterLogLn("Target Sql:");
@@ -105,14 +103,14 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$threshold%> ");
         def sourceResult = getSourceDbRowsResult(sourceSql)
         def targetResult = getTargetDbRowsResult(targetSql)
-        if (sourceSql.replace(" ", "").toLowerCase().contains("SELECT COUNT(1) COUNT_".replace(" ", "").toLowerCase())){
+        if (sourceSql.replace(" ", "").toLowerCase().contains("SELECT COUNT(1) COUNT_".replace(" ", "").toLowerCase())) {
             isCountQuery = true
         }
         equals(sourceResult, targetResult, threshold, isCountQuery, "ska vara lika")
     }
 
 
-    protected void equals(ArrayList sourceMap, ArrayList targetMap, threshold, isCountQuery = false, msg ="") {
+    protected void equals(ArrayList sourceMap, ArrayList targetMap, threshold, isCountQuery = false, msg = "") {
         boolean diffLessThanThreshold = true
 
         def diffCount = sourceMap.size() - targetMap.size()
@@ -152,11 +150,11 @@ public class AnySqlCompareTest {
                     reporterLogLn "  Missing in target: $diffDataCounter:$index <$it>"
                 }
             }
-        }catch (groovy.lang.MissingPropertyException e) {
+        } catch (groovy.lang.MissingPropertyException e) {
             Reporter.log("Source och target result måste ha samma kolumnnamn!")
             throw new SkipException("Source och target result måste ha samma kolumnnamn")
-        }catch (Exception e) {
-            if(!e.cause.toString().contains(BREAK_CLOSURE)){
+        } catch (Exception e) {
+            if (!e.cause.toString().contains(BREAK_CLOSURE)) {
                 throw e
             }
         }
@@ -172,17 +170,17 @@ public class AnySqlCompareTest {
                     reporterLogLn "  Missing in source: $diffDataCounter:$index <$it>"
                 }
             }
-        }catch (groovy.lang.MissingPropertyException e) {
+        } catch (groovy.lang.MissingPropertyException e) {
             Reporter.log("Source och target result måste ha samma kolumnnamn!")
             throw new SkipException("Source och target result måste ha samma kolumnnamn")
-        }catch (Exception e) {
-            if(!e.cause.toString().contains(BREAK_CLOSURE)){
+        } catch (Exception e) {
+            if (!e.cause.toString().contains(BREAK_CLOSURE)) {
                 throw e
             }
         }
 
         float tmpDataDiffProc = 0
-        if(totalCount>0) {
+        if (totalCount > 0) {
             try {
                 tmpDataDiffProc = 100 * diffDataCounter / totalCount
             } catch (Exception e) {
@@ -191,7 +189,7 @@ public class AnySqlCompareTest {
         }
         float diffDataCounterProc = tmpDataDiffProc.trunc(2)
 
-        if(diffSizeProc.abs() > threshold || diffDataCounterProc.abs() > threshold){
+        if (diffSizeProc.abs() > threshold || diffDataCounterProc.abs() > threshold) {
             diffLessThanThreshold = false
         }
         reporterLogLn ""
@@ -204,120 +202,83 @@ public class AnySqlCompareTest {
         tangAssert.assertTrue(totalCount > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$totalCount>");
         tangAssert.assertTrue(diffLessThanThreshold, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc%> <Data $diffDataCounter: $diffDataCounterProc>");
 
-}
+    }
 
-        protected int equals(String message, Map map1, Map map2) {
-            reporterLogLn "<Map>"
-            int diffCounter = 1
+    protected int equals(String message, Map map1, Map map2) {
+        reporterLogLn "<Map>"
+        int diffCounter = 1
 
-            reporterLogLn("Showing max no of diff: " + settings.maxDiffsToShow)
+        reporterLogLn("Showing max no of diff: " + settings.maxDiffsToShow)
 
-            try {
-                map1.eachWithIndex { key, value, index ->
-                    if (diffCounter >= settings.maxDiffsToShow) {
-                        throw new Exception(BREAK_CLOSURE)
-                    }
-                    try {
-                        if (map2[key] != value) {
-                            diffCounter++
-                            reporterLogLn "  Missing $diffCounter:$index <$key: $value>"
-                        }
-                    } catch (groovy.lang.MissingPropertyException e) {
+        try {
+            map1.eachWithIndex { key, value, index ->
+                if (diffCounter >= settings.maxDiffsToShow) {
+                    throw new Exception(BREAK_CLOSURE)
+                }
+                try {
+                    if (map2[key] != value) {
+                        diffCounter++
                         reporterLogLn "  Missing $diffCounter:$index <$key: $value>"
                     }
-
+                } catch (groovy.lang.MissingPropertyException e) {
+                    reporterLogLn "  Missing $diffCounter:$index <$key: $value>"
                 }
-            } catch (Exception e) {
-                def a
+
             }
-            reporterLogLn ""
-            return diffCounter
-
+        } catch (Exception e) {
+            def a
         }
+        reporterLogLn ""
+        return diffCounter
 
-        public void reporterLogLn(message = "") {
-            Reporter.log("$message")
+    }
+
+    public void reporterLogLn(message = "") {
+        Reporter.log("$message")
 //        Reporter.log("$message")
+    }
+
+
+    protected void setSourceSqlHelper(ITestContext testContext, dbName) {
+        sourceDbSqlDriver = new SqlHelper(null, log, dbName, settings.dbRun, settings)
+        testContext.setAttribute(SOURCE_SQL_HELPER, sourceDbSqlDriver)
+    }
+
+    protected void setTargetSqlHelper(ITestContext testContext, dbName) {
+        targetDbSqlDriver = new SqlHelper(null, log, dbName, settings.dbRun, settings)
+        testContext.setAttribute(TARGET_SQL_HELPER, targetDbSqlDriver)
+    }
+
+    public void skipTest(msg) {
+        reporterLogLn("Test is skipped: $msg")
+        throw new SkipException("Test is skipped: $msg")
+    }
+
+    public String getDbType(dbName) {
+        String dbDriverName = settings."$dbName".dbDriverName
+        String icon = ""
+        switch (dbDriverName.toLowerCase()) {
+            case ~/.*oracle.*/:
+                icon = "oracle"
+                break
+            case ~/.*sqlserver.*/:
+                icon = "sqlserver"
+                break
+            case ~/.*mysql.*/:
+                icon = "mysql"
+                break
+            case ~/.*db2.*/:
+                icon = "db2"
+                break
         }
+        return icon
+    }
 
 
-        protected void setSourceSqlHelper(ITestContext testContext, dbName) {
-            sourceSqlDriver = new SqlHelper(null, log, dbName, settings.dbRun, settings)
-            testContext.setAttribute(SOURCE_SQL_HELPER, sourceSqlDriver)
-        }
-
-        protected void setTargetSqlHelper(ITestContext testContext, dbName) {
-            targetSqlDriver = new SqlHelper(null, log, dbName, settings.dbRun, settings)
-            testContext.setAttribute(TARGET_SQL_HELPER, targetSqlDriver)
-        }
-
-        public void skipTest(msg) {
-            reporterLogLn("Test is skipped: $msg")
-            throw new SkipException("Test is skipped: $msg")
-        }
-
-        public String getDbType(dbName){
-            String dbDriverName = settings."$dbName".dbDriverName
-            String icon = ""
-            switch (dbDriverName.toLowerCase()) {
-                case ~/.*oracle.*/:
-                    icon = "oracle"
-                    break
-                case ~/.*sqlserver.*/:
-                    icon = "sqlserver"
-                    break
-                case ~/.*mysql.*/:
-                    icon = "mysql"
-                    break
-                case ~/.*db2.*/:
-                    icon = "db2"
-                    break
-            }
-            return icon
-        }
-
-        public void setup() {
-            if(!settingChanged) {
-                int COLUMN_DB_NAME = 0
-                int COLUMN_OWNER = 1
-                int COLUMN_DB_DRIVER_NAME = 2
-                int COLUMN_DB_DRIVER = 3
-                int COLUMN_DB_URL = 4
-                int COLUMN_DB_USER_NAME = 5
-                int COLUMN_DB_PASSWORD = 6
-                int COLUMN_DB_TEST_DATABASE = 7
-                String[] columns = ["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "dbPassword", "dbTestDataBase"]
-                def databaseNamesFile = "/configFiles/databases.xls"
-                URL is = this.getClass().getResource(databaseNamesFile);
-                if (is == null) {
-                    reporterLogLn("Resource " + databaseNamesFile + " is not found, ignored reading settings")
-                    return
-                }
-                def databases = getObjects(databaseNamesFile, 0, columns)
-                databases.each {
-                    def dbName = (it[COLUMN_DB_NAME]).toString().trim()
-                    def dbOwner = (it[COLUMN_OWNER]).toString().trim()
-                    def dbDriverName = (it[COLUMN_DB_DRIVER_NAME]).toString().trim()
-                    def dbDriver = (it[COLUMN_DB_DRIVER]).toString().trim()
-                    def dbUrl = (it[COLUMN_DB_URL]).toString().trim()
-                    def dbUserName = (it[COLUMN_DB_USER_NAME]).toString().trim()
-                    def dbPassword = (it[COLUMN_DB_PASSWORD]).toString().trim()
-                    def dbDataBase = (it[COLUMN_DB_TEST_DATABASE]).toString().trim()
-
-                    if (dbName != "" && dbName != null) {
-                        def dbSettings = [:]
-                        dbSettings['dbName'] = dbName
-                        dbSettings['owner'] = dbOwner
-                        dbSettings['dbDriverName'] = dbDriverName
-                        dbSettings['dbDriver'] = dbDriver
-                        dbSettings['dbUrl'] = dbUrl
-                        dbSettings['dbUserName'] = dbUserName
-                        dbSettings['dbPassword'] = dbPassword
-                        dbSettings['dbTestDataBase'] = dbDataBase
-                        settings."${dbName}" = dbSettings
-                    }
-                }
-                settingChanged = true
-            }
+    public void setup() {
+        if (!settingChanged) {
+            new InitDbSettings().setupDatabases()
+            settingChanged = true
         }
     }
+}
