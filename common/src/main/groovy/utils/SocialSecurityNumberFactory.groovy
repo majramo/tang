@@ -234,13 +234,13 @@ public class SocialSecurityNumberFactory implements Serializable {
             def year2 = year.substring(2, 4)
 //                socialSecurityNumbers["$year2$month$day$n1$n2$n3$n4"] = "$year$month$day-$n1$n2$n3$n4"
             if (gender.isEmpty()) {
-                addToList(n1, n2, n3, n4, year2)
+                addToList(n1, n2, n3, n4, year)
             } else {
                 if (isGenferFemaleRequired(n3)) {
-                    addToList(n1, n2, n3, n4, year2)
+                    addToList(n1, n2, n3, n4, year)
                 } else {
                     if (isGenferMaleRequired(n3)) {
-                        addToList(n1, n2, n3, n4, year2)
+                        addToList(n1, n2, n3, n4, year)
 
                     }
                 }
