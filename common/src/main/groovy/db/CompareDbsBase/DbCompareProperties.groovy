@@ -18,19 +18,20 @@ public class DbCompareProperties {
         fields["comments"] = ""
         fields["enabled"] = ""
     }
-    public DbCompareProperties(row, String sourceDb, String sourceSql, String targetDb, String targetSql, threshold = 0, comments = "", enabled = ""){
+    public DbCompareProperties(row, String sourceDb, String sourceSql, String targetDb, String targetSql, threshold = 0, comments = "", by = ""){
         fields["row"] = row
         fields["sourceDb"] = sourceDb
         fields["sourceSql"] = sourceSql
         fields["targetSql"] = targetSql
         fields["targetDb"] = targetDb
+        fields["by"] = by
 
         if(targetSql == "" || targetSql == "-") {
             fields["targetSql"] =  sourceSql
         }
         fields["threshold"] = threshold
         fields["comments"] = comments
-        fields["enabled"] = enabled
+        fields["by"] = by
         if(isBlank(fields["sourceDb"])){
             skipReason += "sourceDb is blank, "
         }
@@ -86,5 +87,11 @@ public class DbCompareProperties {
     def getComments() {
         fields["comments"]
     }
+
+    def getBy() {
+        fields["by"]
+    }
+
+    
 
 }

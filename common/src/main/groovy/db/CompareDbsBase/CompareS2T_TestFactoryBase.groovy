@@ -55,7 +55,7 @@ public class CompareS2T_TestFactoryBase {
         def result = [];
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
-        excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_DB, TARGET_DB, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS])
+        excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_DB, TARGET_DB, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS, BY])
         if (enabledColumn) {
             excelObjectProvider.addColumnsCapabiliteisToRetrive(ENABLED, "true")
         }
@@ -80,15 +80,16 @@ public class CompareS2T_TestFactoryBase {
             def targetDb = excelRow[TARGET_DB]
             def threshold = excelRow[THRESHOLD]
             def comments = excelRow[COMMENTS]
-            addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine)
+            def by = excelRow[BY]
+            addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by)
         }
         return result;
     }
 
-    protected void addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine) {
+    protected void addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by = "") {
         def dbCompareProperties
         if (sourceDb != "" && sourceSql != "") {
-            dbCompareProperties = new DbCompareProperties("$rowLine:$row", sourceDb, sourceSql, targetDb, targetSql, threshold, comments)
+            dbCompareProperties = new DbCompareProperties("$row : $rowLine", sourceDb, sourceSql, targetDb, targetSql, threshold, comments, by)
             result.add(new CompareS2T_Test(dbCompareProperties))
         }
     }

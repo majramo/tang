@@ -13,6 +13,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
     private String targetSql;
     private float threshold = 0;
     private String comments;
+    private String by;
     private DbCompareProperties dbCompareProperties
 
     public CompareS2T_Test(DbCompareProperties dbCompareProperties) {
@@ -21,6 +22,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
         sourceDb = dbCompareProperties.sourceDb
         targetDb = dbCompareProperties.targetDb
         comments = dbCompareProperties.comments
+        by = dbCompareProperties.by
 
         String dbSourceOwner = settings."$sourceDb".owner
         String dbTargetOwner = settings."$targetDb".owner
@@ -38,6 +40,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
     @Test
     public void compareSourceEqualsTargetTest(ITestContext testContext){
         reporterLogLn("Row: <$row> $comments ");
+        reporterLogLn("By: <$by>");
         reporterLogLn("#########")
 
         if(!dbCompareProperties.isComplete){

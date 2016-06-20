@@ -95,12 +95,17 @@ public class AnySqlCompareTest {
         boolean isCountQuery
         reporterLogLn("Source: <${sourceDbSqlDriver.dbName}> ");
         reporterLogLn("Target: <$targetDbSqlDriver.dbName> ");
-        reporterLogLn("Source Sql:");
-        reporterLogLn(sourceSql);
-        reporterLogLn("Target Sql:");
         reporterLogLn("");
+        reporterLogLn("Source Sql:");
+        reporterLogLn("###");
+        reporterLogLn(sourceSql);
+        reporterLogLn("");
+        reporterLogLn("Target Sql:");
+        reporterLogLn("###");
         reporterLogLn(targetSql);
+        reporterLogLn("");
         reporterLogLn("Threshold: <$threshold%> ");
+        reporterLogLn("###");
         def sourceResult = getSourceDbRowsResult(sourceSql)
         def targetResult = getTargetDbRowsResult(targetSql)
         if (sourceSql.replace(" ", "").toLowerCase().contains("SELECT COUNT(1) COUNT_".replace(" ", "").toLowerCase())) {
