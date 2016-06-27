@@ -166,9 +166,10 @@ public class ExcelFileObjectReader {
                 //Here we add which columns that should be included
                 excelRow.each { excelHeaderColumn ->
                     def field = excelHeaderColumn.toString()
-
-                    excelObjectData.addHeaderColumn(field)
-                    builder.addField(field, String)
+                    if(excelCapabilities.containsKey(field)){
+                        excelObjectData.addHeaderColumn(field, headerColumnNumber)
+                        builder.addField(field, String)
+                    }
                     headerColumnNumber++
                 }
             } else {

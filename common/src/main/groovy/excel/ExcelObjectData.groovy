@@ -15,6 +15,11 @@ class ExcelObjectData {
         excelHeaderMap[headersColumnNumber++] = field
     }
 
+    public addHeaderColumn(String field, int headersColumnNumber) {
+        excelHeaderMap[headersColumnNumber] = field
+    }
+
+
 
     Map header() {
         return excelHeaderMap

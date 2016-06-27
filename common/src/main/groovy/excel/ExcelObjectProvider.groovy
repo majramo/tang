@@ -45,9 +45,9 @@ class ExcelObjectProvider {
             excelCapabilities[cellName] = excelCellDataProperty
         }
         excelCellDataProperty.valueToComprae = cellCompareValue
-        if(cellCompareValue != ""){
+//        if(cellCompareValue != ""){
             excelCellDataProperty.compareType = cellCompareType
-        }
+//        }
 
 
     }
