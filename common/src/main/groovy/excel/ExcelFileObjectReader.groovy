@@ -51,8 +51,8 @@ public class ExcelFileObjectReader {
         setDataFromFile(capabilities, lines)
         return excelObjectData.getBodyRowObjects()
     }
-   public Iterator<Object[]> getBodyRowObjectsNew(lines, HashMap excelCapabilities) {
-        setDataFromFile(excelCapabilities, lines)
+   public Iterator<Object[]> getBodyRowObjectsNew(to, HashMap excelCapabilities, from = 0) {
+        setDataFromFile(excelCapabilities, to, from)
 //        return excelObjectData.getBodyRowObjects(excelCapabilities)
 //        return excelObjectData.getBodyRowObjects()
         return excelObjectData.excelBodyMap.iterator()
@@ -82,7 +82,7 @@ public class ExcelFileObjectReader {
         }
     }
 
-    private void setDataFromFile(HashMap excelCapabilities, int lines = 0) {
+    private void setDataFromFile(HashMap excelCapabilities, int to = 0, int from = 0) {
         println("\n\n###\nReading file: $fileName")
         try {
             URL is = this.getClass().getResource(fileName);
@@ -95,7 +95,7 @@ public class ExcelFileObjectReader {
             HSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> excelRowIterator = sheet.rowIterator();
             fileInputStream.close();
-            readLines(excelRowIterator, lines, excelCapabilities)
+            readLines(excelRowIterator, to, excelCapabilities, from)
         } catch (FileNotFoundException e) {
             throw new TangFileException("Can't find file " + fileName, e)
         } catch (IOException e) {
@@ -150,7 +150,7 @@ public class ExcelFileObjectReader {
         }
     }
 
-    private void readLines(Iterator<Row> excelRowIterator, int lines, HashMap excelCapabilities ) {
+    private void readLines(Iterator<Row> excelRowIterator, int to, HashMap excelCapabilities, int from ) {
 
         excelObjectData = new ExcelObjectData()
         int rowNumber = 1
@@ -215,11 +215,13 @@ public class ExcelFileObjectReader {
                             }
                         }
                     }
-                    excelObjectData.excelBodyMap[bodyRowNumber] = a
+                    if ((from > 0 && bodyRowNumber >= from ) || (from <= 0)){
+                        excelObjectData.excelBodyMap[bodyRowNumber] = a
+                    }
                     bodyRowNumber++
 
-                    if (lines > 0) {
-                        if (lines < bodyRowNumber) {
+                    if (to > 0) {
+                        if (to < bodyRowNumber) {
                             break
                         }
                     }
@@ -227,7 +229,7 @@ public class ExcelFileObjectReader {
             }
         }
         println("### Capabilities")
-        println("Lines: $lines")
+        println("Lines: $to")
         excelCapabilities.each {key, ExcelCellDataProperty value ->
             println(value.toString())
 

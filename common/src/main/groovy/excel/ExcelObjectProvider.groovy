@@ -77,8 +77,8 @@ class ExcelObjectProvider {
     }
 
     //Groovy 1
-    public static ArrayList<Object[][]> getGdcObjects( int lines) {
-        Iterator<Object[]> objectsFromExcel = new ExcelFileObjectReader(inputFile).getBodyRowObjectsNew(lines, excelCapabilities)
+    public static ArrayList<Object[][]> getGdcObjects( int to, int from = 0) {
+        Iterator<Object[]> objectsFromExcel = new ExcelFileObjectReader(inputFile).getBodyRowObjectsNew(to, excelCapabilities, from)
         return getExcelGdcObjects(objectsFromExcel)
     }
 
