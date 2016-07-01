@@ -179,12 +179,13 @@ public class ExcelFileObjectReader {
                 int column = 1
 
                 excelRow.each { excelBodyColumn ->
-                    String field = excelObjectData.excelHeaderMap[column++]
+                    String field = excelObjectData.excelHeaderMap[column]
                     try {
                         myInstance."$field" = excelBodyColumn.toString()
                     } catch (MissingPropertyException exception) {
-                        log.error("Can't map a header for value <$field> $exception")
+                        log.info("Can't map a header for value <$field> column<$column> $exception")
                     }
+                    column++
                 }
                 def addRow = true
                 if(excelCapabilities.size()) {
