@@ -3,7 +3,6 @@ package base
 import dtos.SettingsHelper
 import dtos.base.Constants
 import dtos.base.SqlHelper
-import excel.ExcelObjectProvider
 import org.apache.log4j.Logger
 import org.testng.ITestContext
 import org.testng.Reporter
@@ -13,7 +12,6 @@ import reports.ReporterHelper
 
 import static corebase.GlobalConstants.REPORT_NG_REPORTING_TITLE
 import static dtos.base.Constants.*
-import static excel.ExcelObjectProvider.getObjects
 
 public class AnySqlCompareTest {
     private final static Logger log = Logger.getLogger("ASC   ")
@@ -86,6 +84,16 @@ public class AnySqlCompareTest {
         return sqlDriver.getDb_result(sqlDriver.dbName)
     }
 
+    protected void truncate(SqlHelper sqlHelper, String targetSql) {
+        reporterLogLn("Target: <$sqlHelper.dbName> ");
+        reporterLogLn("Target Sql: >>>\n$targetSql\n<<< ");
+        sqlHelper.dbQueryType = Constants.dbRunTypeFirstRow
+        sqlHelper.dbQuery = targetSql
+        def dbType = getDbType(sqlHelper.dbName)
+        def skipException = settings.skipException."$dbType"
+        Reporter.log("Skiping <$dbType> exception containing <$skipException>")
+        println sqlHelper.executeAndSkipException(sqlHelper.dbName, targetSql, skipException)
+    }
 
     protected void compareSourceEqualsTarget(sourceSql, targetSql, threshold) {
         compareAllFromDb1InDb2(sourceSql, targetSql, threshold)
@@ -231,7 +239,6 @@ public class AnySqlCompareTest {
 
             }
         } catch (Exception e) {
-            def a
         }
         reporterLogLn ""
         return diffCounter
