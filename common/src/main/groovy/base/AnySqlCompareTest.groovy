@@ -95,8 +95,8 @@ public class AnySqlCompareTest {
         println sqlHelper.executeAndSkipException(sqlHelper.dbName, targetSql, skipException)
     }
 
-    protected void compareSourceEqualsTarget(sourceSql, targetSql, threshold) {
-        compareAllFromDb1InDb2(sourceSql, targetSql, threshold)
+    protected void compareSourceEqualsTarget(sourceValue, targetSql, threshold) {
+        compareSourceValueToTarget(sourceValue, targetSql, threshold)
     }
 
     protected void compareAllFromDb1InDb2(String sourceSql, String targetSql, threshold) {
@@ -122,16 +122,63 @@ public class AnySqlCompareTest {
         equals(sourceResult, targetResult, threshold, isCountQuery, "ska vara lika")
     }
 
+    protected void compareSourceValueToTarget(String sourceValue, String targetSql, threshold) {
+        reporterLogLn("Target: <$targetDbSqlDriver.dbName> ");
+        reporterLogLn("");
+        reporterLogLn("Source value:");
+        reporterLogLn("###");
+        reporterLogLn(sourceValue);
+        reporterLogLn("");
+        reporterLogLn("Target Sql:");
+        reporterLogLn("###");
+        reporterLogLn(targetSql);
+        reporterLogLn("");
+        reporterLogLn("Threshold: <$threshold%> ");
+        reporterLogLn("###");
+        def targetDbResult = getTargetDbRowsResult(targetSql)
+        def targetValue = targetDbResult[0]["COUNT_"]
+        equals(sourceValue, targetValue, threshold,  "ska vara lika")
+    }
+    protected void equals(sourceValue, targetValue, threshold,  msg = "") {
+        boolean diffLessThanThreshold = true
+        reporterLogLn("");
+        float tmpSourceValue = sourceValue.toFloat().trunc(2)
+        float tmpTargetValue = targetValue.toFloat().trunc(2)
+        reporterLogLn("Source value: <$tmpSourceValue>");
+        reporterLogLn("Target value: <$tmpTargetValue>");
+        def biggestValue = [tmpSourceValue , tmpTargetValue].max()
+        def diff = tmpSourceValue - tmpTargetValue
+        float tmpDiffProc = 0
+        if (biggestValue > 0) {
+            try {
+                tmpDiffProc = (100 * diff / biggestValue).trunc(2)
+            } catch (Exception e) {
+                tmpDiffProc = 100
+            }
+        }
 
+        if (tmpDiffProc.abs() > threshold ) {
+            diffLessThanThreshold = false
+        }
+        reporterLogLn ""
+        reporterLogLn "####################"
+        reporterLogLn("Diff size: <$diff> <$tmpDiffProc%>");
+        reporterLogLn("Threshold: <$threshold%> ");
+
+        reporterLogLn ""
+        tangAssert.assertTrue(diffLessThanThreshold, "Värden ska vara lika", "Diffen är <$diff: $tmpDiffProc%>");
+    }
     protected void equals(ArrayList sourceMap, ArrayList targetMap, threshold, isCountQuery = false, msg = "") {
         boolean diffLessThanThreshold = true
 
         def diffCount = sourceMap.size() - targetMap.size()
-        def totalCount = sourceMap.size() + targetMap.size()
+//        def biggestValue = sourceMap.size() + targetMap.size()
+        def biggestValue = [ sourceMap.size() + targetMap.size()].max()
+
         float tmpSizeDiffProc = 0
-        if (totalCount > 0) {
+        if (biggestValue > 0) {
             try {
-                tmpSizeDiffProc = 100 * diffCount / totalCount
+                tmpSizeDiffProc = 100 * diffCount / biggestValue
             } catch (Exception e) {
                 tmpSizeDiffProc = 100
             }
@@ -193,9 +240,9 @@ public class AnySqlCompareTest {
         }
 
         float tmpDataDiffProc = 0
-        if (totalCount > 0) {
+        if (biggestValue > 0) {
             try {
-                tmpDataDiffProc = 100 * diffDataCounter / totalCount
+                tmpDataDiffProc = 100 * diffDataCounter / biggestValue
             } catch (Exception e) {
                 tmpDataDiffProc = 100
             }
@@ -212,7 +259,7 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$threshold%> ");
 
         reporterLogLn ""
-        tangAssert.assertTrue(totalCount > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$totalCount>");
+        tangAssert.assertTrue(biggestValue > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$biggestValue>");
         tangAssert.assertTrue(diffLessThanThreshold, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc%> <Data $diffDataCounter: $diffDataCounterProc>");
 
     }

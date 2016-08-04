@@ -8,6 +8,7 @@ import static excel.ExcelObjectProvider.getGdcObjects
 public class CompareS2T_TestFactoryBase {
     static boolean settingsChanged
     public static final String ENABLED = "enabled"
+    public static final String SOURCE_VALUE = "sourceValue"
     public static final String SOURCE_DB = "sourceDb"
     public static final String SOURCE_SQL = "sourceSql"
     public static final String TARGET_SQL = "targetSql"
@@ -44,8 +45,8 @@ public class CompareS2T_TestFactoryBase {
             def targetSql = excelRow[TARGET_SQL]
             def threshold = excelRow[THRESHOLD]
             def comments = excelRow[COMMENTS]
-
-            addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine)
+            def by = excelRow[BY]
+            addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by)
         }
         return result;
     }
@@ -86,11 +87,54 @@ public class CompareS2T_TestFactoryBase {
         return result;
     }
 
-    protected void addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by = "") {
+    protected ArrayList runTargetToSourceValue(String inputFile, targetDbColumn, boolean enabledColumn, byColumn) {
+        def result = [];
+
+        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
+        excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_VALUE, TARGET_DB, TARGET_SQL, THRESHOLD, COMMENTS, BY])
+        if (enabledColumn) {
+            excelObjectProvider.addColumnsCapabiliteisToRetrive(ENABLED, "true")
+        }
+        if (byColumn != "") {
+            excelObjectProvider.addColumnsCapabiliteisToRetrive(BY, byColumn)
+        }
+        if (targetDbColumn != "") {
+            excelObjectProvider.addColumnsCapabiliteisToRetrive(TARGET_DB, targetDbColumn)
+        }
+        def excelBodyRows = excelObjectProvider.getGdcObjects(0)
+
+        excelBodyRows.eachWithIndex { excelRow, index ->
+            def rowLine = index + 1
+            int row = 0
+            try {
+                row = Integer.parseInt(excelRow[ROW].replaceAll(/\..*/, ''))
+            } catch (java.lang.NumberFormatException e) {
+            }
+            def sourceValue = excelRow[SOURCE_VALUE]
+            def targetSql = excelRow[TARGET_SQL]
+            def targetDb = excelRow[TARGET_DB]
+            def threshold = excelRow[THRESHOLD]
+            def comments = excelRow[COMMENTS]
+            def by = excelRow[BY]
+            addObjectToTargetList(result, row, sourceValue, targetDb, targetSql, threshold, comments, rowLine, by)
+        }
+        return result;
+    }
+
+
+    protected void addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by ) {
         def dbCompareProperties
         if (sourceDb != "" && sourceSql != "") {
             dbCompareProperties = new DbCompareProperties("$row : $rowLine", sourceDb, sourceSql, targetDb, targetSql, threshold, comments, by)
             result.add(new CompareS2T_Test(dbCompareProperties))
+        }
+    }
+
+    protected void addObjectToTargetList(result, row, sourceValue, targetDb, targetSql, threshold, comments, rowLine, by) {
+        def dbTargetCompareProperties
+        if (sourceValue != "") {
+            dbTargetCompareProperties = new DbTargetCompareProperties("$row : $rowLine", sourceValue, targetDb, targetSql, threshold, comments, by)
+            result.add(new CompareT2S_Value_Test(dbTargetCompareProperties))
         }
     }
 }

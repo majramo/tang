@@ -22,13 +22,13 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
 
 
-    @Parameters(["sourceDb", "targetDb", "numberOfTablesToCheck"] )
+    @Parameters(["sourceDbColumn", "targetDbColumn", "numberOfTablesToCheckColumn"] )
     @Test
-    public void compareSourceTableSizeEqualsTargetTableSizeTest(String sourceDb, String targetDb, @Optional("0") int numberOfTablesToCheck, ITestContext testContext){
+    public void compareSourceTableSizeEqualsTargetTableSizeTest(String sourceDb, String targetDb, @Optional("0") int numberOfTablesToCheckColumn, ITestContext testContext){
         super.setup()
         reporterLogLn("Source: <$sourceDb> ");
         reporterLogLn("Target: <$targetDb ");
-        reporterLogLn("numberOfTablesToCheck: <$numberOfTablesToCheck>");
+        reporterLogLn("numberOfTablesToCheckColumn: <$numberOfTablesToCheckColumn>");
 
         String sourceDbOwner = settings."$sourceDb".owner
         String targetDbOwner = settings."$targetDb".owner
@@ -47,8 +47,8 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
 
         int diffCount
-        if(numberOfTablesToCheck > 0){
-            diffCount = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult[0..numberOfTablesToCheck], targetDb, targetDbSqlDriver, targetDbResult[0..numberOfTablesToCheck])
+        if(numberOfTablesToCheckColumn > 0){
+            diffCount = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult[0..numberOfTablesToCheckColumn], targetDb, targetDbSqlDriver, targetDbResult[0..numberOfTablesToCheckColumn])
         }else{
             diffCount = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult)
         }
