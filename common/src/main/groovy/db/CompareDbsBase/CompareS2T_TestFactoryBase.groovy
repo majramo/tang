@@ -132,7 +132,7 @@ public class CompareS2T_TestFactoryBase {
 
     protected void addObjectToTargetList(result, row, sourceValue, targetDb, targetSql, threshold, comments, rowLine, by) {
         def dbTargetCompareProperties
-        if (sourceValue != "") {
+        if (sourceValue != "" && targetDb != "" && targetSql != "" && comments != "" ) {
             dbTargetCompareProperties = new DbTargetCompareProperties("$row : $rowLine", sourceValue, targetDb, targetSql, threshold, comments, by)
             result.add(new CompareT2S_Value_Test(dbTargetCompareProperties))
         }
