@@ -183,7 +183,7 @@ public class ExcelFileObjectReader {
                     try {
                         myInstance."$field" = excelBodyColumn.toString()
                     } catch (MissingPropertyException exception) {
-                        log.info("Can't map a header for value <$field> column<$column> $exception")
+                      //  log.info("Can't map a header for value <$field> column<$column> $exception")
                     }
                     column++
                 }
