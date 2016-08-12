@@ -26,10 +26,9 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
     @Test
     public void compareSourceTableSizeEqualsTargetTableSizeTest(String sourceDb, String targetDb, @Optional("0") int numberOfTablesToCheckColumn, ITestContext testContext){
         super.setup()
-        reporterLogLn("Source: <$sourceDb> ");
-        reporterLogLn("Target: <$targetDb ");
+        reporterLogLn("Source: <$sourceDb>");
+        reporterLogLn("Target: <$targetDb>");
         reporterLogLn("numberOfTablesToCheckColumn: <$numberOfTablesToCheckColumn>");
-
         String sourceDbOwner = settings."$sourceDb".owner
         String targetDbOwner = settings."$targetDb".owner
         def sourceTableSql = String.format(SOURCE_TABLE_QUERY_ORACLE, sourceDbOwner.toUpperCase())
@@ -48,7 +47,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
         int diffCount
         if(numberOfTablesToCheckColumn > 0){
-            diffCount = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult[0..numberOfTablesToCheckColumn], targetDb, targetDbSqlDriver, targetDbResult[0..numberOfTablesToCheckColumn])
+            diffCount = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult[0..(numberOfTablesToCheckColumn-1)], targetDb, targetDbSqlDriver, targetDbResult[0..(numberOfTablesToCheckColumn-1)])
         }else{
             diffCount = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult)
         }
