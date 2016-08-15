@@ -8,7 +8,7 @@
     <artifactId>tang</artifactId>
     <packaging>pom</packaging>
     <name>tang</name>
-    <version>0.0.98-SNAPSHOT</version>
+    <version>0.0.981-SNAPSHOT</version>
     <modules>
         <module>core</module>
         <module>common</module>
