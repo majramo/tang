@@ -32,12 +32,12 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         String sourceDbOwner = settings."$sourceDb".owner
         String targetDbOwner = settings."$targetDb".owner
         def sourceTableSql = String.format(SOURCE_TABLE_QUERY_ORACLE, sourceDbOwner.toUpperCase())
-        def targetTableSql = String.format(TARGET_TABLE_QUERY_ORACLE, sourceDbOwner.toUpperCase())
+        def targetTableSql = String.format(TARGET_TABLE_QUERY_ORACLE, targetDbOwner.toUpperCase())
         if(getDbType(sourceDb).equals("sqlserver")){
-            sourceTableSql = String.format(SOURCE_TABLE_QUERY_SQLSERVER, sourceDbOwner.toUpperCase())
+            sourceTableSql = SOURCE_TABLE_QUERY_SQLSERVER
         }
         if(getDbType(targetDb).equals("sqlserver")){
-            targetTableSql = String.format(TARGET_TABLE_QUERY_SQLSERVER, sourceDbOwner.toUpperCase())
+            targetTableSql = TARGET_TABLE_QUERY_SQLSERVER
         }
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
