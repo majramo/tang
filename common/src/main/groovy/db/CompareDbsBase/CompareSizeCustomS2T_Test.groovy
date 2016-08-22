@@ -1,6 +1,8 @@
 package db.CompareDbsBase
 
 import base.AnySqlCompareTest
+import dtos.base.SqlHelper
+import excel.ExcelObjectProvider
 import org.apache.log4j.Logger
 import org.testng.ITestContext
 import org.testng.annotations.Parameters
@@ -22,10 +24,15 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
 
 
-    @Parameters(["sourceDbColumn", "targetDbColumn", "numberOfTablesToCheckColumn"] )
+    @Parameters(["schemaColumn", "numberOfTablesToCheckColumn", "inputFile"] )
     @Test
-    public void compareSourceTableSizeEqualsTargetTableSizeTest(String sourceDb, String targetDb, @Optional("0") int numberOfTablesToCheckColumn, ITestContext testContext){
+    public void compareSourceTableSizeEqualsTargetTableSizeTest(String schemaColumn, @Optional("0") int numberOfTablesToCheckColumn, @Optional("") String inputFile, ITestContext testContext){
         super.setup()
+
+        def targetDb = schemaColumn.toLowerCase() + "_Target"
+        def sourceDb = schemaColumn.toLowerCase() + "_Source"
+        def system = schemaColumn[0].toUpperCase() + schemaColumn[1..-1].toLowerCase()
+
         reporterLogLn("Source: <$sourceDb>");
         reporterLogLn("Target: <$targetDb>");
         reporterLogLn("numberOfTablesToCheckColumn: <$numberOfTablesToCheckColumn>");
@@ -45,18 +52,22 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
         def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
 
-        int diffCount
+        def diffCount
+        def totalDiffCountExpected
         if(numberOfTablesToCheckColumn > 0){
-            diffCount = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult[0..(numberOfTablesToCheckColumn-1)], targetDb, targetDbSqlDriver, targetDbResult[0..(numberOfTablesToCheckColumn-1)])
+            (diffCount, totalDiffCountExpected)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult[0..(numberOfTablesToCheckColumn-1)], targetDb, targetDbSqlDriver, targetDbResult[0..(numberOfTablesToCheckColumn-1)], schemaColumn, inputFile)
         }else{
-            diffCount = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult)
+            (diffCount, totalDiffCountExpected)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult, system, inputFile)
         }
-        tangAssert.assertEquals(diffCount, 0, "$MESSAGE: ska inte ha några diffar", "$MESSAGE: diffCount $diffCount <> 0 ")
+            tangAssert.assertEquals(diffCount, totalDiffCountExpected, "$MESSAGE: ska inte ha några diff/ar", "$MESSAGE: diffCount $diffCount <> $totalDiffCountExpected ")
 
     }
 
-    private int compareTableSizes(sourceDb, dbDriverSource, sourceDbResult, targetDb, dbDriverTarget, targetDbResult) {
+    private compareTableSizes(sourceDb, SqlHelper dbDriverSource, sourceDbResult, targetDb, dbDriverTarget, targetDbResult, String system, String inputFile) {
         int totalDiffCount = 0
+        float expectedDiff = 0
+        Map expectdValues = [:]
+        float totalDiffCountExpected = 0
         def dbSourceResultCount = sourceDbResult.size
         def dbTargetResultCount = targetDbResult.size
         def uniqueDbResult = (sourceDbResult + targetDbResult).unique()
@@ -67,12 +78,39 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         def nok = aggregate("", "\n#####################\n")
         nok = aggregate(nok, "Dessa jämförelser var inte ok\n")
 
+        ArrayList<Object[][]> excelBodyRows
+        if(inputFile != ""){
+            //Tables that have targetSize overRide TargetSize
+            ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
+            excelObjectProvider.addColumnsToRetriveFromFile(["Tabell", "Atgard"])
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve("Atgard", "Trunkera")
+            excelBodyRows = excelObjectProvider.getGdcObjects(0)
+            excelObjectProvider.printRow(excelBodyRows, ["System", "Tabell", "Trunkera"])
+            excelBodyRows.unique().each{
+                expectdValues[it["Tabell"] ] = 0
+            }
+
+            excelObjectProvider = new ExcelObjectProvider(inputFile)
+            excelObjectProvider.addColumnsToRetriveFromFile(["Tabell", "TargetSize"])
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
+            excelObjectProvider.addColumnsCapabilitiesNotEmptyToRetrieve("TargetSize")
+            excelBodyRows = excelObjectProvider.getGdcObjects(0)
+            excelObjectProvider.printRow(excelBodyRows, ["System", "Tabell", "TargetSize"])
+
+            excelBodyRows.unique().each{
+                expectdValues[it["Tabell"] ] = it["TargetSize"]
+            }
+
+
+        }
         def ok = aggregate("", "\n#####################\n")
         ok = aggregate(ok, "Dessa jämförelser var ok\n")
-        def diffCount = 0
+        float  diffCount = 0
         def numberOfTableDiff = 0
         def numberOfTablesChecked = 0
         uniqueDbResult.eachWithIndex { it, i ->
+            expectedDiff = 0
             def table = it[0]
             log.info("$i:$dbSourceResultCount tabell <$table>")
             def str =""
@@ -92,6 +130,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
             }catch (Exception e){
                 str = aggregate(str, "Fick exception i source <$sourceDb> $e")
             }
+//            sourceSize = sourceSize * 2 //debug
             str = aggregate(str, "Source size <$sourceSize>")
 
             try {
@@ -100,20 +139,47 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
             }catch (Exception e){
                 str = aggregate(str, "Fick exception i target <$targetDb> $e")
             }
+//            targetSize = targetSize *  2 //debug
             str = aggregate(str, "target size <$targetSize>")
 
-            diffCount = sourceSize - targetSize
-            totalDiffCount += diffCount.abs()
-            if (diffCount != 0) {
-                numberOfTableDiff++
-                nok = aggregate(nok, "$str Tabell $table har <$diffCount> diff/ar\n\n")
+            diffCount = (sourceSize - targetSize).abs()
+            def SourceTargetMax = sourceSize
+            if(targetSize > sourceSize){
+                SourceTargetMax = targetSize
+            }
+            float diffCountPercent = 0
+            if(SourceTargetMax > 0){
+                diffCountPercent =  (100 * diffCount / SourceTargetMax).abs()
+            }
+            totalDiffCount += diffCount
+            String expectedTableValue = expectdValues[table]
+            if(expectedTableValue != "" && expectedTableValue != null ){
+                //Om tabellen ska reduceras
+                expectedDiff = (Float.parseFloat(expectedTableValue)*100).trunc(2)
+                totalDiffCountExpected += (expectedDiff * SourceTargetMax / 100).round(0)
+            }
+            if(expectedDiff > 0) {
+                //Todo: Att hantera vid generering då vi kan utöka och få en diff >100%
+                if(sourceSize < targetSize){
+                    nok = aggregate(nok, "$str Tabell $table source <$sourceSize> är mindre än target <$targetSize>\n\n")
+                }else {
+                    if (diffCountPercent < expectedDiff) {
+                        numberOfTableDiff++
+                        nok = aggregate(nok, "$str Tabell $table har <$diffCount> diff/ar, <% $diffCountPercent>, förväntat är target <% $expectedDiff>\n\n")
+                    }
+                }
             }else{
-                ok = aggregate(ok, str)
+                if (diffCountPercent > 0) {
+                    numberOfTableDiff++
+                    nok = aggregate(nok, "$str Tabell $table har <$diffCount> diff/ar, <% $diffCountPercent>, förväntat är target <% 0.0>\n\n")
+                }else{
+                    ok = aggregate(ok, str)
+                }
             }
             numberOfTablesChecked++
 
         }
-        if (totalDiffCount > 0 ){
+        if (numberOfTableDiff > 0 ){
             reporterLogLn("Antal tabeller som har diff <$numberOfTableDiff>")
             reporterLogLn("Total antal diff <$totalDiffCount>")
             reporterLogLn(nok)
@@ -125,7 +191,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         reporterLogLn("#####################")
         reporterLogLn("Antal tabeller som har kontrollerats <$numberOfTablesChecked>")
         reporterLogLn("Antal tabeller som har diff <$numberOfTableDiff>")
-        return totalDiffCount
+        return [totalDiffCount, totalDiffCountExpected]
 
     }
 
