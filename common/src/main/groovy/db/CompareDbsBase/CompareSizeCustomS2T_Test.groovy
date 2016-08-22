@@ -54,8 +54,16 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
         def diffCount
         def totalDiffCountExpected
+        def sourceDbResultTableToCheck = sourceDbResult.size()-1
+        def targetDbResultTableToCheck = targetDbResult.size()-1
         if(numberOfTablesToCheckColumn > 0){
-            (diffCount, totalDiffCountExpected)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult[0..(numberOfTablesToCheckColumn-1)], targetDb, targetDbSqlDriver, targetDbResult[0..(numberOfTablesToCheckColumn-1)], schemaColumn, inputFile)
+            if(sourceDbResultTableToCheck > numberOfTablesToCheckColumn){
+                sourceDbResultTableToCheck = numberOfTablesToCheckColumn - 1
+            }
+            if(targetDbResultTableToCheck > numberOfTablesToCheckColumn){
+                targetDbResultTableToCheck = numberOfTablesToCheckColumn - 1
+            }
+            (diffCount, totalDiffCountExpected)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult[0..sourceDbResultTableToCheck], targetDb, targetDbSqlDriver, targetDbResult[0..targetDbResultTableToCheck], schemaColumn, inputFile)
         }else{
             (diffCount, totalDiffCountExpected)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult, system, inputFile)
         }
