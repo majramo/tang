@@ -54,6 +54,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
         def diffCount
         def totalDiffCountExpected
+        boolean noExceptionAtRun
         def sourceDbResultTableToCheck = sourceDbResult.size()-1
         def targetDbResultTableToCheck = targetDbResult.size()-1
         if(numberOfTablesToCheckColumn > 0){
@@ -63,10 +64,11 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
             if(targetDbResultTableToCheck > numberOfTablesToCheckColumn){
                 targetDbResultTableToCheck = numberOfTablesToCheckColumn - 1
             }
-            (diffCount, totalDiffCountExpected)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult[0..sourceDbResultTableToCheck], targetDb, targetDbSqlDriver, targetDbResult[0..targetDbResultTableToCheck], schemaColumn, inputFile)
+            (diffCount, totalDiffCountExpected, noExceptionAtRun)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult[0..sourceDbResultTableToCheck], targetDb, targetDbSqlDriver, targetDbResult[0..targetDbResultTableToCheck], schemaColumn, inputFile)
         }else{
-            (diffCount, totalDiffCountExpected)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult, system, inputFile)
+            (diffCount, totalDiffCountExpected, noExceptionAtRun)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult, system, inputFile)
         }
+            tangAssert.assertTrue(noExceptionAtRun, "Fick exception vid körning", "Fick exception vid körning")
             tangAssert.assertEquals(diffCount, totalDiffCountExpected, "$MESSAGE: ska inte ha några diff/ar", "$MESSAGE: diffCount $diffCount <> $totalDiffCountExpected ")
 
     }
@@ -79,6 +81,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         def dbSourceResultCount = sourceDbResult.size
         def dbTargetResultCount = targetDbResult.size
         def uniqueDbResult = (sourceDbResult + targetDbResult).unique()
+//        uniqueDbResult = (targetDbResult - sourceDbResult  ).unique()
         def dbUniqeResultCount = uniqueDbResult.size
         reporterLogLn("Antal tabeller som ska kontrolleras i $sourceDb <$dbSourceResultCount>")
         reporterLogLn("Antal tabeller som ska kontrolleras i $targetDb <$dbTargetResultCount>")
@@ -117,7 +120,9 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         float  diffCount = 0
         def numberOfTableDiff = 0
         def numberOfTablesChecked = 0
+        boolean noExceptionAtRun = true
         uniqueDbResult.eachWithIndex { it, i ->
+            boolean  loopException = false
             expectedDiff = 0
             def table = it[0]
             log.info("$i:$dbSourceResultCount tabell <$table>")
@@ -136,6 +141,8 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                 def dbSourceSizeResult = dbDriverSource.sqlConRun(" $sourceDb", dbRunTypeFirstRow, sqlSourceCompare, 0, sourceDb)
                 sourceSize = dbSourceSizeResult["COUNT_"]
             }catch (Exception e){
+                loopException = true
+                noExceptionAtRun = false
                 str = aggregate(str, "Fick exception i source <$sourceDb> $e")
             }
 //            sourceSize = sourceSize * 2 //debug
@@ -145,6 +152,8 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                 def dbTargetSizeResult = dbDriverTarget.sqlConRun("$targetDb", dbRunTypeFirstRow, sqlSourceCompare, 0, targetDb)
                 targetSize = dbTargetSizeResult["COUNT_"]
             }catch (Exception e){
+                loopException = true
+                noExceptionAtRun = false
                 str = aggregate(str, "Fick exception i target <$targetDb> $e")
             }
 //            targetSize = targetSize *  2 //debug
@@ -168,16 +177,16 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
             }
             if(expectedDiff > 0) {
                 //Todo: Att hantera vid generering då vi kan utöka och få en diff >100%
-                if(sourceSize < targetSize){
+                if(sourceSize < targetSize || loopException){
                     nok = aggregate(nok, "$str Tabell $table source <$sourceSize> är mindre än target <$targetSize>\n\n")
                 }else {
-                    if (diffCountPercent < expectedDiff) {
+                    if (diffCountPercent < expectedDiff || loopException) {
                         numberOfTableDiff++
                         nok = aggregate(nok, "$str Tabell $table har <$diffCount> diff/ar, <% $diffCountPercent>, förväntat är target <% $expectedDiff>\n\n")
                     }
                 }
             }else{
-                if (diffCountPercent > 0) {
+                if (diffCountPercent > 0 || loopException) {
                     numberOfTableDiff++
                     nok = aggregate(nok, "$str Tabell $table har <$diffCount> diff/ar, <% $diffCountPercent>, förväntat är target <% 0.0>\n\n")
                 }else{
@@ -199,7 +208,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         reporterLogLn("#####################")
         reporterLogLn("Antal tabeller som har kontrollerats <$numberOfTablesChecked>")
         reporterLogLn("Antal tabeller som har diff <$numberOfTableDiff>")
-        return [totalDiffCount, totalDiffCountExpected]
+        return [totalDiffCount, totalDiffCountExpected, noExceptionAtRun]
 
     }
 
