@@ -1,6 +1,7 @@
 package excel
 
 import static dtos.base.Constants.CompareType.EQUAL
+import static dtos.base.Constants.CompareType.NOT_EMPTY
 
 class ExcelObjectProvider {
 
@@ -38,20 +39,29 @@ class ExcelObjectProvider {
         }
     }
 
-    public static addColumnsCapabiliteisToRetrive(cellName, cellCompareValue, cellCompareType = EQUAL){
+    public static addColumnsCapabilitiesToRetrieve(cellName, cellCompareValue, cellCompareType = EQUAL){
         ExcelCellDataProperty excelCellDataProperty = excelCapabilities[cellName]
         if(excelCellDataProperty == null){
             excelCellDataProperty = new ExcelCellDataProperty(cellName)
             excelCapabilities[cellName] = excelCellDataProperty
         }
         excelCellDataProperty.valueToComprae = cellCompareValue
-//        if(cellCompareValue != ""){
-            excelCellDataProperty.compareType = cellCompareType
-//        }
+        excelCellDataProperty.compareType = cellCompareType
 
 
     }
 
+
+    public static addColumnsCapabilitiesNotEmptyToRetrieve(cellName){
+        ExcelCellDataProperty excelCellDataProperty = excelCapabilities[cellName]
+        if(excelCellDataProperty == null){
+            excelCellDataProperty = new ExcelCellDataProperty(cellName)
+            excelCapabilities[cellName] = excelCellDataProperty
+        }
+        excelCellDataProperty.valueToComprae = ""
+        excelCellDataProperty.compareType = NOT_EMPTY
+
+    }
     //Java
     public static Object[][] getObject(file, int line, String[] columns) {
         Iterator<Object[]> objectsFromExcel = new ExcelFileObjectReader(file).getBodyRowObject(line)

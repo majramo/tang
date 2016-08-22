@@ -25,10 +25,10 @@ public class CompareS2T_TestFactoryBase {
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
         excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS])
         if (enabledColumn) {
-            excelObjectProvider.addColumnsCapabiliteisToRetrive(ENABLED, "true")
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, "true")
         }
         if (byColumn != "") {
-            excelObjectProvider.addColumnsCapabiliteisToRetrive(BY, byColumn)
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(BY, byColumn)
         }
 
         def excelBodyRows = excelObjectProvider.getGdcObjects(0)
@@ -58,13 +58,13 @@ public class CompareS2T_TestFactoryBase {
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
         excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_DB, TARGET_DB, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS, BY])
         if (enabledColumn) {
-            excelObjectProvider.addColumnsCapabiliteisToRetrive(ENABLED, "true")
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, "true")
         }
         if (byColumn != "") {
-            excelObjectProvider.addColumnsCapabiliteisToRetrive(BY, byColumn)
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(BY, byColumn)
         }
         if (sourceDbColumn != "") {
-            excelObjectProvider.addColumnsCapabiliteisToRetrive(SOURCE_DB, sourceDbColumn)
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(SOURCE_DB, sourceDbColumn)
         }
         def excelBodyRows = excelObjectProvider.getGdcObjects(0)
 
@@ -93,13 +93,13 @@ public class CompareS2T_TestFactoryBase {
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
         excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_VALUE, TARGET_DB, TARGET_SQL, THRESHOLD, COMMENTS, BY])
         if (enabledColumn) {
-            excelObjectProvider.addColumnsCapabiliteisToRetrive(ENABLED, "true")
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, "true")
         }
         if (byColumn != "") {
-            excelObjectProvider.addColumnsCapabiliteisToRetrive(BY, byColumn)
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(BY, byColumn)
         }
         if (targetDbColumn != "") {
-            excelObjectProvider.addColumnsCapabiliteisToRetrive(TARGET_DB, targetDbColumn)
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(TARGET_DB, targetDbColumn)
         }
         def excelBodyRows = excelObjectProvider.getGdcObjects(0)
 

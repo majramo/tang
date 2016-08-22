@@ -2,6 +2,7 @@ package excel
 
 import static dtos.base.Constants.CompareType.EQUAL
 import static dtos.base.Constants.CompareType.DIFF
+import static dtos.base.Constants.CompareType.NOT_EMPTY
 
 /**
  * Created by majid on 2016-05-20.
@@ -20,6 +21,10 @@ class ExcelCellDataProperty {
         } else {
             if (compareType == DIFF && !this.valueToComprae.equals(cellName)) {
                 return true
+            }else {
+                if (compareType == NOT_EMPTY && !cellName.isEmpty()) {
+                    return true
+                }
             }
         }
         return false

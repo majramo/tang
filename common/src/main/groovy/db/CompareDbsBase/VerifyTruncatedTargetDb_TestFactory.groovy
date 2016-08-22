@@ -19,8 +19,8 @@ class VerifyTruncatedTargetDb_TestFactory extends CompareS2T_TestFactoryBase{
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
         excelObjectProvider.addColumnsToRetriveFromFile(["Tabell"])
-        excelObjectProvider.addColumnsCapabiliteisToRetrive("System", system)
-        excelObjectProvider.addColumnsCapabiliteisToRetrive("Atgard", atgardColumn)
+        excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
+        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Atgard", atgardColumn)
         def excelBodyRows = excelObjectProvider.getGdcObjects(5)
         excelObjectProvider.printRow(excelBodyRows, ["System", "Tabell", "Atgard"])
 
