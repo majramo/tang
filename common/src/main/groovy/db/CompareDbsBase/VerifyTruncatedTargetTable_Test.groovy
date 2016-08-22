@@ -25,7 +25,7 @@ public class VerifyTruncatedTargetTable_Test extends AnySqlCompareTest{
         this.atgard = atgard
         this.table = table
         targetDbOwner = settings."$targetDb".owner
-        targetSql = "-- Verify truncated table size <$table> in system <$system> iz zero\n"
+        targetSql = "-- Verify truncated table size <$table> in system <$system> is zero\n"
         targetSql += String.format(VERIFY_TRUNCATED_TABLE_QUERY, "$table")
 
         println "$targetSql "
