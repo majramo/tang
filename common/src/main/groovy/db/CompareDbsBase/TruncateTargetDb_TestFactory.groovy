@@ -18,7 +18,7 @@ class TruncateTargetDb_TestFactory extends CompareS2T_TestFactoryBase {
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
         excelObjectProvider.addColumnsToRetriveFromFile(["Tabell"])
-        excelObjectProvider.addColumnsCapabiliteisToRetrive("System", system)
+        excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
 //        excelObjectProvider.addColumnsCapabiliteisToRetrive("Tabell", "AMSULOG")
 //        excelObjectProvider.addColumnsCapabiliteisToRetrive("Atgard", atgardColumn)
         def excelBodyRows = excelObjectProvider.getGdcObjects(2,1)
