@@ -3,6 +3,7 @@ package base
 import dtos.SettingsHelper
 import dtos.base.Constants
 import dtos.base.SqlHelper
+import excel.ExcelObjectProvider
 import org.apache.log4j.Logger
 import org.testng.ITestContext
 import org.testng.Reporter
@@ -25,6 +26,16 @@ public class AnySqlCompareTest {
     def settings = settingsHelper.settings
     def applicationConf = settingsHelper.applicationConf
     private static boolean settingChanged
+    public static final String ENABLED = "enabled"
+    public static final String SOURCE_VALUE = "sourceValue"
+    public static final String SOURCE_DB = "sourceDb"
+    public static final String SOURCE_SQL = "sourceSql"
+    public static final String TARGET_SQL = "targetSql"
+    public static final String TARGET_DB = "targetDb"
+    public static final String THRESHOLD = "threshold"
+    public static final String COMMENTS = "comments"
+    public static final String ROW = "row"
+    public static final String BY = "by"
 
     @BeforeSuite(alwaysRun = true)
     public void beforeSuite(ITestContext testContext) {
@@ -99,7 +110,7 @@ public class AnySqlCompareTest {
         compareSourceValueToTarget(sourceValue, targetSql, threshold)
     }
 
-    protected void compareAllFromDb1InDb2(String sourceSql, String targetSql, threshold) {
+    protected void compareAllFromDb1InDb2(String sourceSql, String targetSql, threshold, ArrayList tableFieldsToExcludeMap = [], String tableFieldToExclude = "") {
         boolean isCountQuery
         reporterLogLn("Source: <${sourceDbSqlDriver.dbName}> ");
         reporterLogLn("Target: <$targetDbSqlDriver.dbName> ");
@@ -116,9 +127,19 @@ public class AnySqlCompareTest {
         reporterLogLn("###");
         def sourceResult = getSourceDbRowsResult(sourceSql)
         def targetResult = getTargetDbRowsResult(targetSql)
+        if(tableFieldsToExcludeMap.size() && !tableFieldToExclude.isEmpty()){
+            tableFieldsToExcludeMap.each {exclude ->
+                def found = sourceResult.findAll {it[tableFieldToExclude] ==  exclude}
+                if(found.size()){
+                    sourceResult -= found
+                    targetResult -= found
+                }
+            }
+        }
         if (sourceSql.replace(" ", "").toLowerCase().contains("SELECT COUNT(1) COUNT_".replace(" ", "").toLowerCase())) {
             isCountQuery = true
         }
+
         equals(sourceResult, targetResult, threshold, isCountQuery, "ska vara lika")
     }
 
@@ -168,8 +189,16 @@ public class AnySqlCompareTest {
         reporterLogLn ""
         tangAssert.assertTrue(diffLessThanThreshold, "Värden ska vara lika", "Diffen är <$diff: $tmpDiffProc%>");
     }
-    protected void equals(ArrayList sourceMap, ArrayList targetMap, threshold, isCountQuery = false, msg = "") {
+
+
+    protected void equals(ArrayList sourceMap, ArrayList targetMap, threshold, isCountQuery = false, msg = "", String tableFieldsFileColumn = "", String tableFieldToExclude = "", sourceDb = "") {
         boolean diffLessThanThreshold = true
+        ArrayList tableFieldsToExcludeMap
+        if(!tableFieldsFileColumn.isEmpty()){
+            reporterLogLn("TableFieldsFileColumn: <$tableFieldsFileColumn}>");
+            tableFieldsToExcludeMap = getTableFieldsToExcludeMap (tableFieldsFileColumn, sourceDb)
+        }
+
 
         def diffCount = sourceMap.size() - targetMap.size()
 //        def biggestValue = sourceMap.size() + targetMap.size()
@@ -187,6 +216,7 @@ public class AnySqlCompareTest {
         reporterLogLn("");
         reporterLogLn("Source size: <${sourceMap.size()}>");
         reporterLogLn("Target size: <${targetMap.size()}>");
+
         if (isCountQuery) {
             reporterLogLn("Source result: <$sourceMap>");
             reporterLogLn("Target result: <$targetMap>");

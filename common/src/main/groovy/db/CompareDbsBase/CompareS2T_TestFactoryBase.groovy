@@ -17,13 +17,14 @@ public class CompareS2T_TestFactoryBase {
     public static final String COMMENTS = "comments"
     public static final String ROW = "row"
     public static final String BY = "by"
+    public static final String TABLE_FIELD_TO_EXCLUDE = "tableFieldToExclude"
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
 
-    protected ArrayList runCommon(String inputFile, String sourceDb, String targetDb, boolean enabledColumn, String byColumn) {
+    protected ArrayList runCommon(String inputFile, String sourceDb, String targetDb, boolean enabledColumn, String byColumn, String tableFieldsFileColumn) {
         def result = [];
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
-        excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS])
+        excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS, TABLE_FIELD_TO_EXCLUDE])
         if (enabledColumn) {
             excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, "true")
         }
@@ -45,8 +46,9 @@ public class CompareS2T_TestFactoryBase {
             def targetSql = excelRow[TARGET_SQL]
             def threshold = excelRow[THRESHOLD]
             def comments = excelRow[COMMENTS]
+            def tableFieldToExclude = excelRow[TABLE_FIELD_TO_EXCLUDE]
             def by = excelRow[BY]
-            addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by)
+            addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by, tableFieldsFileColumn, tableFieldToExclude)
         }
         return result;
     }
@@ -122,10 +124,10 @@ public class CompareS2T_TestFactoryBase {
     }
 
 
-    protected void addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by ) {
+    protected void addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by, tableFieldsFileColumn = "", String tableFieldToExclude = "" ) {
         def dbCompareProperties
         if (sourceDb != "" && sourceSql != "") {
-            dbCompareProperties = new DbCompareProperties("$row : $rowLine", sourceDb, sourceSql, targetDb, targetSql, threshold, comments, by)
+            dbCompareProperties = new DbCompareProperties("$row : $rowLine", sourceDb, sourceSql, targetDb, targetSql, threshold, comments, by, tableFieldsFileColumn, tableFieldToExclude)
             result.add(new CompareS2T_Test(dbCompareProperties))
         }
     }
