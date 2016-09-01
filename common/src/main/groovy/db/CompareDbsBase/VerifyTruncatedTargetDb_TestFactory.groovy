@@ -9,15 +9,15 @@ class VerifyTruncatedTargetDb_TestFactory extends CompareS2T_TestFactoryBase{
 
 
 
-    @Parameters(["inputFile", "schemaColumn", "atgardColumn"] )
+    @Parameters(["inputFileColumn", "schemaColumn", "atgardColumn"] )
     @Factory
-    public Object[] createVerifyTruncatedInstances(String inputFile, String schemaColumn, String atgardColumn) {
+    public Object[] createVerifyTruncatedInstances(String inputFileColumn, String schemaColumn, String atgardColumn) {
 
         def targetDb = schemaColumn.toLowerCase() + "_Target"
         def system = schemaColumn[0].toUpperCase() + schemaColumn[1..-1].toLowerCase()
         def result = [];
 
-        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
+        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFileColumn)
         excelObjectProvider.addColumnsToRetriveFromFile(["Tabell"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("Atgard", atgardColumn)

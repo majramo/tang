@@ -5,10 +5,10 @@ import org.testng.annotations.Parameters
 
 class CompareTargetToSourceValue_TestFactory extends CompareS2T_TestFactoryBase{
 
-    @Parameters(["inputFile", "enabledColumn", "byColumn",  "targetDbColumn"] )
+    @Parameters(["inputFileColumn", "enabledColumn", "byColumn",  "targetDbColumn"] )
     @Factory
-    public Object[] createCommonInstances(String inputFile, boolean enabledColumn, String byColumn, String targetDbColumn) {
+    public Object[] createCommonInstances(String inputFileColumn, boolean enabledColumn, String byColumn, String targetDbColumn) {
 
-        return runTargetToSourceValue(inputFile, targetDbColumn, enabledColumn, byColumn)
+        return runTargetToSourceValue(inputFileColumn, targetDbColumn, enabledColumn, byColumn)
     }
 }

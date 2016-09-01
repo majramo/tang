@@ -50,7 +50,7 @@ public class VerifyTruncatedTargetTable_Test extends AnySqlCompareTest{
         }
         def dbResult = getDbResult(targetDbSqlDriver, targetTableSql, dbRunTypeFirstRow)
         if(dbResult == null){
-            Reporter.log("Table <$table> does not exist")
+            Reporter.log("Table <$table> does not exist, skipping the test")
             Reporter.log("targetTableSql <$targetTableSql>")
             throw new SkipException("Table <$table> does not exist")
         }

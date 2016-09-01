@@ -6,10 +6,10 @@ import org.testng.annotations.Parameters
 
 class CompareCommonS2T_TestFactory extends CompareS2T_TestFactoryBase{
 
-    @Parameters(["inputFile", "sourceDbColumn", "targetDbColumn", "enabledColumn", "byColumn"] )
+    @Parameters(["inputFileColumn", "sourceDbColumn", "targetDbColumn", "tableFieldsFileColumn", "enabledColumn", "byColumn"] )
     @Factory
-    public Object[] createCommonInstances(String inputFile, String sourceDbColumn, String targetDbColumn, @Optional ("")boolean enabledColumn, @Optional ("") String byColumn) {
+    public Object[] createCommonInstances(String inputFileColumn, String sourceDbColumn, String targetDbColumn, @Optional ("") String tableFieldsFileColumn, @Optional ("")boolean enabledColumn, @Optional ("") String byColumn) {
 
-        return runCommon(inputFile, sourceDbColumn, targetDbColumn, enabledColumn, byColumn)
+        return runCommon(inputFileColumn, sourceDbColumn, targetDbColumn, enabledColumn, byColumn, tableFieldsFileColumn)
     }
 }
