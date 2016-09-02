@@ -202,7 +202,6 @@ public class AnySqlCompareTest {
         }
         if(!tableFieldsFileColumn.isEmpty()){
             reporterLogLn("TableFieldsFileColumn: <$tableFieldsFileColumn}>");
-            tableFieldsToExcludeMap = getTableFieldsToExcludeMap (tableFieldsFileColumn, sourceDb)
         }
         def sourceMapSize = sourceMap.size()
         def targetMapSize = targetMap.size()
