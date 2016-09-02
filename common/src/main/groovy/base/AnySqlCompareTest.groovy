@@ -210,6 +210,10 @@ public class AnySqlCompareTest {
         float tmpSizeDiffProc = 100
         if (sourceMapSize > 0) {
             tmpSizeDiffProc = 100 * diffCount / sourceMapSize
+        } else {
+            if (targetMapSize == 0) {
+                tmpSizeDiffProc = 0
+            }
         }
         float diffSizeProc = tmpSizeDiffProc.trunc(2)
         reporterLogLn("");
@@ -271,6 +275,10 @@ public class AnySqlCompareTest {
         float tmpDataDiffProc = 100
         if (sourceMapSize > 0) {
             tmpDataDiffProc = 100 * diffDataCounter / sourceMapSize
+        } else {
+            if (targetMapSize == 0) {
+                tmpDataDiffProc = 0
+            }
         }
         float diffDataCounterProc = tmpDataDiffProc.trunc(2)
 
@@ -299,7 +307,7 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$thresholdString%> (+10: positiv, -10: negative, 10: abs()) diff");
 
         reporterLogLn ""
-        tangAssert.assertTrue(sourceMapSize > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$sourceMapSize>");
+//        tangAssert.assertTrue(sourceMapSize > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$sourceMapSize>");
         tangAssert.assertTrue(thresholdPassed, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc%> <Data $diffDataCounter: $diffDataCounterProc>");
 
     }
