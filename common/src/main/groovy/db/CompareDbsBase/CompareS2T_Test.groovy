@@ -12,7 +12,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
     private String targetDb;
     private String sourceSql;
     private String targetSql;
-    private float threshold = 0;
+    private String threshold = "0";
     private String comments;
     private String tableFieldsFileColumn;
     private String tableFieldToExclude;
@@ -34,11 +34,8 @@ public class CompareS2T_Test extends AnySqlCompareTest{
         sourceSql = String.format(dbCompareProperties.sourceSql, dbSourceOwner.toUpperCase())
         targetSql = String.format(dbCompareProperties.targetSql, dbTargetOwner.toUpperCase())
 
-        try{
-            threshold = Float.parseFloat(dbCompareProperties.fields["threshold"])
-        }catch(Exception e){
+        threshold = dbCompareProperties.fields["threshold"]
 
-        }
         this.dbCompareProperties = dbCompareProperties
     }
 
