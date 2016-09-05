@@ -21,19 +21,12 @@ public class CompareS2T_TestFactoryBase {
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
 
-    protected ArrayList runCommon(String inputFile, String sourceDb, String targetDb, boolean enabledColumn, String byColumn, String tableFieldsFileColumn) {
+    protected ArrayList runCommon(String inputFile, String sourceDb, String targetDb, String tableFieldsFileColumn) {
         def result = [];
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
         excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS, TABLE_FIELD_TO_EXCLUDE])
-        if (enabledColumn) {
-            excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, "true")
-        }
-        if (byColumn != "") {
-            excelObjectProvider.addColumnsCapabilitiesToRetrieve(BY, byColumn)
-        }
 
         def excelBodyRows = excelObjectProvider.getGdcObjects(0)
-
 
         excelBodyRows.eachWithIndex { excelRow, index ->
             def rowLine = index + 1
@@ -54,17 +47,12 @@ public class CompareS2T_TestFactoryBase {
     }
 
 
-    protected ArrayList runCustom(String inputFile, boolean enabledColumn, byColumn, sourceDbColumn) {
+    protected ArrayList runCustom(String inputFile, sourceDbColumn) {
         def result = [];
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
         excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_DB, TARGET_DB, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS, BY])
-        if (enabledColumn) {
-            excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, "true")
-        }
-        if (byColumn != "") {
-            excelObjectProvider.addColumnsCapabilitiesToRetrieve(BY, byColumn)
-        }
+
         if (sourceDbColumn != "") {
             excelObjectProvider.addColumnsCapabilitiesToRetrieve(SOURCE_DB, sourceDbColumn)
         }
@@ -89,17 +77,12 @@ public class CompareS2T_TestFactoryBase {
         return result;
     }
 
-    protected ArrayList runTargetToSourceValue(String inputFile, targetDbColumn, boolean enabledColumn, byColumn) {
+    protected ArrayList runTargetToSourceValue(String inputFile, targetDbColumn) {
         def result = [];
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
         excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_VALUE, TARGET_DB, TARGET_SQL, THRESHOLD, COMMENTS, BY])
-        if (enabledColumn) {
-            excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, "true")
-        }
-        if (byColumn != "") {
-            excelObjectProvider.addColumnsCapabilitiesToRetrieve(BY, byColumn)
-        }
+
         if (targetDbColumn != "") {
             excelObjectProvider.addColumnsCapabilitiesToRetrieve(TARGET_DB, targetDbColumn)
         }
