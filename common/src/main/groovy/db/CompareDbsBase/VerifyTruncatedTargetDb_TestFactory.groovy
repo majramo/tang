@@ -5,7 +5,7 @@ import org.testng.Reporter
 import org.testng.annotations.Factory
 import org.testng.annotations.Parameters
 
-class VerifyTruncatedTargetDb_TestFactory extends CompareS2T_TestFactoryBase{
+class VerifyTruncatedTargetDb_TestFactory {
 
 
 
@@ -26,7 +26,6 @@ class VerifyTruncatedTargetDb_TestFactory extends CompareS2T_TestFactoryBase{
 
         Reporter.log("Number of lines read <$excelBodyRows.size>")
         excelBodyRows.unique().eachWithIndex { excelRow, index ->
-//            int row = Integer.parseInt(excelRow["row"][0].replaceAll(/\..*/, ''))
             def table = excelRow["Tabell"]
 
             result.add(new VerifyTruncatedTargetTable_Test(targetDb, excelRow["System"], table, atgardColumn))
