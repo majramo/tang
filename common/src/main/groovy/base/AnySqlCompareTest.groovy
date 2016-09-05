@@ -3,13 +3,15 @@ package base
 import dtos.SettingsHelper
 import dtos.base.Constants
 import dtos.base.SqlHelper
-import excel.ExcelObjectProvider
 import org.apache.log4j.Logger
 import org.testng.ITestContext
 import org.testng.Reporter
 import org.testng.SkipException
 import org.testng.annotations.*
 import reports.ReporterHelper
+
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 import static corebase.GlobalConstants.REPORT_NG_REPORTING_TITLE
 import static dtos.base.Constants.*
@@ -21,6 +23,7 @@ public class AnySqlCompareTest {
 
     protected SqlHelper sourceDbSqlDriver = null
     protected SqlHelper targetDbSqlDriver = null
+    protected SqlHelper repositroyDbSqlDriver = null
     public TangDbAssert tangAssert
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
@@ -110,7 +113,7 @@ public class AnySqlCompareTest {
         compareSourceValueToTarget(sourceValue, targetSql, threshold)
     }
 
-    protected void compareAllFromDb1InDb2(String sourceSql, String targetSql, threshold, ArrayList tableFieldsToExcludeMap = [], String tableFieldToExclude = "") {
+    protected void compareAllFromDb1InDb2(ITestContext testContext, String sourceSql, String targetSql, threshold, comments, ArrayList tableFieldsToExcludeMap = [], String tableFieldToExclude = "", lastSourceColumn = "", schema = "") {
         boolean isCountQuery
         reporterLogLn("Source: <${sourceDbSqlDriver.dbName}> ");
         reporterLogLn("Target: <$targetDbSqlDriver.dbName> ");
@@ -126,7 +129,26 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$threshold%> ");
         reporterLogLn("###");
         def sourceResult = getSourceDbRowsResult(sourceSql)
-        def targetResult = getTargetDbRowsResult(targetSql)
+        def targetResult
+        if(lastSourceColumn == "SAVE"){
+            //Save sourceResult in JALFA
+            reporterLogLn("Saving schema <$schema> to DB")
+            saveResultToDb(testContext, schema, comments, sourceResult)
+            targetResult = sourceResult
+        }else{
+            if(lastSourceColumn == "READ"){
+                reporterLogLn("Reading saved schema <$schema> from DB")
+                //READ sourceResult in JALFA
+                def tmp = readResultFromDbSaved(testContext, schema, comments)
+                tmp.each {
+                    targetResult.add(it)
+                }
+
+            }else{
+                targetResult = getTargetDbRowsResult(targetSql)
+            }
+        }
+
         if(tableFieldsToExcludeMap.size() && !tableFieldToExclude.isEmpty()){
             tableFieldsToExcludeMap.each {exclude ->
                 def found = sourceResult.findAll {it[tableFieldToExclude] ==  exclude}
@@ -201,7 +223,7 @@ public class AnySqlCompareTest {
             thresholdValue = 0
         }
         if(!tableFieldsFileColumn.isEmpty()){
-            reporterLogLn("TableFieldsFileColumn: <$tableFieldsFileColumn}>");
+            reporterLogLn("TableFieldsFileColumn: <$tableFieldsFileColumn>");
         }
         def sourceMapSize = sourceMap.size()
         def targetMapSize = targetMap.size()
@@ -356,6 +378,11 @@ public class AnySqlCompareTest {
         testContext.setAttribute(TARGET_SQL_HELPER, targetDbSqlDriver)
     }
 
+    protected void setRepositorySqlHelper(ITestContext testContext, dbName) {
+        repositroyDbSqlDriver = new SqlHelper(null, log, dbName, settings.dbRun, settings)
+        testContext.setAttribute(REPOSITORY_SQL_HELPER, repositroyDbSqlDriver)
+    }
+
     public void skipTest(msg) {
         reporterLogLn("Test is skipped: $msg")
         throw new SkipException("Test is skipped: $msg")
@@ -388,4 +415,42 @@ public class AnySqlCompareTest {
             settingChanged = true
         }
     }
+
+    private saveResultToDb(ITestContext testContext, schema, comments, sourceResult){
+        //Spara till DB fungerar men DELETE fungerar inte
+        //Connect to DB and save values
+        def savedComments = cleanUp(comments)
+        SqlHelper repositroyDbSqlDriver = testContext.getAttribute(REPOSITORY_SQL_HELPER)
+        def time = getCurrentTime()
+        def deleteQuery = "DELETE REPOSITORY WHERE SCHEMA_NAME = '" + schema + "' AND SOURCE_SQL = '" + savedComments + "'"
+        def dbQuery = "INSERT INTO REPOSITORY " +
+                "(SCHEMA_NAME, SOURCE_SQL, SAVED_VALUE, TIME) " +
+                "values " +
+                "('$schema', '$savedComments', '$sourceResult', '$time')"
+//        def dbResult = repositroyDbSqlDriver.execute("repository", deleteQuery)
+        def dbResult = repositroyDbSqlDriver.execute("repository", dbQuery)
+
+
+    }
+    private readResultFromDbSaved(ITestContext testContext,schema, comments){
+        //Connect to DB and read values
+        def savedSourceSql = cleanUp(comments)
+        SqlHelper repositroyDbSqlDriver = testContext.getAttribute(REPOSITORY_SQL_HELPER)
+        def dbQuery = "SELECT SAVED_VALUE FROM REPOSITORY " +
+                "WHERE SCHEMA_NAME = '$schema' " +
+                "AND SOURCE_SQL =  '$savedSourceSql'"
+        def dbResult = getDbResult(repositroyDbSqlDriver, dbQuery, Constants.dbRunTypeFirstRow)
+        return dbResult
+    }
+
+    def getCurrentTime(){
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss")
+        return dateFormat.format(new Date())
+    }
+
+    def  cleanUp(String sourceSql){
+        def savedSourceSql = sourceSql.replaceAll(/( |\.|,|\')/, "_").replaceAll( "\n", "___").replaceAll(/[åäöÅÄÖ]/,'_');
+        return savedSourceSql
+    }
+
 }

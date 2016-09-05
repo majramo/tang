@@ -19,8 +19,9 @@ public class DbCompareProperties {
         fields["enabled"] = ""
         fields["tableFieldsFileColumn"] = ""
         fields["tableFieldToExcludetableFieldToExclude"] = ""
+        fields["lastSourceColumn"] = ""
     }
-    public DbCompareProperties(row, String sourceDb, String sourceSql, String targetDb, String targetSql, threshold = 0, comments = "", by = "", tableFieldsFileColumn = "", tableFieldToExclude = ""){
+    public DbCompareProperties(row, String sourceDb, String sourceSql, String targetDb, String targetSql, threshold = 0, comments = "", by = "", tableFieldsFileColumn = "", tableFieldToExclude = "", lastSourceColumn = ""){
         fields["row"] = row
         fields["sourceDb"] = sourceDb
         fields["sourceSql"] = sourceSql
@@ -29,6 +30,7 @@ public class DbCompareProperties {
         fields["by"] = by
         fields["tableFieldsFileColumn"] = tableFieldsFileColumn
         fields["tableFieldToExclude"] = tableFieldToExclude
+        fields["lastSourceColumn"] = lastSourceColumn
 
         if(targetSql == "" || targetSql == "-") {
             fields["targetSql"] =  sourceSql
@@ -102,6 +104,10 @@ public class DbCompareProperties {
 
    def getTableFieldToExclude() {
         fields["tableFieldToExclude"]
+    }
+
+   def getLastSourceColumn() {
+        fields["lastSourceColumn"]
     }
 
     

@@ -16,6 +16,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
     private String comments;
     private String tableFieldsFileColumn;
     private String tableFieldToExclude;
+    private String lastSourceColumn;
     private String by;
     private DbCompareProperties dbCompareProperties
 
@@ -27,6 +28,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
         comments = dbCompareProperties.comments
         tableFieldsFileColumn = dbCompareProperties.tableFieldsFileColumn
         tableFieldToExclude = dbCompareProperties.tableFieldToExclude
+        lastSourceColumn = dbCompareProperties.lastSourceColumn
         by = dbCompareProperties.by
 
         String dbSourceOwner = settings."$sourceDb".owner
@@ -50,19 +52,22 @@ public class CompareS2T_Test extends AnySqlCompareTest{
         }
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
+        if(!lastSourceColumn.isEmpty()){
+            super.setRepositorySqlHelper(testContext, "repository")
+        }
         reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb), getDbType(targetDb)))
 
         def schema = sourceDb.replaceAll(/_Source/, "")
         ArrayList tableFieldsToExcludeMap = []
         if(!tableFieldsFileColumn.isEmpty() && !tableFieldToExclude.isEmpty()){
-            reporterLogLn("TableFieldsFileColumn: <$tableFieldsFileColumn}>");
-            reporterLogLn("tableFieldToExclude:   <$tableFieldToExclude}>");
-            reporterLogLn("schema:                <$schema}>");
+            reporterLogLn("TableFieldsFileColumn: <$tableFieldsFileColumn>");
+            reporterLogLn("tableFieldToExclude:   <$tableFieldToExclude>");
+            reporterLogLn("schema:                <$schema>");
             tableFieldsToExcludeMap = getTableFieldsToExcludeMap (tableFieldsFileColumn, schema)
         }
 
 
-        compareAllFromDb1InDb2(sourceSql, targetSql, threshold, tableFieldsToExcludeMap, tableFieldToExclude)
+        compareAllFromDb1InDb2(testContext, sourceSql, targetSql, threshold, comments, tableFieldsToExcludeMap, tableFieldToExclude, lastSourceColumn, schema)
     }
 
     private getTableFieldsToExcludeMap (inputFile, schema){
