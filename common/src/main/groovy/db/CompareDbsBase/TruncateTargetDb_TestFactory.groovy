@@ -5,7 +5,7 @@ import org.testng.Reporter
 import org.testng.annotations.Factory
 import org.testng.annotations.Parameters
 
-class TruncateTargetDb_TestFactory extends CompareS2T_TestFactoryBase {
+class TruncateTargetDb_TestFactory {
 
 
     @Parameters(["inputFileColumn", "schemaColumn", "atgardColumn"])
