@@ -2,7 +2,9 @@ package db
 
 import dtos.SettingsHelper
 import dtos.base.SqlHelper
+import excel.ExcelObjectProvider
 import org.apache.log4j.Logger
+import static dtos.base.Constants.CompareType.DIFF
 
 import static dtos.base.Constants.dbRunTypeRows
 
@@ -67,5 +69,44 @@ class DbObjectProvider {
         return valueList
     }
 
+    public static Object[][] sqlFieldJiraTestProvider(String inputFile, boolean smokeTest) {
+        def result = [];
+        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
+        excelObjectProvider.addColumnsToRetriveFromFile(["row","field", "table", "testType", "jira", "comment"])
+        if(!smokeTest){
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve("testType", "Regression")
+        }else{
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve("testType", "Regression", DIFF)
+        }
+        def excelBodyRows = excelObjectProvider.getGdcObjects(0)
+        excelBodyRows.eachWithIndex { excelRow, index ->
+            def rowLine = index + 1
+            String field = excelRow["field"]
+            String table = excelRow["table"]
+            String jira = excelRow["jira"]
+            String comment = excelRow["comment"]
+            String testType = excelRow["testType"]
+            String rowId = "$rowLine:" +  excelRow["row"]
+            if(table == null || table == "-"){
+                table = ""
+            }
+            if(field == null || field == "-"){
+                field = ""
+            }
+            if(jira == null || jira == "-"){
+                jira = ""
+            }
+            if(comment == null || comment == "-"){
+                comment = ""
+            }
+            if(testType == null || testType == "-"){
+                testType = ""
+            }
+            if( field != "" && table != "" ){
+                result.add([rowId, field, table, jira, comment, testType])
+            }
+        }
+        return result;
+    }
 
 }
