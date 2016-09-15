@@ -79,8 +79,8 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
         String browser = testResult.getTestContext().getAttribute(BROWSER)
         String browserIcon = testResult.getTestContext().getAttribute(BROWSER_ICON)
         String databaseIcon = testResult.getTestContext().getAttribute(DATABASE_VENDOR_1)
-        String description = testResult.getMethod().getDescription()
 
+        testResult.setAttribute(DESCRIPTION, testResult.getMethod().getDescription())
 
         testResult.setAttribute(ENVIRONMENT, environment)
         testResult.setAttribute(BROWSER, browser)
@@ -154,7 +154,6 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
         if (seleniumHelper != null) {
             seleniumHelper.takeScreenShotAndSource()
         }
-        testResult.setAttribute(DESCRIPTION, testResult.getMethod().getDescription())
     }
 
     private static void copyFolder(String sourceDir, String destinationDir) {

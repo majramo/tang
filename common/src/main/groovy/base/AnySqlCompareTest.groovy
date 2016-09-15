@@ -179,7 +179,13 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$threshold%> ");
         reporterLogLn("###");
         def targetDbResult = getTargetDbRowsResult(targetSql)
-        def targetValue = targetDbResult[0]["COUNT_"]
+        def targetValue = "7777777"
+        try{
+            targetValue = targetDbResult[0]["COUNT_"]
+        } catch (Exception e) {
+            reporterHelper.log("Exception $e")
+            reporterHelper.log("targetValue set to 7777777")
+        }
         equals(sourceValue, targetValue, threshold,  "ska vara lika")
     }
     protected void equals(sourceValue, targetValue, threshold,  msg = "") {
