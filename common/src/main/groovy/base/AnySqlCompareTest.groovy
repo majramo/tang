@@ -20,6 +20,7 @@ public class AnySqlCompareTest {
     private final static Logger log = Logger.getLogger("ASC   ")
     protected final static ReporterHelper reporterHelper = new ReporterHelper()
     public static final String BREAK_CLOSURE = "BreakClosure"
+    public static final String REPOSITORY_DB = "repository"
 
     protected SqlHelper sourceDbSqlDriver = null
     protected SqlHelper targetDbSqlDriver = null
@@ -31,9 +32,15 @@ public class AnySqlCompareTest {
     private static boolean settingChanged
     public static final String ENABLED = "enabled"
     public static final String SOURCE_VALUE = "sourceValue"
-    public static final String SOURCE_DB = "sourceDb"
-    public static final String SOURCE_SQL = "sourceSql"
-    public static final String TARGET_SQL = "targetSql"
+    private final String DATABASE_STRUCTURE = "DATABASE_STRUCTURE"
+    private final String DATABASE_CONSTRAINTS = "DATABASE_CONSTRAINTS"
+    private final String DATABASE_SOURCE = "DATABASE_SOURCE"
+    private final String DATABASE_INDEXES = "DATABASE_INDEXES"
+    public static final String SCHEMA_NAME = "SCHEMA_NAME"
+    public static final String SOURCE_SQL = "SOURCE_SQL"
+    public static final String TIME = "TIME"
+    public static final String TARGET_SQL = "TARGETSQL"
+    public static final String ROW_ID = "ROW_ID"
     public static final String TARGET_DB = "targetDb"
     public static final String THRESHOLD = "threshold"
     public static final String COMMENTS = "comments"
@@ -129,23 +136,18 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$threshold%> ");
         reporterLogLn("###");
         def sourceResult = getSourceDbRowsResult(sourceSql)
-        def targetResult
+        def targetResult = getTargetDbRowsResult(targetSql)
         if(lastSourceColumn == "SAVE"){
-            //Save sourceResult in JALFA
-            reporterLogLn("Saving schema <$schema> to DB")
-            saveResultToDb(testContext, schema, comments, sourceResult)
-            targetResult = sourceResult
+            def size = sourceResult.size()
+            //Save sourceResult in Repository database
+            reporterLogLn("Saving schema <$schema> <$size> rows DB")
+            saveResultToDb(testContext, schema, comments, sourceResult, sourceSql)
+            reporterLogLn("Saved to database")
+            return
         }else{
             if(lastSourceColumn == "READ"){
-                reporterLogLn("Reading saved schema <$schema> from DB")
-                //READ sourceResult in JALFA
-                def tmp = readResultFromDbSaved(testContext, schema, comments)
-                tmp.each {
-                    targetResult.add(it)
-                }
-
-            }else{
-                targetResult = getTargetDbRowsResult(targetSql)
+                //READ sourceResult from Repository database
+                targetResult = readSavedResultFromDb(testContext, schema, comments, sourceSql)
             }
         }
 
@@ -332,7 +334,7 @@ public class AnySqlCompareTest {
         reporterLogLn "####################"
         reporterLogLn("Diff size: <$diffCount> <$diffSizeProc%>");
         reporterLogLn("Diff data: <$diffDataCounter> <$diffDataCounterProc%>");
-        reporterLogLn("Threshold: <$thresholdString%> (+10: positiv, -10: negative, 10: abs()) diff");
+        reporterLogLn("Threshold: <$thresholdString%> (+10: positiv, -10: negative, 10: abs( )) diff");
 
         reporterLogLn ""
 //        tangAssert.assertTrue(sourceMapSize > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$sourceMapSize>");
@@ -422,31 +424,140 @@ public class AnySqlCompareTest {
         }
     }
 
-    private saveResultToDb(ITestContext testContext, schema, comments, sourceResult){
-        //Spara till DB fungerar men DELETE fungerar inte
-        //Connect to DB and save values
-        def savedComments = cleanUp(comments)
-        SqlHelper repositroyDbSqlDriver = testContext.getAttribute(REPOSITORY_SQL_HELPER)
-        def time = getCurrentTime()
-        def deleteQuery = "DELETE REPOSITORY WHERE SCHEMA_NAME = '" + schema + "' AND SOURCE_SQL = '" + savedComments + "'"
-        def dbQuery = "INSERT INTO REPOSITORY " +
-                "(SCHEMA_NAME, SOURCE_SQL, SAVED_VALUE, TIME) " +
-                "values " +
-                "('$schema', '$savedComments', '$sourceResult', '$time')"
-//        def dbResult = repositroyDbSqlDriver.execute("repository", deleteQuery)
-        def dbResult = repositroyDbSqlDriver.execute("repository", dbQuery)
+    private saveResultToDb(ITestContext testContext, schema, comments, sourceResult, sourceSql){
+        def repositoryTable = DATABASE_STRUCTURE
 
+        //Connect to DB , delete old values and save new values
+        if(sourceResult.size()) {
 
+            def savedComments = cleanUp(comments)
+
+            def fields = sourceResult[0].keySet().join(",")
+            (repositoryTable, fields) = getRepositoryDatabase(sourceSql)
+            Reporter.log("Saving table <$repositoryTable>")
+
+            def fieldsStr = ""
+            def TABBS = "$TABB$TABB$TABB"
+            fields.split(",").collect().each{
+                fieldsStr += "$TABBS\"${it.trim()}\" VARCHAR2(1000 CHAR),\n"
+            }
+            fieldsStr = fieldsStr[0..fieldsStr.length()-3]
+            def createTableQuery = """\n
+            drop  TABLE "$repositoryTable" ;
+            CREATE TABLE "$repositoryTable"
+               (
+            --Common columns
+            "ROW_ID" int,
+            "SCHEMA_NAME" VARCHAR2(50 CHAR),
+            "SOURCE_SQL" VARCHAR2(50 CHAR),
+            "TIME" VARCHAR2(20 CHAR),
+
+            --Custom coulmns
+$fieldsStr
+            ) SEGMENT CREATION IMMEDIATE;"""
+            println createTableQuery
+            SqlHelper repositroyDbSqlDriver = testContext.getAttribute(REPOSITORY_SQL_HELPER)
+            def time = getCurrentTime()
+            def dbSelectQuery = "SELECT COUNT(*) COUNT_ FROM $repositoryTable " +
+                    "WHERE $SCHEMA_NAME = '$schema' "
+
+            String deleteQuery = "DELETE $repositoryTable WHERE $SCHEMA_NAME = '" + schema  + "'"
+            def dbResult = repositroyDbSqlDriver.execute(REPOSITORY_DB, deleteQuery)
+            dbResult = getDbResult(repositroyDbSqlDriver, dbSelectQuery, Constants.dbRunTypeRows)
+            if(dbResult["COUNT_"][0] != 0 ){
+                Reporter.log("Kunde inte exekvera $deleteQuery")
+                throw new SkipException("Tabellen <$repositoryTable> kunde inte tömmas")
+            }
+            def dbInsertQuery = "INSERT INTO $repositoryTable " +
+                    "($SCHEMA_NAME, $SOURCE_SQL, $TIME, $ROW_ID, $fields) " +
+                    "values " +
+                    "('$schema', '$savedComments', '$time', "
+            repositroyDbSqlDriver.dbQueryRun = ""
+            //Each field will be singleQuoted ''
+            sourceResult.eachWithIndex { Map it, index ->
+                it.findAll().each { i->
+                    String value = i.value
+                    if(value != "" && value != null){
+                        value = value.replaceAll(/'/, /''/)
+                    }
+                    i.value = "'$value'"
+                }
+                def values = it.values().join (",")
+                String insertQuery = "$dbInsertQuery  $index, " + values + "  )"
+                dbResult = repositroyDbSqlDriver.execute(REPOSITORY_DB, insertQuery)
+            }
+        }
     }
-    private readResultFromDbSaved(ITestContext testContext,schema, comments){
+
+    private readSavedResultFromDb(ITestContext testContext, schema, comments, String sourceSql){
         //Connect to DB and read values
+        def repositoryTable
+        def fields
+        (repositoryTable, fields) = getRepositoryDatabase(sourceSql)
+
+        if(repositoryTable == ""){
+           reporterLogLn("Could not decide Database table")
+           return
+        }
+
+//         ToDO: Fix switch!
+//        switch (sourceSqlUpperCase) {
+//            case ~/.*ALL_TAB_COLS.*/:
+//                repositoryTable = DATABASE_STRUCTURE
+//                break
+//            case ~/USER_CONSTRAINTS/:
+//                repositoryTable = DATABASE_CONSTRAINTS
+//                break
+//            case ~/DBA_SOURCE/:
+//                repositoryTable = DATABASE_SOURCE
+//                break
+//            case ~/USER_INDEXES/:
+//                repositoryTable = DATABASE_INDEXES
+//                 break
+//            default:
+//                return
+//        }
+
+
+        reporterLogLn("Reading Targetsaved schema <$schema> from Table <$repositoryTable>")
+
         def savedSourceSql = cleanUp(comments)
         SqlHelper repositroyDbSqlDriver = testContext.getAttribute(REPOSITORY_SQL_HELPER)
-        def dbQuery = "SELECT SAVED_VALUE FROM REPOSITORY " +
-                "WHERE SCHEMA_NAME = '$schema' " +
-                "AND SOURCE_SQL =  '$savedSourceSql'"
-        def dbResult = getDbResult(repositroyDbSqlDriver, dbQuery, Constants.dbRunTypeFirstRow)
-        return dbResult
+        def dbQuery = "SELECT * FROM $repositoryTable " +
+                "WHERE $SCHEMA_NAME = '$schema' " +
+                "AND $SOURCE_SQL =  '$savedSourceSql'" +
+                "ORDER BY $ROW_ID"
+        def dbResult = getDbResult(repositroyDbSqlDriver, dbQuery, Constants.dbRunTypeRows)
+
+        ArrayList dbResultModified = new ArrayList()
+        reporterLogLn("${dbResult.size()} rows read in schema <$schema> from Table <$repositoryTable>")
+
+        dbResult.findAll().each {
+            it.keySet().removeAll([SCHEMA_NAME, SOURCE_SQL, TIME, ROW_ID])
+            dbResultModified.add(it)
+        }
+        return dbResultModified
+    }
+
+    private getRepositoryDatabase(String sourceSql) {
+        def repositoryTable
+        def sourceSqlUpperCase = sourceSql.toUpperCase()
+        if (sourceSqlUpperCase.contains("USER_TAB_COLS")) {
+            repositoryTable = DATABASE_STRUCTURE
+        }
+        if (sourceSqlUpperCase.contains("USER_CONSTRAINTS")) {
+            repositoryTable = DATABASE_CONSTRAINTS
+        }
+        if (sourceSqlUpperCase.contains("DBA_SOURCE")) {
+            repositoryTable = DATABASE_SOURCE
+        }
+        if (sourceSqlUpperCase.contains("USER_INDEXES")) {
+            repositoryTable = DATABASE_INDEXES
+        }
+        def fields = sourceSqlUpperCase.replaceAll(/\n/, ' ').replaceAll(/\n/, ' ').replaceAll(/FROM.*/, '').replaceAll(/.*(DISTINCT|SELECT)/, '').replaceAll("FROM.*", '').replaceAll(" ", "")
+        reporterLogLn("repositoryTable <$repositoryTable>")
+        reporterLogLn("fields <$fields")
+        return [repositoryTable, fields]
     }
 
     def getCurrentTime(){
