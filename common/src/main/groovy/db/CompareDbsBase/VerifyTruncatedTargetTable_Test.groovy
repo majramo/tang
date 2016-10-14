@@ -58,7 +58,7 @@ public class VerifyTruncatedTargetTable_Test extends AnySqlCompareTest{
         dbResult = getDbResult(targetDbSqlDriver, targetSql, dbRunTypeFirstRow)
         def count = dbResult["COUNT_"]
         reporterLogLn("Table count: <$count>")
-        tangAssert.assertEquals(count, 0, "Tabllen ska vara tom", "Tabellen har  <$count> rader, förväntat är <0>");
+        tangAssert.assertEquals(count, 0, "Tabellen ska vara tom", "Tabellen har  <$count> rader, förväntat är <0>");
 
     }
 
