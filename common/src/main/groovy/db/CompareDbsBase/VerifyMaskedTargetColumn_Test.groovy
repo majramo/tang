@@ -17,16 +17,14 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     private String system;
     private String targetSql;
     private String targetDbOwner;
-    private String atgard;
     def table
     def column
 
-    public VerifyMaskedTargetColumn_Test(targetDb, sourceDb, system, table, column,atgard) {
+    public VerifyMaskedTargetColumn_Test(targetDb, sourceDb, system, table, column) {
         super.setup()
         this.targetDb = targetDb
         this.sourceDb = sourceDb
         this.system = system.toLowerCase()
-        this.atgard = atgard
         this.table = table
         this.column = column
         targetDbOwner = settings."$targetDb".owner
@@ -45,7 +43,6 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         reporterLogLn("targetDb:  <$targetDb> ");
         reporterLogLn("table: <$table> ");
         reporterLogLn("column: <$column> ");
-        reporterLogLn("Atgard:    <$atgard> ");
         def TARGET_TABLE_QUERY_ORACLE = "SELECT %s,  ROWIDTONCHAR(ROWID) FROM %s WHERE %s || '_' || ROWID IN(\n" +
                 " SELECT %s || '_' || ROWID FROM %s --%s@$sourceDb\n" +
                 " WHERE NOT %s IS NULL\n" +
