@@ -176,5 +176,5 @@ public interface ISeleniumHelper {
 
     public void sleep(long milliseconds )
     public List analyseLinksByXpath(String[] xpaths)
-
+    boolean selectVisualOption(java.lang.String xpath, java.lang.String text);
  }

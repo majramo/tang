@@ -1484,4 +1484,14 @@ public class SeleniumHelper implements ISeleniumHelper {
     public reporterLogLn(message = "") {
         Reporter.log("$message$CR")
     }
+
+    public boolean selectVisualOption(final String element, final String text) {
+        log.info getCurrentMethodName() + " element<$element> text<$text>"
+        final WebElement we = findElementByXpathOrId(element + "/option[text()='" + text + "']")
+        if (we == null) {
+            return false
+        }
+        we.click()
+        return true
+    }
 }
