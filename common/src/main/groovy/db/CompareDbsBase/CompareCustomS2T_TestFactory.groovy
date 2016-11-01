@@ -6,9 +6,9 @@ import org.testng.annotations.Parameters
 
 class CompareCustomS2T_TestFactory extends CompareS2T_TestFactoryBase {
 
-    @Parameters(["inputFile", "enabledColumn", "byColumn", "sourceDbColumn"])
+    @Parameters(["inputFileColumn", "sourceDbColumn"])
     @Factory
-    public Object[] createCustomInstances(String inputFile, @Optional ("") boolean enabledColumn, @Optional ("") String byColumn, @Optional ("") String sourceDbColumn) {
-        return runCustom(inputFile, enabledColumn, byColumn, sourceDbColumn)
+    public Object[] createCustomInstances(String inputFileColumn,  @Optional ("") String sourceDbColumn) {
+        return runCustom(inputFileColumn, sourceDbColumn)
     }
 }

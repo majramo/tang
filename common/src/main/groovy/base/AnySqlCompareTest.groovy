@@ -10,6 +10,9 @@ import org.testng.SkipException
 import org.testng.annotations.*
 import reports.ReporterHelper
 
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+
 import static corebase.GlobalConstants.REPORT_NG_REPORTING_TITLE
 import static dtos.base.Constants.*
 
@@ -17,14 +20,32 @@ public class AnySqlCompareTest {
     private final static Logger log = Logger.getLogger("ASC   ")
     protected final static ReporterHelper reporterHelper = new ReporterHelper()
     public static final String BREAK_CLOSURE = "BreakClosure"
+    public static final String REPOSITORY_DB = "repository"
 
     protected SqlHelper sourceDbSqlDriver = null
     protected SqlHelper targetDbSqlDriver = null
+    protected SqlHelper repositroyDbSqlDriver = null
     public TangDbAssert tangAssert
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
     def applicationConf = settingsHelper.applicationConf
     private static boolean settingChanged
+    public static final String ENABLED = "enabled"
+    public static final String SOURCE_VALUE = "sourceValue"
+    private final String DATABASE_STRUCTURE = "DATABASE_STRUCTURE"
+    private final String DATABASE_CONSTRAINTS = "DATABASE_CONSTRAINTS"
+    private final String DATABASE_SOURCE = "DATABASE_SOURCE"
+    private final String DATABASE_INDEXES = "DATABASE_INDEXES"
+    public static final String SCHEMA_NAME = "SCHEMA_NAME"
+    public static final String SOURCE_SQL = "SOURCE_SQL"
+    public static final String TIME = "TIME"
+    public static final String TARGET_SQL = "TARGETSQL"
+    public static final String ROW_ID = "ROW_ID"
+    public static final String TARGET_DB = "targetDb"
+    public static final String THRESHOLD = "threshold"
+    public static final String COMMENTS = "comments"
+    public static final String ROW = "row"
+    public static final String BY = "by"
 
     @BeforeSuite(alwaysRun = true)
     public void beforeSuite(ITestContext testContext) {
@@ -99,7 +120,7 @@ public class AnySqlCompareTest {
         compareSourceValueToTarget(sourceValue, targetSql, threshold)
     }
 
-    protected void compareAllFromDb1InDb2(String sourceSql, String targetSql, threshold) {
+    protected void compareAllFromDb1InDb2(ITestContext testContext, String sourceSql, String targetSql, threshold, comments, ArrayList tableFieldsToExcludeMap = [], String tableFieldToExclude = "", lastSourceColumn = "", schema = "") {
         boolean isCountQuery
         reporterLogLn("Source: <${sourceDbSqlDriver.dbName}> ");
         reporterLogLn("Target: <$targetDbSqlDriver.dbName> ");
@@ -116,9 +137,33 @@ public class AnySqlCompareTest {
         reporterLogLn("###");
         def sourceResult = getSourceDbRowsResult(sourceSql)
         def targetResult = getTargetDbRowsResult(targetSql)
+        if(lastSourceColumn == "SAVE"){
+            def size = sourceResult.size()
+            //Save sourceResult in Repository database
+            reporterLogLn("Saving schema <$schema> <$size> rows DB")
+            saveResultToDb(testContext, schema, comments, sourceResult, sourceSql)
+            reporterLogLn("Saved to database")
+            return
+        }else{
+            if(lastSourceColumn == "READ"){
+                //READ sourceResult from Repository database
+                targetResult = readSavedResultFromDb(testContext, schema, comments, sourceSql)
+            }
+        }
+
+        if(tableFieldsToExcludeMap.size() && !tableFieldToExclude.isEmpty()){
+            tableFieldsToExcludeMap.each {exclude ->
+                def found = sourceResult.findAll {it[tableFieldToExclude] ==  exclude}
+                if(found.size()){
+                    sourceResult -= found
+                    targetResult -= found
+                }
+            }
+        }
         if (sourceSql.replace(" ", "").toLowerCase().contains("SELECT COUNT(1) COUNT_".replace(" ", "").toLowerCase())) {
             isCountQuery = true
         }
+
         equals(sourceResult, targetResult, threshold, isCountQuery, "ska vara lika")
     }
 
@@ -174,25 +219,37 @@ public class AnySqlCompareTest {
         reporterLogLn ""
         tangAssert.assertTrue(diffLessThanThreshold, "Värden ska vara lika", "Diffen är <$diff: $tmpDiffProc%>");
     }
-    protected void equals(ArrayList sourceMap, ArrayList targetMap, threshold, isCountQuery = false, msg = "") {
-        boolean diffLessThanThreshold = true
 
-        def diffCount = sourceMap.size() - targetMap.size()
-//        def biggestValue = sourceMap.size() + targetMap.size()
-        def biggestValue = [ sourceMap.size() + targetMap.size()].max()
 
-        float tmpSizeDiffProc = 0
-        if (biggestValue > 0) {
-            try {
-                tmpSizeDiffProc = 100 * diffCount / biggestValue
-            } catch (Exception e) {
-                tmpSizeDiffProc = 100
+    protected void equals(ArrayList sourceMap, ArrayList targetMap, thresholdString, isCountQuery = false, msg = "", String tableFieldsFileColumn = "", String tableFieldToExclude = "", sourceDb = "") {
+        boolean thresholdPassed = true
+        ArrayList tableFieldsToExcludeMap
+        Float thresholdValue = 0
+        try{
+            thresholdValue = Float.parseFloat(thresholdString)
+        }catch(Exception e){
+            thresholdValue = 0
+        }
+        if(!tableFieldsFileColumn.isEmpty()){
+            reporterLogLn("TableFieldsFileColumn: <$tableFieldsFileColumn>");
+        }
+        def sourceMapSize = sourceMap.size()
+        def targetMapSize = targetMap.size()
+        def diffCount = sourceMapSize - targetMapSize
+
+        float tmpSizeDiffProc = 100
+        if (sourceMapSize > 0) {
+            tmpSizeDiffProc = 100 * diffCount / sourceMapSize
+        } else {
+            if (targetMapSize == 0) {
+                tmpSizeDiffProc = 0
             }
         }
         float diffSizeProc = tmpSizeDiffProc.trunc(2)
         reporterLogLn("");
-        reporterLogLn("Source size: <${sourceMap.size()}>");
-        reporterLogLn("Target size: <${targetMap.size()}>");
+        reporterLogLn("Source size: <$sourceMapSize>");
+        reporterLogLn("Target size: <$targetMapSize>");
+
         if (isCountQuery) {
             reporterLogLn("Source result: <$sourceMap>");
             reporterLogLn("Target result: <$targetMap>");
@@ -245,28 +302,43 @@ public class AnySqlCompareTest {
             }
         }
 
-        float tmpDataDiffProc = 0
-        if (biggestValue > 0) {
-            try {
-                tmpDataDiffProc = 100 * diffDataCounter / biggestValue
-            } catch (Exception e) {
-                tmpDataDiffProc = 100
+        float tmpDataDiffProc = 100
+        if (sourceMapSize > 0) {
+            tmpDataDiffProc = 100 * diffDataCounter / sourceMapSize
+        } else {
+            if (targetMapSize == 0) {
+                tmpDataDiffProc = 0
             }
         }
         float diffDataCounterProc = tmpDataDiffProc.trunc(2)
 
-        if (diffSizeProc.abs() > threshold || diffDataCounterProc.abs() > threshold) {
-            diffLessThanThreshold = false
+        switch (thresholdString) {
+            case ~/^\+.*/:
+                if (diffSizeProc > thresholdValue || diffDataCounterProc > thresholdValue) {
+                    thresholdPassed = false
+                }
+                break
+            case ~/^\-.*/:
+                if (diffSizeProc < thresholdValue || diffDataCounterProc < thresholdValue) {
+                    thresholdPassed = false
+                }
+                break
+            default:
+                if (diffSizeProc.abs() > thresholdValue || diffDataCounterProc.abs() > thresholdValue) {
+                    thresholdPassed = false
+                }
+                break
         }
+
         reporterLogLn ""
         reporterLogLn "####################"
         reporterLogLn("Diff size: <$diffCount> <$diffSizeProc%>");
         reporterLogLn("Diff data: <$diffDataCounter> <$diffDataCounterProc%>");
-        reporterLogLn("Threshold: <$threshold%> ");
+        reporterLogLn("Threshold: <$thresholdString%> (+10: positiv, -10: negative, 10: abs( )) diff");
 
         reporterLogLn ""
-        tangAssert.assertTrue(biggestValue > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$biggestValue>");
-        tangAssert.assertTrue(diffLessThanThreshold, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc%> <Data $diffDataCounter: $diffDataCounterProc>");
+//        tangAssert.assertTrue(sourceMapSize > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$sourceMapSize>");
+        tangAssert.assertTrue(thresholdPassed, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc%> <Data $diffDataCounter: $diffDataCounterProc>");
 
     }
 
@@ -314,6 +386,11 @@ public class AnySqlCompareTest {
         testContext.setAttribute(TARGET_SQL_HELPER, targetDbSqlDriver)
     }
 
+    protected void setRepositorySqlHelper(ITestContext testContext, dbName) {
+        repositroyDbSqlDriver = new SqlHelper(null, log, dbName, settings.dbRun, settings)
+        testContext.setAttribute(REPOSITORY_SQL_HELPER, repositroyDbSqlDriver)
+    }
+
     public void skipTest(msg) {
         reporterLogLn("Test is skipped: $msg")
         throw new SkipException("Test is skipped: $msg")
@@ -346,4 +423,151 @@ public class AnySqlCompareTest {
             settingChanged = true
         }
     }
+
+    private saveResultToDb(ITestContext testContext, schema, comments, sourceResult, sourceSql){
+        def repositoryTable = DATABASE_STRUCTURE
+
+        //Connect to DB , delete old values and save new values
+        if(sourceResult.size()) {
+
+            def savedComments = cleanUp(comments)
+
+            def fields = sourceResult[0].keySet().join(",")
+            (repositoryTable, fields) = getRepositoryDatabase(sourceSql)
+            Reporter.log("Saving table <$repositoryTable>")
+
+            def fieldsStr = ""
+            def TABBS = "$TABB$TABB$TABB"
+            fields.split(",").collect().each{
+                fieldsStr += "$TABBS\"${it.trim()}\" VARCHAR2(1000 CHAR),\n"
+            }
+            fieldsStr = fieldsStr[0..fieldsStr.length()-3]
+            def createTableQuery = """\n
+            drop  TABLE "$repositoryTable" ;
+            CREATE TABLE "$repositoryTable"
+               (
+            --Common columns
+            "ROW_ID" int,
+            "SCHEMA_NAME" VARCHAR2(50 CHAR),
+            "SOURCE_SQL" VARCHAR2(50 CHAR),
+            "TIME" VARCHAR2(20 CHAR),
+
+            --Custom coulmns
+$fieldsStr
+            ) SEGMENT CREATION IMMEDIATE;"""
+            println createTableQuery
+            SqlHelper repositroyDbSqlDriver = testContext.getAttribute(REPOSITORY_SQL_HELPER)
+            def time = getCurrentTime()
+            def dbSelectQuery = "SELECT COUNT(*) COUNT_ FROM $repositoryTable " +
+                    "WHERE $SCHEMA_NAME = '$schema' "
+
+            String deleteQuery = "DELETE $repositoryTable WHERE $SCHEMA_NAME = '" + schema  + "'"
+            def dbResult = repositroyDbSqlDriver.execute(REPOSITORY_DB, deleteQuery)
+            dbResult = getDbResult(repositroyDbSqlDriver, dbSelectQuery, Constants.dbRunTypeRows)
+            if(dbResult["COUNT_"][0] != 0 ){
+                Reporter.log("Kunde inte exekvera $deleteQuery")
+                throw new SkipException("Tabellen <$repositoryTable> kunde inte tömmas")
+            }
+            def dbInsertQuery = "INSERT INTO $repositoryTable " +
+                    "($SCHEMA_NAME, $SOURCE_SQL, $TIME, $ROW_ID, $fields) " +
+                    "values " +
+                    "('$schema', '$savedComments', '$time', "
+            repositroyDbSqlDriver.dbQueryRun = ""
+            //Each field will be singleQuoted ''
+            sourceResult.eachWithIndex { Map it, index ->
+                it.findAll().each { i->
+                    String value = i.value
+                    if(value != "" && value != null){
+                        value = value.replaceAll(/'/, /''/)
+                    }
+                    i.value = "'$value'"
+                }
+                def values = it.values().join (",")
+                String insertQuery = "$dbInsertQuery  $index, " + values + "  )"
+                dbResult = repositroyDbSqlDriver.execute(REPOSITORY_DB, insertQuery)
+            }
+        }
+    }
+
+    private readSavedResultFromDb(ITestContext testContext, schema, comments, String sourceSql){
+        //Connect to DB and read values
+        def repositoryTable
+        def fields
+        (repositoryTable, fields) = getRepositoryDatabase(sourceSql)
+
+        if(repositoryTable == ""){
+           reporterLogLn("Could not decide Database table")
+           return
+        }
+
+//         ToDO: Fix switch!
+//        switch (sourceSqlUpperCase) {
+//            case ~/.*ALL_TAB_COLS.*/:
+//                repositoryTable = DATABASE_STRUCTURE
+//                break
+//            case ~/USER_CONSTRAINTS/:
+//                repositoryTable = DATABASE_CONSTRAINTS
+//                break
+//            case ~/DBA_SOURCE/:
+//                repositoryTable = DATABASE_SOURCE
+//                break
+//            case ~/USER_INDEXES/:
+//                repositoryTable = DATABASE_INDEXES
+//                 break
+//            default:
+//                return
+//        }
+
+
+        reporterLogLn("Reading Targetsaved schema <$schema> from Table <$repositoryTable>")
+
+        def savedSourceSql = cleanUp(comments)
+        SqlHelper repositroyDbSqlDriver = testContext.getAttribute(REPOSITORY_SQL_HELPER)
+        def dbQuery = "SELECT * FROM $repositoryTable " +
+                "WHERE $SCHEMA_NAME = '$schema' " +
+                "AND $SOURCE_SQL =  '$savedSourceSql'" +
+                "ORDER BY $ROW_ID"
+        def dbResult = getDbResult(repositroyDbSqlDriver, dbQuery, Constants.dbRunTypeRows)
+
+        ArrayList dbResultModified = new ArrayList()
+        reporterLogLn("${dbResult.size()} rows read in schema <$schema> from Table <$repositoryTable>")
+
+        dbResult.findAll().each {
+            it.keySet().removeAll([SCHEMA_NAME, SOURCE_SQL, TIME, ROW_ID])
+            dbResultModified.add(it)
+        }
+        return dbResultModified
+    }
+
+    private getRepositoryDatabase(String sourceSql) {
+        def repositoryTable
+        def sourceSqlUpperCase = sourceSql.toUpperCase()
+        if (sourceSqlUpperCase.contains("USER_TAB_COLS")) {
+            repositoryTable = DATABASE_STRUCTURE
+        }
+        if (sourceSqlUpperCase.contains("USER_CONSTRAINTS")) {
+            repositoryTable = DATABASE_CONSTRAINTS
+        }
+        if (sourceSqlUpperCase.contains("DBA_SOURCE")) {
+            repositoryTable = DATABASE_SOURCE
+        }
+        if (sourceSqlUpperCase.contains("USER_INDEXES")) {
+            repositoryTable = DATABASE_INDEXES
+        }
+        def fields = sourceSqlUpperCase.replaceAll(/\n/, ' ').replaceAll(/\n/, ' ').replaceAll(/FROM.*/, '').replaceAll(/.*(DISTINCT|SELECT)/, '').replaceAll("FROM.*", '').replaceAll(" ", "")
+        reporterLogLn("repositoryTable <$repositoryTable>")
+        reporterLogLn("fields <$fields")
+        return [repositoryTable, fields]
+    }
+
+    def getCurrentTime(){
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss")
+        return dateFormat.format(new Date())
+    }
+
+    def  cleanUp(String sourceSql){
+        def savedSourceSql = sourceSql.replaceAll(/( |\.|,|\')/, "_").replaceAll( "\n", "___").replaceAll(/[åäöÅÄÖ]/,'_');
+        return savedSourceSql
+    }
+
 }

@@ -91,6 +91,7 @@ public class Constants {
     public static final String SQL_HELPER = "SQL_HELPER"
     public static final String SOURCE_SQL_HELPER = "SOURCE_SQL_HELPER"
     public static final String TARGET_SQL_HELPER = "TARGET_SQL_HELPER"
+    public static final String REPOSITORY_SQL_HELPER = "REPOSITORY_SQL_HELPER"
     public static final String DATABASE = "DATABASE"
     public static final String DATABASE_VENDOR_1 = "DATABASE_VENDOR_1"
     public static final String DATABASE_VENDOR_2 = "DATABASE_VENDOR_2"

@@ -5,18 +5,18 @@ import org.testng.Reporter
 import org.testng.annotations.Factory
 import org.testng.annotations.Parameters
 
-class TruncateTargetDb_TestFactory extends CompareS2T_TestFactoryBase {
+class TruncateTargetDb_TestFactory {
 
 
-    @Parameters(["inputFile", "schemaColumn", "atgardColumn"])
+    @Parameters(["inputFileColumn", "schemaColumn", "atgardColumn"])
     @Factory
-    public Object[] createTruncateInstances(String inputFile, String schemaColumn, String atgardColumn) {
+    public Object[] createTruncateInstances(String inputFileColumn, String schemaColumn, String atgardColumn) {
 
         def targetDb = schemaColumn.toLowerCase() + "_Target"
         def system = schemaColumn[0].toUpperCase() + schemaColumn[1..-1].toLowerCase()
         def result = [];
 
-        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
+        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFileColumn)
         excelObjectProvider.addColumnsToRetriveFromFile(["Tabell"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
 //        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Tabell", "AMSULOG")
