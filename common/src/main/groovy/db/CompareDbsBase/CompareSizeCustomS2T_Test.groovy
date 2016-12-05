@@ -122,12 +122,14 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         def numberOfTablesChecked = 0
         boolean noExceptionAtRun = true
         uniqueDbResult.eachWithIndex { it, i ->
+            def j = i + 1
             boolean  loopException = false
             expectedDiff = 0
             def table = it[0]
-            log.info("$i:$dbSourceResultCount tabell <$table>")
+            def row = "$j:$dbSourceResultCount tabell <$table> "
+            log.info("$row")
             def str =""
-            str = aggregate(str, "$i:$dbSourceResultCount tabell <$table>")
+            str = aggregate(str, "$j:$dbSourceResultCount tabell <$table>")
 //            SqlHelper dbDriverSource = new SqlHelper(null, null, sourceDb, settings.dbRun, settings)
 //            SqlHelper dbDriverTarget = new SqlHelper(null, null, targetDb, settings.dbRun, settings)
 
@@ -147,7 +149,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
             }
 //            sourceSize = sourceSize * 2 //debug
             str = aggregate(str, "Source size <$sourceSize>")
-
+            row += "\tS<$sourceSize>"
             try {
                 def dbTargetSizeResult = dbDriverTarget.sqlConRun("$targetDb", dbRunTypeFirstRow, sqlSourceCompare, 0, targetDb)
                 targetSize = dbTargetSizeResult["COUNT_"]
@@ -156,7 +158,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                 noExceptionAtRun = false
                 str = aggregate(str, "Fick exception i target <$targetDb> $e")
             }
-//            targetSize = targetSize *  2 //debug
+            row += "\tT<$targetSize>"
             str = aggregate(str, "target size <$targetSize>")
 
             diffCount = (sourceSize - targetSize).abs()
@@ -168,6 +170,9 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
             if(SourceTargetMax > 0){
                 diffCountPercent =  (100 * diffCount / SourceTargetMax).abs()
             }
+            row += "\tD<$diffCount>"
+            reporterLogLn("$row")
+
             totalDiffCount += diffCount
             String expectedTableValue = expectdValues[table]
             if(expectedTableValue != "" && expectedTableValue != null ){
