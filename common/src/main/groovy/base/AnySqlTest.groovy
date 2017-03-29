@@ -110,7 +110,7 @@ public class AnySqlTest {
             settings = settingsHelper.settings
         }
         Reporter.log("$message")
-        Reporter.log("Query<$database>: $query")
+        Reporter.log("Query<$database>: \n$query\n")
         Reporter.log("dbRecordLine: $dbRecordLine")
         def dbResult = driver.sqlConRun(message, dbRunType, query, dbRecordLine, database)
 //        Reporter.log("\nResult\n###")
@@ -173,5 +173,19 @@ public class AnySqlTest {
             new InitDbSettings().setupDatabases()
             settingChanged = true
         }
+    }
+
+    public setIssueLink(String issueStr){
+
+        if(!issueStr.isEmpty() && !issueStr.equals("-")) {
+            if(!issueStr.isEmpty()) {
+                def issueLinkStr = issueStr
+                if(settings["issueLink"]){
+                    issueLinkStr = String.format(settings.issueLink, issueStr, issueStr)
+                }
+                Reporter.getCurrentTestResult().setAttribute(ISSUE_LINK, issueLinkStr)
+            }
+        }
+
     }
 }

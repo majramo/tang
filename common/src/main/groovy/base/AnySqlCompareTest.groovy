@@ -107,12 +107,12 @@ public class AnySqlCompareTest {
 
     protected void truncate(SqlHelper sqlHelper, String targetSql) {
         reporterLogLn("Target: <$sqlHelper.dbName> ");
-        reporterLogLn("Target Sql: >>>\n$targetSql\n<<< ");
+        reporterLogLn("Target Sql:\n$targetSql\n");
         sqlHelper.dbQueryType = Constants.dbRunTypeFirstRow
         sqlHelper.dbQuery = targetSql
         def dbType = getDbType(sqlHelper.dbName)
         def skipException = settings.skipException."$dbType"
-        Reporter.log("Skiping <$dbType> exception containing <$skipException>")
+        Reporter.log("Skiping <$dbType> exceptions if containing <$skipException>")
         println sqlHelper.executeAndSkipException(sqlHelper.dbName, targetSql, skipException)
     }
 

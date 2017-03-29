@@ -9,8 +9,8 @@ public class TruncateTargetTable_Test extends AnySqlCompareTest{
     private String targetDb;
     private String targetSql;
     private String atgard;
-    private final static String TRUNCATE_TABLE_QUERY = "SELECT COUNT(*) COUNT_ FROM %s"
-//    private final static String TRUNCATE_TABLE_QUERY = "TRUNCATE TABLE %s"
+//    private final static String TRUNCATE_TABLE_QUERY = "SELECT COUNT(*) COUNT_ FROM %s"
+    private final static String TRUNCATE_TABLE_QUERY = "TRUNCATE TABLE %s"
 
     public TruncateTargetTable_Test(targetDb, system, table, atgard) {
         super.setup()

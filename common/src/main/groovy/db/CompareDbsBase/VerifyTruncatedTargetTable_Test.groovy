@@ -37,10 +37,10 @@ public class VerifyTruncatedTargetTable_Test extends AnySqlCompareTest{
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(targetDb)))
         row++
         reporterLogLn("Row: <$row> TRUNCATE TABLE ");
-        reporterLogLn("targetDb:  <$targetDb> ");
-        reporterLogLn("table: <$table> ");
-        reporterLogLn("Atgard:    <$atgard> ");
-        reporterLogLn("targetSql: <$targetSql> ");
+        reporterLogLn("targetDb:   <$targetDb> ");
+        reporterLogLn("table:      <$table> ");
+        reporterLogLn("Atgard:     <$atgard> ");
+        reporterLogLn("targetSql:\n$targetSql\n");
         reporterLogLn("#########")
 
         //Search for table before executing, skip if table not exists
@@ -51,7 +51,7 @@ public class VerifyTruncatedTargetTable_Test extends AnySqlCompareTest{
         def dbResult = getDbResult(targetDbSqlDriver, targetTableSql, dbRunTypeFirstRow)
         if(dbResult == null){
             Reporter.log("Table <$table> does not exist, skipping the test")
-            Reporter.log("targetTableSql <$targetTableSql>")
+            Reporter.log("targetTableSql:\n$targetTableSql\n")
             throw new SkipException("Table <$table> does not exist")
         }
 

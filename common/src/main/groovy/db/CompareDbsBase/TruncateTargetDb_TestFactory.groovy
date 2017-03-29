@@ -19,9 +19,8 @@ class TruncateTargetDb_TestFactory {
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFileColumn)
         excelObjectProvider.addColumnsToRetriveFromFile(["Tabell"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
-//        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Tabell", "AMSULOG")
-//        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Atgard", atgardColumn)
-        def excelBodyRows = excelObjectProvider.getGdcObjects(2,1)
+        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Atgard", atgardColumn)
+        def excelBodyRows = excelObjectProvider.getGdcObjects(0)
         excelObjectProvider.printRow(excelBodyRows, ["System", "Tabell", "Atgard"])
 
         Reporter.log("Number of lines read <$excelBodyRows.size>")

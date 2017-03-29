@@ -26,6 +26,7 @@ import static dtos.base.Constants.CR
 import static dtos.base.Constants.ENVIRONMENT
 import static corebase.GlobalConstants.SELENIUM_HELPER
 import static corebase.GlobalConstants.WEB_DRIVER
+import static dtos.base.Constants.ISSUE_LINK
 import static dtos.base.Constants.dbRunTypeRows
 
 public class /**/AnyTest {
@@ -202,5 +203,19 @@ public class /**/AnyTest {
 
     public reporterLogLn(message = "") {
         Reporter.log("$message$CR")
+    }
+
+    public setIssueLink(String issueStr){
+
+        if(!issueStr.isEmpty() && !issueStr.equals("-")) {
+            if(!issueStr.isEmpty()) {
+                def issueLinkStr = issueStr
+                if(settings["issueLink"]){
+                    issueLinkStr = String.format(settings.issueLink, issueStr, issueStr)
+                }
+                Reporter.getCurrentTestResult().setAttribute(ISSUE_LINK, issueLinkStr)
+            }
+        }
+
     }
 }
