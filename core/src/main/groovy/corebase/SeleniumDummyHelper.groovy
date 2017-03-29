@@ -408,4 +408,8 @@ class SeleniumDummyHelper implements ISeleniumHelper {
     @Override
     List analyseLinksByXpath(String[] xpaths) {
     }
+    public boolean selectVisualOption(java.lang.String xpath, java.lang.String text) {
+
+    }
+
 }

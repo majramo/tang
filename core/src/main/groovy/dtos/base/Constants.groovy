@@ -5,6 +5,8 @@ public class Constants {
 
     public static final String TEST_STATUS = "TEST_STATUS";
     public static final String ICONS = "ICONS";
+    public static final String ISSUE_LINK_GROUP = ".*ISSUE_LINK_GROUP.*";
+    public static final String ISSUE_LINK = "ISSUE_LINK";
     public static final String BROWSER = "DEFAULT_BROWSER";
     public static final String APPLICATION = "APPLICATION";
     public static final String BROWSER_ICON = "BROWSER_ICON";
