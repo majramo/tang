@@ -48,7 +48,7 @@ public class CompareS2T_TestFactoryBase {
     }
 
 
-    protected ArrayList runCustom(String inputFile, sourceDbColumn) {
+    protected ArrayList runCustom(String inputFile, sourceDbColumn, enabledColumn, byColumn) {
         def result = [];
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
@@ -56,6 +56,12 @@ public class CompareS2T_TestFactoryBase {
 
         if (sourceDbColumn != "") {
             excelObjectProvider.addColumnsCapabilitiesToRetrieve(SOURCE_DB, sourceDbColumn)
+        }
+        if (enabledColumn != "") {
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, enabledColumn)
+        }
+        if (byColumn != "") {
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(BY, byColumn)
         }
         def excelBodyRows = excelObjectProvider.getGdcObjects(0)
 
