@@ -45,10 +45,9 @@ public class CompareS2T_Test extends AnySqlCompareTest{
     public void compareSourceEqualsTargetTest(ITestContext testContext){
         reporterLogLn("Row: <$row> $comments ");
         reporterLogLn("By: <$by>");
-        reporterLogLn("#########")
 
         if(!dbCompareProperties.isComplete){
-            skipTest("Värden för databas jämförelsen är inte kompletta: <${dbCompareProperties.skipReason}> \n ${dbCompareProperties.toString()}")
+            skipTest("Värden för databas-jämförelsen är inte kompletta: <${dbCompareProperties.skipReason}> \n ${dbCompareProperties.toString()}")
         }
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)

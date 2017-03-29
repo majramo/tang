@@ -84,14 +84,20 @@ public class CompareS2T_TestFactoryBase {
         return result;
     }
 
-    protected ArrayList runTargetToSourceValue(String inputFile, targetDbColumn) {
+    protected ArrayList runTargetToSourceValue(String inputFileColumn, targetDbColumn, enabledColumn, byColumn) {
         def result = [];
 
-        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
+        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFileColumn)
         excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_VALUE, TARGET_DB, TARGET_SQL, THRESHOLD, COMMENTS, BY])
 
         if (targetDbColumn != "") {
             excelObjectProvider.addColumnsCapabilitiesToRetrieve(TARGET_DB, targetDbColumn)
+        }
+        if (enabledColumn != "") {
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, enabledColumn)
+        }
+        if (byColumn != "") {
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(BY, byColumn)
         }
         def excelBodyRows = excelObjectProvider.getGdcObjects(0)
 

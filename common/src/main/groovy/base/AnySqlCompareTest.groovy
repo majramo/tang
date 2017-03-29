@@ -125,14 +125,8 @@ public class AnySqlCompareTest {
         reporterLogLn("Source: <${sourceDbSqlDriver.dbName}> ");
         reporterLogLn("Target: <$targetDbSqlDriver.dbName> ");
         reporterLogLn("");
-        reporterLogLn("Source Sql:");
-        reporterLogLn("###");
-        reporterLogLn(sourceSql);
-        reporterLogLn("");
-        reporterLogLn("Target Sql:");
-        reporterLogLn("###");
-        reporterLogLn(targetSql);
-        reporterLogLn("");
+        reporterLogLn("Source Sql:\n$sourceSql\n");
+        reporterLogLn("Target Sql:\n$targetSql\n");
         reporterLogLn("Threshold: <$threshold%> ");
         reporterLogLn("###");
         def sourceResult = getSourceDbRowsResult(sourceSql)
@@ -168,16 +162,9 @@ public class AnySqlCompareTest {
     }
 
     protected void compareSourceValueToTarget(String sourceValue, String targetSql, threshold) {
+        reporterLogLn("Source value:\n$sourceValue\n");
         reporterLogLn("Target: <$targetDbSqlDriver.dbName> ");
-        reporterLogLn("");
-        reporterLogLn("Source value:");
-        reporterLogLn("###");
-        reporterLogLn(sourceValue);
-        reporterLogLn("");
-        reporterLogLn("Target Sql:");
-        reporterLogLn("###");
-        reporterLogLn(targetSql);
-        reporterLogLn("");
+        reporterLogLn("Target Sql:\n$targetSql\n");
         reporterLogLn("Threshold: <$threshold%> ");
         reporterLogLn("###");
         def targetDbResult = getTargetDbRowsResult(targetSql)
