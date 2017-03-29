@@ -68,6 +68,18 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
         def destinationDirectory = outputDirectory + ICONS_DIRECTORY
         System.setProperty(ICONS_DIRECTORY_PROPERTY, destinationDirectory)
 
+        def issueLinkGroup = testResult.getMethod().getGroups().toString()
+        if(issueLinkGroup.contains(ISSUE_LINK_GROUP)){
+            def issueStr = issueLinkGroup.replaceAll(/.*ISSUE_LINK_GROUP../, '').replaceAll(/]/, '').trim()
+            if(!issueStr.isEmpty()) {
+                def issueLinkStr = issueStr
+                if(settings["issueLink"]){
+                    issueLinkStr = String.format(settings.issueLink, issueStr, issueStr)
+                }
+                testResult.setAttribute(ISSUE_LINK_GROUP, issueLinkStr)
+            }
+        }
+
         File source = new File(settings.iconsSourceDir)
         File destination = new File(destinationDirectory + "")
         log.debug("Test is started: " + testResult.getMethod().getMethodName())
@@ -163,7 +175,6 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
                 exclude(name: "*.DS_Store")
             }
         }
-
     }
 
 }

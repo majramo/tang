@@ -29,7 +29,6 @@ public class ScreenshotReportNGUtils extends ReportNGUtils {
         if (StringUtils.isNotBlank((String) result.getAttribute(ICONS))) {
             out += result.getAttribute(ICONS)
         }
-
         if (StringUtils.isNotBlank((String) result.getAttribute(DESCRIPTION))) {
             out += "<br>Description: " + result.getAttribute(DESCRIPTION)
         }
@@ -39,7 +38,12 @@ public class ScreenshotReportNGUtils extends ReportNGUtils {
         if (StringUtils.isNotBlank((String) result.getAttribute(BROWSER))) {
             out += "<br>Browser: " + result.getAttribute(BROWSER)
         }
-
+        if (StringUtils.isNotBlank((String) result.getAttribute(ISSUE_LINK_GROUP))) {
+            out += "<br>" + result.getAttribute(ISSUE_LINK_GROUP)
+        }
+        if (StringUtils.isNotBlank((String) result.getAttribute(ISSUE_LINK))) {
+            out += "<br>" + result.getAttribute(ISSUE_LINK)
+        }
         outputOut.addAll(out)
         outputOut.addAll(outputIn)
         return outputOut
