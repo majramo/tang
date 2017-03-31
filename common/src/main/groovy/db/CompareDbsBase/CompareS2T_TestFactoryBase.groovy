@@ -27,7 +27,7 @@ public class CompareS2T_TestFactoryBase {
         excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS, TABLE_FIELD_TO_EXCLUDE, BY])
 
 //        excelObjectProvider.addColumnsCapabilitiesToRetrieve(   ENABLED, "true" )
-        def excelBodyRows = excelObjectProvider.getGdcObjects(0)
+        def excelBodyRows = excelObjectProvider.getGdcObjects(1)
 
         excelBodyRows.eachWithIndex { excelRow, index ->
             def rowLine = index + 1

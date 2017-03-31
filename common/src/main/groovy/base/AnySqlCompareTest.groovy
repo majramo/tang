@@ -117,28 +117,37 @@ public class AnySqlCompareTest {
         compareSourceValueToTarget(sourceValue, targetSql, threshold)
     }
 
-    protected void compareAllFromDb1InDb2(ITestContext testContext, String sourceSql, String targetSql, threshold, comments, ArrayList tableFieldsToExcludeMap = [], String tableFieldToExclude = "", lastSourceColumn = "", schema = "") {
+    protected void compareAllFromDb1InDb2(ITestContext testContext, String sourceSql, String targetSql, threshold, comments, ArrayList tableFieldsToExcludeMap = [], String tableFieldToExclude = "", lastSourceColumn = "", system = "") {
         boolean isCountQuery
+        if(!(lastSourceColumn == "SAVE")) {
+            reporterLogLn("\nComparing (reading) structure from db\n#######\n");
+        }else{
+            reporterLogLn("\nSaving structure in db\n#######\n");
+        }
         reporterLogLn("Source: <${sourceDbSqlDriver.dbName}> ");
-        reporterLogLn("Target: <$targetDbSqlDriver.dbName> ");
-        reporterLogLn("Threshold: <$threshold%> ");
-        reporterLogLn("");
         reporterLogLn("Source Sql:\n$sourceSql\n");
-        reporterLogLn("Target Sql:\n$targetSql\n");
+        if(!(lastSourceColumn == "SAVE")){
+            reporterLogLn("");
+            reporterLogLn("Target: <$targetDbSqlDriver.dbName> ");
+            reporterLogLn("Target Sql:\n$targetSql\n");
+            reporterLogLn("Threshold: <$threshold%> ");
+        }
+        reporterLogLn("");
         reporterLogLn "####################"
         def sourceResult = getSourceDbRowsResult(sourceSql)
         def targetResult = getTargetDbRowsResult(targetSql)
         if(lastSourceColumn == "SAVE"){
             def size = sourceResult.size()
             //Save sourceResult in Repository database
-            reporterLogLn("Saving schema <$schema> <$size> rows DB")
-            saveResultToDb(testContext, schema, comments, sourceResult, sourceSql)
+            reporterLogLn("Saving system <$system> <$size> rows to db")
+            saveResultToDb(testContext, system, comments, sourceResult, sourceSql)
             reporterLogLn("Saved to database")
             return
         }else{
             if(lastSourceColumn == "READ"){
                 //READ sourceResult from Repository database
-                targetResult = readSavedResultFromDb(testContext, schema, comments, sourceSql)
+                reporterLogLn("Reading system <$system> from db")
+                targetResult = readSavedResultFromDb(testContext, system, comments, sourceSql)
             }
         }
 
@@ -155,7 +164,7 @@ public class AnySqlCompareTest {
             isCountQuery = true
         }
 
-        equals(sourceResult, targetResult, threshold, isCountQuery, "ska vara lika")
+        equals(sourceResult, targetResult, threshold, isCountQuery, "should be the same")
     }
 
     protected void compareSourceValueToTarget(String sourceValue, String targetSql, threshold) {
@@ -172,7 +181,7 @@ public class AnySqlCompareTest {
             reporterHelper.log("Exception $e")
             reporterHelper.log("targetValue set to 7777777")
         }
-        equals(sourceValue, targetValue, threshold,  "ska vara lika")
+        equals(sourceValue, targetValue, threshold,  "should be the same")
     }
     protected void equals(sourceValue, targetValue, threshold,  msg = "") {
         boolean diffLessThanThreshold = true
@@ -201,7 +210,7 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$threshold%> ");
 
         reporterLogLn ""
-        tangAssert.assertTrue(diffLessThanThreshold, "Värden ska vara lika", "Diffen är <$diff: $tmpDiffProc%>");
+        tangAssert.assertTrue(diffLessThanThreshold, "Values should be the same", "Dif is <$diff: $tmpDiffProc%>");
     }
 
 
@@ -414,7 +423,7 @@ public class AnySqlCompareTest {
         }
     }
 
-    private saveResultToDb(ITestContext testContext, schema, comments, sourceResult, sourceSql){
+    private saveResultToDb(ITestContext testContext, system, comments, sourceResult, sourceSql){
         def repositoryTable = DATABASE_STRUCTURE
 
         //Connect to DB , delete old values and save new values
@@ -449,9 +458,9 @@ $fieldsStr
             SqlHelper repositroyDbSqlDriver = testContext.getAttribute(REPOSITORY_SQL_HELPER)
             def time = getCurrentTime()
             def dbSelectQuery = "SELECT COUNT(*) COUNT_ FROM $repositoryTable " +
-                    "WHERE $SCHEMA_NAME = '$schema' "
+                    "WHERE $SCHEMA_NAME = '$system' "
 
-            String deleteQuery = "DELETE $repositoryTable WHERE $SCHEMA_NAME = '" + schema  + "'"
+            String deleteQuery = "DELETE $repositoryTable WHERE $SCHEMA_NAME = '" + system  + "'"
             def dbResult = repositroyDbSqlDriver.execute(REPOSITORY_DB, deleteQuery)
             dbResult = getDbResult(repositroyDbSqlDriver, dbSelectQuery, Constants.dbRunTypeRows)
             if(dbResult["COUNT_"][0] != 0 ){
@@ -461,7 +470,7 @@ $fieldsStr
             def dbInsertQuery = "INSERT INTO $repositoryTable " +
                     "($SCHEMA_NAME, $SOURCE_SQL, $TIME, $ROW_ID, $fields) " +
                     "values " +
-                    "('$schema', '$savedComments', '$time', "
+                    "('$system', '$savedComments', '$time', "
             repositroyDbSqlDriver.dbQueryRun = ""
             //Each field will be singleQuoted ''
             sourceResult.eachWithIndex { Map it, index ->
@@ -479,7 +488,7 @@ $fieldsStr
         }
     }
 
-    private readSavedResultFromDb(ITestContext testContext, schema, comments, String sourceSql){
+    private readSavedResultFromDb(ITestContext testContext, system, comments, String sourceSql){
         //Connect to DB and read values
         def repositoryTable
         def fields
@@ -509,18 +518,18 @@ $fieldsStr
 //        }
 
 
-        reporterLogLn("Reading Targetsaved schema <$schema> from Table <$repositoryTable>")
+        reporterLogLn("Reading Targetsaved system<$system> from Table <$repositoryTable>")
 
         def savedSourceSql = cleanUp(comments)
         SqlHelper repositroyDbSqlDriver = testContext.getAttribute(REPOSITORY_SQL_HELPER)
         def dbQuery = "SELECT * FROM $repositoryTable " +
-                "WHERE $SCHEMA_NAME = '$schema' " +
+                "WHERE $SCHEMA_NAME = '$system' " +
                 "AND $SOURCE_SQL =  '$savedSourceSql'" +
                 "ORDER BY $ROW_ID"
         def dbResult = getDbResult(repositroyDbSqlDriver, dbQuery, Constants.dbRunTypeRows)
 
         ArrayList dbResultModified = new ArrayList()
-        reporterLogLn("${dbResult.size()} rows read in schema <$schema> from Table <$repositoryTable>")
+        reporterLogLn("${dbResult.size()} rows read in system <$system> from Table <$repositoryTable>")
 
         dbResult.findAll().each {
             it.keySet().removeAll([SCHEMA_NAME, SOURCE_SQL, TIME, ROW_ID])
@@ -545,8 +554,8 @@ $fieldsStr
             repositoryTable = DATABASE_INDEXES
         }
         def fields = sourceSqlUpperCase.replaceAll(/\n/, ' ').replaceAll(/\n/, ' ').replaceAll(/FROM.*/, '').replaceAll(/.*(DISTINCT|SELECT)/, '').replaceAll("FROM.*", '').replaceAll(" ", "")
-        reporterLogLn("repositoryTable <$repositoryTable>")
-        reporterLogLn("fields <$fields")
+        reporterLogLn("Repository table <$repositoryTable>")
+        reporterLogLn("Fields <$fields>")
         return [repositoryTable, fields]
     }
 
