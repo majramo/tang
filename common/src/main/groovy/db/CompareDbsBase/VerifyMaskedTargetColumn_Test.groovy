@@ -43,9 +43,9 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(targetDb)))
         row++
         reporterLogLn("Row: <$row> Verify masked TABLE/COLUMN ");
-        reporterLogLn("sourceDb:  <$sourceDb> ");
-        reporterLogLn("targetDb:  <$targetDb> ");
-        reporterLogLn("tmpTable: <$tmpTable> ");
+        reporterLogLn("Source Db: <$sourceDb> ");
+        reporterLogLn("Target Db: <$targetDb> ");
+        reporterLogLn("Tmp Table: <$tmpTable> ");
         //reporterLogLn("column: <$column> ");
 
 
@@ -60,7 +60,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         if(checkColumnTypeResult[0] == "CLOB" || checkColumnTypeResult[0] == "BLOB"){
             tmpColumn = "dbms_lob.substr( $column, 4000,1)"
             reporterLogLn("checkColumnType:\n$checkColumnType\n")
-            reporterLogLn("Kolumn <$table> <$column> är LOB <$checkColumnTypeResult> ==> <$tmpColumn>")
+            reporterLogLn("Column <$table> <$column> is xLOB type<$checkColumnTypeResult> ==> <$tmpColumn>")
         }
         reporterLogLn("tmpColumn: <$tmpColumn> ");
 
@@ -98,7 +98,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                 }
             }
         }
-        tangAssert.assertTrue(!sameData, "Tabellen/kolumn <$table/$column> ska vara avidentiferad", "Tabellen har  ej avidentiferade rader, förväntat är <0>");
+        tangAssert.assertTrue(!sameData, "Table/Column <$table/$column> should be masked", "Table/Column unmasked rows is expected to be <0> ");
 
     }
 

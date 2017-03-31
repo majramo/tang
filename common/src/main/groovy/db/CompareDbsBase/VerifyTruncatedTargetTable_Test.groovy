@@ -13,16 +13,16 @@ public class VerifyTruncatedTargetTable_Test extends AnySqlCompareTest{
     private String targetDb;
     private String targetSql;
     private String targetDbOwner;
-    private String atgard;
+    private String action;
     private final static String VERIFY_TRUNCATED_TABLE_QUERY = "SELECT COUNT(*) COUNT_ FROM %s"
     def TARGET_TABLE_QUERY_ORACLE = "SELECT DISTINCT table_name FROM all_tab_cols WHERE table_name = '%s' AND NOT table_name IN (select view_name from all_views) AND OWNER = '%s'"
     def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns WHERE table_name = '%s'"
     def table
 
-    public VerifyTruncatedTargetTable_Test(targetDb, system, table, atgard) {
+    public VerifyTruncatedTargetTable_Test(targetDb, system, table, action) {
         super.setup()
         this.targetDb = targetDb
-        this.atgard = atgard
+        this.action = action
         this.table = table
         targetDbOwner = settings."$targetDb".owner
         targetSql = "-- Verify truncated table size <$table> in system <$system> is zero\n"
@@ -37,10 +37,9 @@ public class VerifyTruncatedTargetTable_Test extends AnySqlCompareTest{
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(targetDb)))
         row++
         reporterLogLn("Row: <$row> TRUNCATE TABLE ");
-        reporterLogLn("targetDb:   <$targetDb> ");
-        reporterLogLn("table:      <$table> ");
-        reporterLogLn("Atgard:     <$atgard> ");
-        reporterLogLn("targetSql:\n$targetSql\n");
+        reporterLogLn("Target Db:  <$targetDb> ");
+        reporterLogLn("Table:      <$table> ");
+        reporterLogLn("Target Sql:\n$targetSql\n");
         reporterLogLn("#########")
 
         //Search for table before executing, skip if table not exists
@@ -58,7 +57,7 @@ public class VerifyTruncatedTargetTable_Test extends AnySqlCompareTest{
         dbResult = getDbResult(targetDbSqlDriver, targetSql, dbRunTypeFirstRow)
         def count = dbResult["COUNT_"]
         reporterLogLn("Table count: <$count>")
-        tangAssert.assertEquals(count, 0, "Tabellen ska vara tom", "Tabellen har  <$count> rader, förväntat är <0>");
+        tangAssert.assertEquals(count, 0, "Table should have zero rows", "Table has  <$count> rows, expected was <0>");
 
     }
 

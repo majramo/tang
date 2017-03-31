@@ -106,13 +106,10 @@ public class AnySqlCompareTest {
     }
 
     protected void truncate(SqlHelper sqlHelper, String targetSql) {
-        reporterLogLn("Target: <$sqlHelper.dbName> ");
-        reporterLogLn("Target Sql:\n$targetSql\n");
         sqlHelper.dbQueryType = Constants.dbRunTypeFirstRow
         sqlHelper.dbQuery = targetSql
         def dbType = getDbType(sqlHelper.dbName)
         def skipException = settings.skipException."$dbType"
-        Reporter.log("Skiping <$dbType> exceptions if containing <$skipException>")
         println sqlHelper.executeAndSkipException(sqlHelper.dbName, targetSql, skipException)
     }
 
@@ -124,11 +121,11 @@ public class AnySqlCompareTest {
         boolean isCountQuery
         reporterLogLn("Source: <${sourceDbSqlDriver.dbName}> ");
         reporterLogLn("Target: <$targetDbSqlDriver.dbName> ");
+        reporterLogLn("Threshold: <$threshold%> ");
         reporterLogLn("");
         reporterLogLn("Source Sql:\n$sourceSql\n");
         reporterLogLn("Target Sql:\n$targetSql\n");
-        reporterLogLn("Threshold: <$threshold%> ");
-        reporterLogLn("###");
+        reporterLogLn "####################"
         def sourceResult = getSourceDbRowsResult(sourceSql)
         def targetResult = getTargetDbRowsResult(targetSql)
         if(lastSourceColumn == "SAVE"){
@@ -166,7 +163,7 @@ public class AnySqlCompareTest {
         reporterLogLn("Target: <$targetDbSqlDriver.dbName> ");
         reporterLogLn("Target Sql:\n$targetSql\n");
         reporterLogLn("Threshold: <$threshold%> ");
-        reporterLogLn("###");
+        reporterLogLn "####################"
         def targetDbResult = getTargetDbRowsResult(targetSql)
         def targetValue = "7777777"
         try{
@@ -222,6 +219,14 @@ public class AnySqlCompareTest {
         }
         def sourceMapSize = sourceMap.size()
         def targetMapSize = targetMap.size()
+        if(sourceMap.size() == 1){
+            try{
+                sourceMapSize = sourceMap[0]["COUNT_"]
+                targetMapSize = targetMap[0]["COUNT_"]
+            }catch(Exception e){
+                throw new Exception("Assuming result is a COUNT_ value", e)
+            }
+        }
         def diffCount = sourceMapSize - targetMapSize
 
         float tmpSizeDiffProc = 100
@@ -261,8 +266,8 @@ public class AnySqlCompareTest {
                 }
             }
         } catch (groovy.lang.MissingPropertyException e) {
-            Reporter.log("Source och target result måste ha samma kolumnnamn!")
-            throw new SkipException("Source och target result måste ha samma kolumnnamn")
+            Reporter.log("Source and target result must have same columnname!")
+            throw new SkipException("Source and target result must have same columnname")
         } catch (Exception e) {
             if (!e.cause.toString().contains(BREAK_CLOSURE)) {
                 throw e
@@ -281,8 +286,8 @@ public class AnySqlCompareTest {
                 }
             }
         } catch (groovy.lang.MissingPropertyException e) {
-            Reporter.log("Source och target result måste ha samma kolumnnamn!")
-            throw new SkipException("Source och target result måste ha samma kolumnnamn")
+            Reporter.log("Source and target result must have same columnname!")
+            throw new SkipException("Source and target result must have same columnname")
         } catch (Exception e) {
             if (!e.cause.toString().contains(BREAK_CLOSURE)) {
                 throw e
@@ -324,9 +329,7 @@ public class AnySqlCompareTest {
         reporterLogLn("Threshold: <$thresholdString%> (+10: positiv, -10: negative, 10: abs( )) diff");
 
         reporterLogLn ""
-//        tangAssert.assertTrue(sourceMapSize > 0, "Det ska finnas data i tabellerna", "Det finns inget data i tabellerna <$sourceMapSize>");
-        tangAssert.assertTrue(thresholdPassed, "Listor ska vara lika", "Diffen är <Size $diffCount: $diffSizeProc%> <Data $diffDataCounter: $diffDataCounterProc>");
-
+        tangAssert.assertTrue(thresholdPassed, "List should be equal", "Diff is <Size $diffCount: $diffSizeProc%> <Data $diffDataCounter: $diffDataCounterProc>");
     }
 
     protected int equals(String message, Map map1, Map map2) {
@@ -452,8 +455,8 @@ $fieldsStr
             def dbResult = repositroyDbSqlDriver.execute(REPOSITORY_DB, deleteQuery)
             dbResult = getDbResult(repositroyDbSqlDriver, dbSelectQuery, Constants.dbRunTypeRows)
             if(dbResult["COUNT_"][0] != 0 ){
-                Reporter.log("Kunde inte exekvera $deleteQuery")
-                throw new SkipException("Tabellen <$repositoryTable> kunde inte tömmas")
+                Reporter.log("Can't execute $deleteQuery")
+                throw new SkipException("Can't truncate table <$repositoryTable> ")
             }
             def dbInsertQuery = "INSERT INTO $repositoryTable " +
                     "($SCHEMA_NAME, $SOURCE_SQL, $TIME, $ROW_ID, $fields) " +

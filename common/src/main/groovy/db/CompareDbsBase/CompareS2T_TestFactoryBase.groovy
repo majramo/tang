@@ -65,7 +65,7 @@ public class CompareS2T_TestFactoryBase {
         }
         def excelBodyRows = excelObjectProvider.getGdcObjects(0)
 
-        excelBodyRows.eachWithIndex { excelRow, index ->
+        excelBodyRows.unique().eachWithIndex { excelRow, index ->
             def rowLine = index + 1
             int row = 0
             try {

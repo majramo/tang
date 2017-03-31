@@ -41,7 +41,7 @@ public class CompareT2S_Value_Test extends AnySqlCompareTest{
         reporterLogLn("#########")
 
         if(!dbTargetCompareProperties.isComplete){
-            skipTest("Värden för databas jämförelsen är inte kompletta: <${dbTargetCompareProperties.skipReason}> \n ${dbTargetCompareProperties.toString()}")
+            skipTest("Compare object is not complete: <${dbTargetCompareProperties.skipReason}> \n ${dbTargetCompareProperties.toString()}")
         }
         super.setTargetSqlHelper(testContext, targetDb)
         reporterLogLn(reporterHelper.addIcons(getDbType(targetDb)))

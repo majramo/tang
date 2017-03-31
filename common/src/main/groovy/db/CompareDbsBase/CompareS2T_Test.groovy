@@ -43,30 +43,31 @@ public class CompareS2T_Test extends AnySqlCompareTest{
 
     @Test
     public void compareSourceEqualsTargetTest(ITestContext testContext){
-        reporterLogLn("Row: <$row> $comments ");
-        reporterLogLn("By: <$by>");
-
-        if(!dbCompareProperties.isComplete){
-            skipTest("Värden för databas-jämförelsen är inte kompletta: <${dbCompareProperties.skipReason}> \n ${dbCompareProperties.toString()}")
+         if(!dbCompareProperties.isComplete){
+            skipTest("Compare object is not complete: <${dbCompareProperties.skipReason}> \n ${dbCompareProperties.toString()}")
         }
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
+        reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb), getDbType(targetDb)))
+
+        reporterLogLn("Row: <$row> $comments ");
+        reporterLogLn("By: <$by>");
+
         if(!lastSourceColumn.isEmpty()){
             super.setRepositorySqlHelper(testContext, "repository")
         }
-        reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb), getDbType(targetDb)))
 
-        def schema = sourceDb.replaceAll(/_Source/, "")
+        def system = sourceDb.replaceAll(/_Source/, "")
         ArrayList tableFieldsToExcludeMap = []
         if(!tableFieldsFileColumn.isEmpty() && !tableFieldToExclude.isEmpty()){
             reporterLogLn("TableFieldsFileColumn: <$tableFieldsFileColumn>");
-            reporterLogLn("tableFieldToExclude:   <$tableFieldToExclude>");
-            reporterLogLn("schema:                <$schema>");
-            tableFieldsToExcludeMap = getTableFieldsToExcludeMap (tableFieldsFileColumn, schema)
+            reporterLogLn("TableFieldToExclude:   <$tableFieldToExclude>");
+            reporterLogLn("System:                <$system>");
+            tableFieldsToExcludeMap = getTableFieldsToExcludeMap (tableFieldsFileColumn, system)
         }
 
 
-        compareAllFromDb1InDb2(testContext, sourceSql, targetSql, threshold, comments, tableFieldsToExcludeMap, tableFieldToExclude, lastSourceColumn, schema)
+        compareAllFromDb1InDb2(testContext, sourceSql, targetSql, threshold, comments, tableFieldsToExcludeMap, tableFieldToExclude, lastSourceColumn, system)
     }
 
     private getTableFieldsToExcludeMap (inputFile, schema){
@@ -74,15 +75,15 @@ public class CompareS2T_Test extends AnySqlCompareTest{
         def result = []
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
-        excelObjectProvider.addColumnsToRetriveFromFile(["Tabell"])
+        excelObjectProvider.addColumnsToRetriveFromFile(["Table"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", schema)
-        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Atgard", "Trunkera")
+        excelObjectProvider.addColumnsToRetriveFromFile("Action", "Truncate")
         def excelBodyRows = excelObjectProvider.getGdcObjects(6)
 
 
 
         excelBodyRows.unique().each {
-           result.add(it["Tabell"])
+           result.add(it["Table"])
         }
         return result;
     }

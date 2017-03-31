@@ -9,26 +9,26 @@ class VerifyTruncatedTargetDb_TestFactory {
 
 
 
-    @Parameters(["inputFileColumn", "schemaColumn", "atgardColumn"] )
+    @Parameters(["inputFileColumn", "systemColumn", "actionColumn"] )
     @Factory
-    public Object[] createVerifyTruncatedInstances(String inputFileColumn, String schemaColumn, String atgardColumn) {
+    public Object[] createVerifyTruncatedInstances(String inputFileColumn, String systemColumn, String actionColumn) {
 
-        def targetDb = schemaColumn.toLowerCase() + "_Target"
-        def system = schemaColumn[0].toUpperCase() + schemaColumn[1..-1].toLowerCase()
+        def targetDb = systemColumn.toLowerCase() + "_Target"
+        def system = systemColumn[0].toUpperCase() + systemColumn[1..-1].toLowerCase()
         def result = [];
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFileColumn)
-        excelObjectProvider.addColumnsToRetriveFromFile(["Tabell"])
+        excelObjectProvider.addColumnsToRetriveFromFile(["Table"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
-        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Atgard", atgardColumn)
+        excelObjectProvider.addColumnsToRetriveFromFile("Action", actionColumn)
         def excelBodyRows = excelObjectProvider.getGdcObjects(0)
-        excelObjectProvider.printRow(excelBodyRows, ["System", "Tabell", "Atgard"])
+        excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "action"])
 
         Reporter.log("Number of lines read <$excelBodyRows.size>")
         excelBodyRows.unique().eachWithIndex { excelRow, index ->
-            def table = excelRow["Tabell"]
+            def table = excelRow["Table"]
 
-            result.add(new VerifyTruncatedTargetTable_Test(targetDb, excelRow["System"], table, atgardColumn))
+            result.add(new VerifyTruncatedTargetTable_Test(targetDb, excelRow["System"], table, actionColumn))
 
         }
         return result;

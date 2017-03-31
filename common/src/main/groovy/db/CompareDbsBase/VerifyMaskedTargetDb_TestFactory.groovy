@@ -10,29 +10,28 @@ class VerifyMaskedTargetDb_TestFactory {
 
 
 
-    @Parameters(["inputFileColumn", "schemaColumn"] )
+    @Parameters(["inputFileColumn", "systemColumn"] )
     @Factory
-    public Object[] createVerifyTruncatedInstances(ITestContext testContext, String inputFileColumn, String schemaColumn) {
+    public Object[] createVerifyTruncatedInstances(ITestContext testContext, String inputFileColumn, String systemColumn) {
 
-        def targetDb = schemaColumn.toLowerCase() + "_Target"
-        def sourceDb = schemaColumn.toLowerCase() + "_Source"
-//        targetDb = schemaColumn.toLowerCase() + "_Source"
-//        sourceDb = schemaColumn.toLowerCase() + "_Target"
-        def system = schemaColumn[0].toUpperCase() + schemaColumn[1..-1].toLowerCase()
+        def targetDb = systemColumn.toLowerCase() + "_Target"
+        def sourceDb = systemColumn.toLowerCase() + "_Source"
+//        targetDb = systemColumn.toLowerCase() + "_Source"
+//        sourceDb = systemColumn.toLowerCase() + "_Target"
+        def system = systemColumn[0].toUpperCase() + systemColumn[1..-1].toLowerCase()
         def result = [];
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFileColumn)
-        excelObjectProvider.addColumnsToRetriveFromFile(["Tabell", "Kolumn"])
+        excelObjectProvider.addColumnsToRetriveFromFile(["Table", "Column", "Action", "Masking"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
-        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Atgard", "Avidentifiera")
         def excelBodyRows = excelObjectProvider.getGdcObjects(0)
-        excelObjectProvider.printRow(excelBodyRows, ["System", "Tabell", "Kolumn", "Atgard"])
+        excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "Column", "Action"])
 
         Reporter.log("Number of lines read <$excelBodyRows.size>")
-        Reporter.log("Atgard <Avidentifiera> ")
+        Reporter.log("Action <Masking> ")
         excelBodyRows.unique().eachWithIndex { excelRow, index ->
-            def table = excelRow["Tabell"]
-            def column = excelRow["Kolumn"]
+            def table = excelRow["Table"]
+            def column = excelRow["Column"]
 
             result.add(new VerifyMaskedTargetColumn_Test(testContext, targetDb, sourceDb, excelRow["System"], table, column))
 
