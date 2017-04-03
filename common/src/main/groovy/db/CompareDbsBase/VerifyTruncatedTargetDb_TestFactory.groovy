@@ -20,12 +20,12 @@ class VerifyTruncatedTargetDb_TestFactory {
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFileColumn)
         excelObjectProvider.addColumnsToRetriveFromFile(["Table"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
-        excelObjectProvider.addColumnsToRetriveFromFile("Action", actionColumn)
-        def excelBodyRows = excelObjectProvider.getGdcObjects(0)
+        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
+        ArrayList<Object[][]> excelBodyRows = excelObjectProvider.getGdcRows()
         excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "action"])
 
         Reporter.log("Number of lines read <$excelBodyRows.size>")
-        excelBodyRows.unique().eachWithIndex { excelRow, index ->
+        excelBodyRows.eachWithIndex { excelRow, index ->
             def table = excelRow["Table"]
 
             result.add(new VerifyTruncatedTargetTable_Test(targetDb, excelRow["System"], table, actionColumn))

@@ -17,18 +17,16 @@ class TruncateTargetDb_TestFactory {
         def result = [];
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFileColumn)
-        excelObjectProvider.addColumnsToRetriveFromFile(["Table"])
+        excelObjectProvider.addColumnsToRetriveFromFile(["System", "Table", "Action"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
-        def excelBodyRows = excelObjectProvider.getGdcObjects(15)
+        ArrayList<Object[][]> excelBodyRows = excelObjectProvider.getGdcRows()
         excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "Action"])
 
         Reporter.log("Number of lines read <$excelBodyRows.size>")
-        excelBodyRows.unique().eachWithIndex { excelRow, index ->
+        excelBodyRows.eachWithIndex { excelRow, index ->
             def table = excelRow["Table"]
             result.add(new TruncateTargetTable_Test(targetDb, excelRow["System"], table, actionColumn))
-
-
         }
         return result;
     }

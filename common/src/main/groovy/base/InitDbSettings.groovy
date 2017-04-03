@@ -14,8 +14,8 @@ class InitDbSettings {
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider("/configFiles/databases.xls")
         excelObjectProvider.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "dbPassword", "dbTestDataBase"])
+        ArrayList<Object[][]> databases = excelObjectProvider.getGdcRows()
 
-        def databases = excelObjectProvider.getGdcObjects(0)
         databases.each {
             def dbName = (it["dbName"]).toString().trim()
             if (dbName != "" && dbName != null) {

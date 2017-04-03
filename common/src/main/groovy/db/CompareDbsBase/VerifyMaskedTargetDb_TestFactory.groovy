@@ -24,7 +24,7 @@ class VerifyMaskedTargetDb_TestFactory {
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFileColumn)
         excelObjectProvider.addColumnsToRetriveFromFile(["Table", "Column", "Action", "Masking"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
-        def excelBodyRows = excelObjectProvider.getGdcObjects(0)
+        def excelBodyRows = excelObjectProvider.getGdcRows()
         excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "Column", "Action"])
 
         Reporter.log("Number of lines read <$excelBodyRows.size>")
