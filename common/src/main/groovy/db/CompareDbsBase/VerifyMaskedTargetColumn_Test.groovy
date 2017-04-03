@@ -50,6 +50,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
 
 
         def checkColumnType = "SELECT data_type FROM USER_TAB_COLS WHERE lower(table_name) = '$tmpTable' AND lower(column_name) = '$column'"
+        reporterLogLn("Sql to check column type:\n$checkColumnType\n")
         def checkColumnTypeResult = getDbResult(targetDbSqlDriver, checkColumnType, dbRunTypeFirstRow)
 
 
