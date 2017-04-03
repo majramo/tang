@@ -33,9 +33,6 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         def sourceDb = systemColumn.toLowerCase() + "_Source"
         def system = systemColumn[0].toUpperCase() + systemColumn[1..-1].toLowerCase()
 
-        reporterLogLn("Source: <$sourceDb>");
-        reporterLogLn("Target: <$targetDb>");
-        reporterLogLn("Number of tables to check: <$numberOfTablesToCheckColumn>\n");
         String sourceDbOwner = settings."$sourceDb".owner
         String targetDbOwner = settings."$targetDb".owner
         def sourceTableSql = String.format(SOURCE_TABLE_QUERY_ORACLE, sourceDbOwner.toUpperCase())
@@ -49,6 +46,11 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
         reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb), getDbType(targetDb)))
+
+        reporterLogLn("Source: <$sourceDb>");
+        reporterLogLn("Target: <$targetDb>");
+        reporterLogLn("Number of tables to check: <$numberOfTablesToCheckColumn>\n");
+
         def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
         def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
 
