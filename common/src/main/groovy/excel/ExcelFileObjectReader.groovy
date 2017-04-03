@@ -298,6 +298,9 @@ public class ExcelFileObjectReader {
         int maxRowsToReadFromFile
         try {
             maxRowsToReadFromFile = Integer.parseInt(settings.maxRowsToReadFromFile.toString())
+            if(maxRowsToReadFromFile < 100){
+                maxRowsToReadFromFile = 100
+            }
         } catch (NumberFormatException exception) {
             log.info("Can't find maxRowsToReadFromFile in settings:$exception")
         }
