@@ -3,8 +3,6 @@ package db.CompareDbsBase
 import dtos.SettingsHelper
 import excel.ExcelObjectProvider
 
-import static excel.ExcelObjectProvider.getGdcObjects
-
 public class CompareS2T_TestFactoryBase {
     static boolean settingsChanged
     public static final String ENABLED = "enabled"
@@ -27,7 +25,7 @@ public class CompareS2T_TestFactoryBase {
         excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS, TABLE_FIELD_TO_EXCLUDE, BY])
 
 //        excelObjectProvider.addColumnsCapabilitiesToRetrieve(   ENABLED, "true" )
-        def excelBodyRows = excelObjectProvider.getGdcObjects(1)
+        def excelBodyRows = excelObjectProvider.getGdcRows(1)
 
         excelBodyRows.eachWithIndex { excelRow, index ->
             def rowLine = index + 1
@@ -63,7 +61,7 @@ public class CompareS2T_TestFactoryBase {
         if (byColumn != "") {
             excelObjectProvider.addColumnsCapabilitiesToRetrieve(BY, byColumn)
         }
-        def excelBodyRows = excelObjectProvider.getGdcObjects(0)
+        def excelBodyRows = excelObjectProvider.getGdcRows()
 
         excelBodyRows.unique().eachWithIndex { excelRow, index ->
             def rowLine = index + 1
@@ -99,7 +97,7 @@ public class CompareS2T_TestFactoryBase {
         if (byColumn != "") {
             excelObjectProvider.addColumnsCapabilitiesToRetrieve(BY, byColumn)
         }
-        def excelBodyRows = excelObjectProvider.getGdcObjects(0)
+        def excelBodyRows = excelObjectProvider.getGdcRows()
 
         excelBodyRows.eachWithIndex { excelRow, index ->
             def rowLine = index + 1
