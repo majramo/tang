@@ -190,11 +190,13 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
             //Comparing
             if(truncateTables[table]){
                 if (targetSize > 0 || loopException) {
+                    icon = "t"
                     numberOfTableDiff++
                     nok = aggregate(nok, "$str a. Table $table has <$targetSize> rows, expected to be truncated\n\n")
                 } else {
                     ok = aggregate(ok, "$str a. Table $table has <$targetSize> rows as expected, is truncated\n\n")
                 }
+                reporterLogLn("$icon D " + "$diffCount".padLeft(12) + " | S " + "$sourceSize".padLeft(12) + " | T " + "$targetSize".padLeft(12)+ " | " + row.padRight(45) + " * should be truncated" )
 
             }else {
                 diffCount = (sourceSize - targetSize).abs()
@@ -214,6 +216,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                 if(SourceTargetMax > 0) {
                     totalDiffCountExpected += (expectedMaximumDiff * SourceTargetMax / 100).round(0)
                 }
+                def expectedMaximumDiff_Ok  = false
                 if (expectedMaximumDiff > 0) {
                     //Todo: Att hantera vid generering då vi kan utöka och få en diff >100%
                     if (diffCountPercent > expectedMaximumDiff || loopException) {
@@ -230,10 +233,11 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                         numberOfTableDiff++
                         nok = aggregate(nok, "$str table $table has <$diffCount> diff, <$diffCountPercent>, expected maximum diff in target was <0.0 %>\n\n")
                     } else {
-                        ok = aggregate(ok, str)
+                        expectedMaximumDiff_Ok = true
                     }
                 }
                 reporterLogLn("$icon D " + "$diffCount".padLeft(12) + " | S " + "$sourceSize".padLeft(12) + " | T " + "$targetSize".padLeft(12)+ " | " + row.padRight(25) )
+                def expectedMinimumDiff_Ok = false
                 if (expectedMinimumDiff > 0) {
                     //Todo: Att hantera vid generering då vi kan utöka och få en diff >100%
                     if (diffCountPercent < expectedMinimumDiff || loopException) {
@@ -248,10 +252,14 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                         numberOfTableDiff++
                         nok = aggregate(nok, "$str c. table $table has <$diffCount> diff, <$diffCountPercent %>, expected minimum diff in target was <0.0 %>\n\n")
                     } else {
-                        ok = aggregate(ok, str)
+                        expectedMinimumDiff_Ok = true
                     }
                 }
+                if (expectedMaximumDiff_Ok || expectedMinimumDiff_Ok){
+                    ok = aggregate(ok, str)
+                }
             }
+
             //Comparing
 
             numberOfTablesChecked++
