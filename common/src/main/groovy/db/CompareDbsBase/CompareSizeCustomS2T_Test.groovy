@@ -24,14 +24,12 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
 
 
-    @Parameters(["systemColumn", "numberOfTablesToCheckColumn", "inputFileColumn"] )
+    @Parameters(["systemColumn", "numberOfTablesToCheckColumn"] )
     @Test
-    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("0") int numberOfTablesToCheckColumn, @Optional("") String inputFileColumn, ITestContext testContext){
+    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("0") int numberOfTablesToCheckColumn, ITestContext testContext){
         super.setup()
 
-        def targetDb = systemColumn.toLowerCase() + "_Target"
-        def sourceDb = systemColumn.toLowerCase() + "_Source"
-        def system = systemColumn[0].toUpperCase() + systemColumn[1..-1].toLowerCase()
+        def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
 
         String sourceDbOwner = settings."$sourceDb".owner
         String targetDbOwner = settings."$targetDb".owner
@@ -62,16 +60,17 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         if(numberOfTablesToCheckColumn > 0){
             if(sourceDbResultTableToCheck > numberOfTablesToCheckColumn){
                 sourceDbResultTableToCheck = numberOfTablesToCheckColumn - 1
+                sourceDbResult = sourceDbResult[0..sourceDbResultTableToCheck]
             }
             if(targetDbResultTableToCheck > numberOfTablesToCheckColumn){
                 targetDbResultTableToCheck = numberOfTablesToCheckColumn - 1
+                targetDbResult = targetDbResult[0..targetDbResultTableToCheck]
             }
-            (diffCount, totalDiffCountExpected, noExceptionAtRun)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult[0..sourceDbResultTableToCheck], targetDb, targetDbSqlDriver, targetDbResult[0..targetDbResultTableToCheck], systemColumn, inputFileColumn)
-        }else{
-            (diffCount, totalDiffCountExpected, noExceptionAtRun)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult, system, inputFileColumn)
         }
-            tangAssert.assertTrue(noExceptionAtRun, "No exception", "Got exception")
-            tangAssert.assertEquals(diffCount, totalDiffCountExpected, "$MESSAGE: should have no diff", "$MESSAGE: diffCount $diffCount <> $totalDiffCountExpected ")
+        (diffCount, totalDiffCountExpected, noExceptionAtRun)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult, system, excelObjectProvider.inputFile)
+
+        tangAssert.assertTrue(noExceptionAtRun, "No exception", "Got exception")
+        tangAssert.assertEquals(diffCount, totalDiffCountExpected, "$MESSAGE: should have no diff", "$MESSAGE: diffCount $diffCount <> $totalDiffCountExpected ")
 
     }
 
@@ -223,6 +222,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                         nok = aggregate(nok, "$str Table $table has <$diffCount> diff, <$diffCountPercent %>, expected maximum diff in target was <$expectedMaximumDiff %>\n\n")
                     } else {
                         ok = aggregate(ok, "$str Table $table has <$diffCount> diff, <$diffCountPercent %>, expected maximum diff in target was <$expectedMaximumDiff %>\n\n")
+
                     }
                 } else {
                     if (diffCountPercent > 0 || loopException) {

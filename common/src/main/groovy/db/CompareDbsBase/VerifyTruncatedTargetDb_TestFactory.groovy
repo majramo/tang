@@ -9,22 +9,20 @@ class VerifyTruncatedTargetDb_TestFactory {
 
 
 
-    @Parameters(["inputFileColumn", "systemColumn", "actionColumn"] )
+    @Parameters(["systemColumn", "actionColumn"] )
     @Factory
-    public Object[] createVerifyTruncatedInstances(String inputFileColumn, String systemColumn, String actionColumn) {
+    public Object[] createVerifyTruncatedInstances(String systemColumn, String actionColumn) {
 
-        def targetDb = systemColumn.toLowerCase() + "_Target"
-        def system = systemColumn[0].toUpperCase() + systemColumn[1..-1].toLowerCase()
-        def result = [];
+        def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
 
-        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFileColumn)
         excelObjectProvider.addColumnsToRetriveFromFile(["Table"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
-        ArrayList<Object[][]> excelBodyRows = excelObjectProvider.getGdcRows()
+        ArrayList<Object[][]> excelBodyRows = excelObjectProvider.getGdcRows(2)
         excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "action"])
 
         Reporter.log("Number of lines read <$excelBodyRows.size>")
+        def result = [];
         excelBodyRows.eachWithIndex { excelRow, index ->
             def table = excelRow["Table"]
 

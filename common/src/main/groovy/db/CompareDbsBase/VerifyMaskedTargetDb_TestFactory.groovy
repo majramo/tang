@@ -9,22 +9,14 @@ import org.testng.annotations.Parameters
 
 class VerifyMaskedTargetDb_TestFactory {
 
-    SettingsHelper settingsHelper = SettingsHelper.getInstance()
-    def settings = settingsHelper.settings
 
     @Parameters(["systemColumn"] )
     @Factory
     public Object[] createVerifyTruncatedInstances(ITestContext testContext, String systemColumn) {
 
-        def targetDb = systemColumn.toLowerCase() + "_Target"
-        def sourceDb = systemColumn.toLowerCase() + "_Source"
-        def system = systemColumn[0].toUpperCase() + systemColumn[1..-1].toLowerCase()
-        def result = [];
+        def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
 
-        def systemInputFile = settings.systemInputFile + systemColumn.toLowerCase() + ".xls"
-
-        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(systemInputFile)
-        excelObjectProvider.addColumnsToRetriveFromFile(["Table", "Column", "Action", "Masking"])
+        excelObjectProvider.addColumnsToRetriveFromFile(["System", "Table", "Column", "Action"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", "Mask")
         def excelBodyRows = excelObjectProvider.getGdcRows()
@@ -32,6 +24,8 @@ class VerifyMaskedTargetDb_TestFactory {
 
         Reporter.log("Lines read <$excelBodyRows.size>")
         Reporter.log("Action <Masking> ")
+
+        def result = [];
         excelBodyRows.unique().eachWithIndex { excelRow, index ->
             def table = excelRow["Table"]
             def column = excelRow["Column"]
