@@ -57,6 +57,10 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         boolean noExceptionAtRun
         def sourceDbResultTableToCheck = sourceDbResult.size()-1
         def targetDbResultTableToCheck = targetDbResult.size()-1
+
+        /*
+        If numberOfTablesToCheckColumn parameter is set then the db result set is reduced to this size before compare id executed
+         */
         if(numberOfTablesToCheckColumn > 0){
             if(sourceDbResultTableToCheck > numberOfTablesToCheckColumn){
                 sourceDbResultTableToCheck = numberOfTablesToCheckColumn - 1
