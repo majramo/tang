@@ -139,6 +139,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         def numberOfTablesChecked = 0
         boolean noExceptionAtRun = true
         uniqueDbResult.eachWithIndex { it, i ->
+            def icon = " "
             def j = i + 1
             boolean  loopException = false
             expectedMaximumDiff = 0
@@ -206,7 +207,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                 if (SourceTargetMax > 0) {
                     diffCountPercent = (100 * diffCount / SourceTargetMax).abs()
                 }
-                reporterLogLn(row.padRight(25) + " <D " + "$diffCount>".padLeft(12) + " <S " + "$sourceSize>".padLeft(12) + " <T " + "$targetSize>".padLeft(12))
+//                reporterLogLn(row.padRight(25) + " <D " + "$diffCount>".padLeft(12) + " <S " + "$sourceSize>".padLeft(12) + " <T " + "$targetSize>".padLeft(12))
 
                 totalDiffCount += diffCount
 
@@ -217,6 +218,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                 if (expectedMaximumDiff > 0) {
                     //Todo: Att hantera vid generering då vi kan utöka och få en diff >100%
                     if (diffCountPercent > expectedMaximumDiff || loopException) {
+                        icon = "*"
                         numberOfTableDiff++
                         nok = aggregate(nok, "$str Table $table has <$diffCount> diff, <$diffCountPercent %>, expected maximum diff in target was <$expectedMaximumDiff %>\n\n")
                     } else {
@@ -224,12 +226,14 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                     }
                 } else {
                     if (diffCountPercent > 0 || loopException) {
+                        icon = "*"
                         numberOfTableDiff++
                         nok = aggregate(nok, "$str table $table has <$diffCount> diff, <$diffCountPercent>, expected maximum diff in target was <0.0 %>\n\n")
                     } else {
                         ok = aggregate(ok, str)
                     }
                 }
+                reporterLogLn("$icon D " + "$diffCount".padLeft(12) + " | S " + "$sourceSize".padLeft(12) + " | T " + "$targetSize".padLeft(12)+ " | " + row.padRight(25) )
                 if (expectedMinimumDiff > 0) {
                     //Todo: Att hantera vid generering då vi kan utöka och få en diff >100%
                     if (diffCountPercent < expectedMinimumDiff || loopException) {
