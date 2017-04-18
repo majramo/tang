@@ -136,6 +136,7 @@ public class AnySqlCompareTest {
         reporterLogLn "####################"
         def sourceResult = getSourceDbRowsResult(sourceSql)
         def targetResult = getTargetDbRowsResult(targetSql)
+
         if(lastSourceColumn == "SAVE"){
             def size = sourceResult.size()
             //Save sourceResult in Repository database
@@ -456,16 +457,20 @@ $fieldsStr
             ) SEGMENT CREATION IMMEDIATE;"""
             println createTableQuery
             SqlHelper repositroyDbSqlDriver = testContext.getAttribute(REPOSITORY_SQL_HELPER)
-            def time = getCurrentTime()
+            def time = getCurrentDateHour()
             def dbSelectQuery = "SELECT COUNT(*) COUNT_ FROM $repositoryTable " +
-                    "WHERE $SCHEMA_NAME = '$system' "
+                    "WHERE $SCHEMA_NAME = '$system' AND time = '$time'"
 
-            String deleteQuery = "DELETE $repositoryTable WHERE $SCHEMA_NAME = '" + system  + "'"
-            def dbResult = repositroyDbSqlDriver.execute(REPOSITORY_DB, deleteQuery)
-            dbResult = getDbResult(repositroyDbSqlDriver, dbSelectQuery, Constants.dbRunTypeRows)
-            if(dbResult["COUNT_"][0] != 0 ){
-                Reporter.log("Can't execute $deleteQuery")
-                throw new SkipException("Can't truncate table <$repositoryTable> ")
+            def dbResult = getDbResult(repositroyDbSqlDriver, dbSelectQuery, Constants.dbRunTypeRows)
+            if(dbResult["COUNT_"][0] != 0 ) {
+                String deleteQuery = "DELETE $repositoryTable WHERE $SCHEMA_NAME = '" + system + "' AND time = '$time'"
+                dbResult = repositroyDbSqlDriver.execute(REPOSITORY_DB, deleteQuery)
+
+                dbResult = getDbResult(repositroyDbSqlDriver, dbSelectQuery, Constants.dbRunTypeRows)
+                if(dbResult["COUNT_"][0] != 0 ){
+                    Reporter.log("Can't execute $deleteQuery")
+                    throw new SkipException("Can't truncate table <$repositoryTable> ")
+                }
             }
             def dbInsertQuery = "INSERT INTO $repositoryTable " +
                     "($SCHEMA_NAME, $SOURCE_SQL, $TIME, $ROW_ID, $fields) " +
@@ -525,6 +530,7 @@ $fieldsStr
         def dbQuery = "SELECT * FROM $repositoryTable " +
                 "WHERE $SCHEMA_NAME = '$system' " +
                 "AND $SOURCE_SQL =  '$savedSourceSql'" +
+                "AND time = (SELECT max(time) FROM $repositoryTable WHERE SCHEMA_NAME = '$system' AND SOURCE_SQL =  '$savedSourceSql' )"
                 "ORDER BY $ROW_ID"
         def dbResult = getDbResult(repositroyDbSqlDriver, dbQuery, Constants.dbRunTypeRows)
 
@@ -533,6 +539,7 @@ $fieldsStr
 
         dbResult.findAll().each {
             it.keySet().removeAll([SCHEMA_NAME, SOURCE_SQL, TIME, ROW_ID])
+            it
             dbResultModified.add(it)
         }
         return dbResultModified
@@ -564,6 +571,11 @@ $fieldsStr
         return dateFormat.format(new Date())
     }
 
+
+    def getCurrentDateHour(){
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HH")
+        return dateFormat.format(new Date())
+    }
     def  cleanUp(String sourceSql){
         def savedSourceSql = sourceSql.replaceAll(/( |\.|,|\')/, "_").replaceAll( "\n", "___").replaceAll(/[åäöÅÄÖ]/,'_');
         return savedSourceSql
