@@ -77,7 +77,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
         excelObjectProvider.addColumnsToRetriveFromFile(["Table"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", schema)
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", "Truncate")
-        def excelBodyRows = excelObjectProvider.getGdcRows()
+        def excelBodyRows = SystemPropertiesInitation.readExcelEnabled(excelObjectProvider)
 
 
 

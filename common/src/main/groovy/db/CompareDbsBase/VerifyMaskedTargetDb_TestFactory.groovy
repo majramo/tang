@@ -1,13 +1,12 @@
 package db.CompareDbsBase
 
-import dtos.SettingsHelper
 import excel.ExcelObjectProvider
 import org.testng.ITestContext
 import org.testng.Reporter
 import org.testng.annotations.Factory
 import org.testng.annotations.Parameters
 
-class VerifyMaskedTargetDb_TestFactory {
+class  VerifyMaskedTargetDb_TestFactory {
 
 
     @Parameters(["systemColumn"] )
@@ -19,7 +18,7 @@ class VerifyMaskedTargetDb_TestFactory {
         excelObjectProvider.addColumnsToRetriveFromFile(["System", "Table", "Column", "Action"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", "Mask")
-        def excelBodyRows = excelObjectProvider.getGdcRows()
+        def excelBodyRows = SystemPropertiesInitation.readExcel(excelObjectProvider)
         excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "Column", "Action"])
 
         Reporter.log("Lines read <$excelBodyRows.size>")

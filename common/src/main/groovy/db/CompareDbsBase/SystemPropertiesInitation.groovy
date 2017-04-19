@@ -30,11 +30,22 @@ public final class SystemPropertiesInitation {
         [excelObjectProvider, system, targetDb, sourceDb]
     }
 
-    public static  ArrayList<Object[][]> readExcel(excelObjectProvider){
+    public static  ArrayList<Object[][]> readExcelEnabled(excelObjectProvider){
         def columnsCapabilitiesToRetrieve = (settingsHelper.settings.columnsCapabilitiesToRetrieve.enabled).toString()
         if(columnsCapabilitiesToRetrieve != "[:]" && columnsCapabilitiesToRetrieve != ""){
             excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, columnsCapabilitiesToRetrieve )
         }
+        def excelBodyRows
+        def excelRowsToRead = (settingsHelper.settings.excelRowsToRead).toString()
+        if(excelRowsToRead != "[:]" && excelRowsToRead != "") {
+            excelBodyRows = excelObjectProvider.getGdcRows(Integer.parseInt(excelRowsToRead))
+        }else{
+            excelBodyRows = excelObjectProvider.getGdcRows()
+        }
+        return excelBodyRows
+    }
+
+    public static  ArrayList<Object[][]> readExcel(excelObjectProvider){
         def excelBodyRows
         def excelRowsToRead = (settingsHelper.settings.excelRowsToRead).toString()
         if(excelRowsToRead != "[:]" && excelRowsToRead != "") {

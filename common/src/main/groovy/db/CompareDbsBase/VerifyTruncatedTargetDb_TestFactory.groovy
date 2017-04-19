@@ -18,7 +18,7 @@ class VerifyTruncatedTargetDb_TestFactory {
         excelObjectProvider.addColumnsToRetriveFromFile(["Table"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
-        ArrayList<Object[][]> excelBodyRows = excelObjectProvider.getGdcRows()
+        def excelBodyRows = SystemPropertiesInitation.readExcel(excelObjectProvider)
         excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "Action"])
 
         Reporter.log("Number of lines read <$excelBodyRows.size>")

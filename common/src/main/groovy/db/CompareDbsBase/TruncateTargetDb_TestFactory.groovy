@@ -17,7 +17,7 @@ class TruncateTargetDb_TestFactory {
         excelObjectProvider.addColumnsToRetriveFromFile(["System", "Table", "Action"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
-        ArrayList<Object[][]> excelBodyRows = excelObjectProvider.getGdcRows()
+        def excelBodyRows = SystemPropertiesInitation.readExcel(excelObjectProvider)
         excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "Action"])
 
         Reporter.log("Lines read <$excelBodyRows.size>")
