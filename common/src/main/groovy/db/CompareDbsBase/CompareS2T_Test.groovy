@@ -13,7 +13,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
     private String targetSql;
     private String threshold = "0";
     private String comments;
-    private String tableFieldsFileColumn;
+    private String considerSystemTableColumnAnalyse;
     private String tableFieldToExclude;
     private String actionTypeColumn;
     private String by;
@@ -25,7 +25,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
         sourceDb = dbCompareProperties.sourceDb
         targetDb = dbCompareProperties.targetDb
         comments = dbCompareProperties.comments
-        tableFieldsFileColumn = dbCompareProperties.tableFieldsFileColumn
+        considerSystemTableColumnAnalyse = dbCompareProperties.considerSystemTableColumnAnalyse
         tableFieldToExclude = dbCompareProperties.tableFieldToExclude
         actionTypeColumn = dbCompareProperties.actionTypeColumn
         by = dbCompareProperties.by
@@ -57,27 +57,31 @@ public class CompareS2T_Test extends AnySqlCompareTest{
         }
 
         def system = sourceDb.replaceAll(/_Source/, "")
+        system = system[0].toUpperCase() + system[1..-1].toLowerCase()
         ArrayList tableFieldsToExcludeMap = []
-        if(!tableFieldsFileColumn.isEmpty() && !tableFieldToExclude.isEmpty()){
-            reporterLogLn("TableFieldsFileColumn: <$tableFieldsFileColumn>");
+        if(!considerSystemTableColumnAnalyse.isEmpty() && considerSystemTableColumnAnalyse.equals("true") && !tableFieldToExclude.isEmpty()){
+            def inputFile = sourceDb.replaceAll(".Source", "")
+            ExcelObjectProvider excelObjectProvider = SystemPropertiesInitation.getExcelProvider(inputFile)
+
+            reporterLogLn("considerSystemTableColumnAnalyse: <$considerSystemTableColumnAnalyse>");
+            reporterLogLn("Systemanalyse inputFile: <$inputFile>");
             reporterLogLn("TableFieldToExclude:   <$tableFieldToExclude>");
             reporterLogLn("System:                <$system>");
-            tableFieldsToExcludeMap = getTableFieldsToExcludeMap (tableFieldsFileColumn, system)
+            tableFieldsToExcludeMap = getTableFieldsToExcludeMap (excelObjectProvider, system)
         }
 
 
         compareAllFromDb1InDb2(testContext, sourceSql, targetSql, threshold, comments, tableFieldsToExcludeMap, tableFieldToExclude, actionTypeColumn, system)
     }
 
-    private getTableFieldsToExcludeMap (inputFile, schema){
+    private getTableFieldsToExcludeMap (ExcelObjectProvider excelObjectProvider, schema){
 
         def result = []
 
-        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
         excelObjectProvider.addColumnsToRetriveFromFile(["Table"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", schema)
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", "Truncate")
-        def excelBodyRows = SystemPropertiesInitation.readExcelEnabled(excelObjectProvider)
+        def excelBodyRows = SystemPropertiesInitation.readExcel(excelObjectProvider)
 
 
 

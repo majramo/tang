@@ -21,6 +21,14 @@ public final class SystemPropertiesInitation {
         [excelObjectProvider, system, targetDb, sourceDb]
     }
 
+    public static ExcelObjectProvider getExcelProvider(String systemColumn) {
+
+        def systemInputFile = systemColumn.toLowerCase() + settings.systemInputFile
+
+        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(systemInputFile)
+        return excelObjectProvider
+    }
+
     public static List getSystemData(String systemColumn, systemInputFile) {
         def targetDb = systemColumn.toLowerCase() + "_Target"
         def sourceDb = systemColumn.toLowerCase() + "_Source"

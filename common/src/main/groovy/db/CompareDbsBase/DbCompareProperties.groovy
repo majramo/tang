@@ -17,18 +17,18 @@ public class DbCompareProperties {
         fields["threshold"] = 0
         fields["comments"] = ""
         fields["enabled"] = ""
-        fields["tableFieldsFileColumn"] = ""
+        fields["considerSystemTableColumnAnalyse"] = ""
         fields["tableFieldToExcludetableFieldToExclude"] = ""
         fields["actionTypeColumn"] = ""
     }
-    public DbCompareProperties(row, String sourceDb, String sourceSql, String targetDb, String targetSql, threshold = 0, comments = "", by = "", tableFieldsFileColumn = "", tableFieldToExclude = "", actionTypeColumn = ""){
+    public DbCompareProperties(row, String sourceDb, String sourceSql, String targetDb, String targetSql, threshold = 0, comments = "", by = "", considerSystemTableColumnAnalyse = "", tableFieldToExclude = "", actionTypeColumn = ""){
         fields["row"] = row
         fields["sourceDb"] = sourceDb
         fields["sourceSql"] = sourceSql
         fields["targetSql"] = targetSql
         fields["targetDb"] = targetDb
         fields["by"] = by
-        fields["tableFieldsFileColumn"] = tableFieldsFileColumn
+        fields["considerSystemTableColumnAnalyse"] = considerSystemTableColumnAnalyse
         fields["tableFieldToExclude"] = tableFieldToExclude
         fields["actionTypeColumn"] = actionTypeColumn
 
@@ -98,15 +98,15 @@ public class DbCompareProperties {
         fields["by"]
     }
 
-   def getTableFieldsFileColumn() {
-        fields["tableFieldsFileColumn"]
+   def getConsiderSystemTableColumnAnalyse() {
+        fields["considerSystemTableColumnAnalyse"]
     }
 
    def getTableFieldToExclude() {
         fields["tableFieldToExclude"]
     }
 
-   def getactionTypeColumn() {
+   def getActionTypeColumn() {
         fields["actionTypeColumn"]
     }
 

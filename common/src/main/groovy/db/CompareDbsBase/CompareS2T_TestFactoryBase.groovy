@@ -19,7 +19,7 @@ public class CompareS2T_TestFactoryBase {
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
 
-    protected ArrayList runCommon(String inputFileColumn, String systemColumn, String tableFieldsFileColumn, String actionTypeColumn) {
+    protected ArrayList runCommon(String inputFileColumn, String systemColumn, String considerSystemTableColumnAnalyse, String actionTypeColumn) {
         def result = [];
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn, inputFileColumn)
         excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS, TABLE_FIELD_TO_EXCLUDE, BY])
@@ -39,7 +39,7 @@ public class CompareS2T_TestFactoryBase {
             def comments = excelRow[COMMENTS]
             def tableFieldToExclude = excelRow[TABLE_FIELD_TO_EXCLUDE]
             def by = excelRow[BY]
-            addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by, tableFieldsFileColumn, tableFieldToExclude, actionTypeColumn)
+            addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by, considerSystemTableColumnAnalyse, tableFieldToExclude, actionTypeColumn)
         }
         return result;
     }
@@ -117,10 +117,10 @@ public class CompareS2T_TestFactoryBase {
     }
 
 
-    protected void addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by, tableFieldsFileColumn = "", String tableFieldToExclude = "", String actionTypeColumn = "" ) {
+    protected void addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by, considerSystemTableColumnAnalyse = "", String tableFieldToExclude = "", String actionTypeColumn = "" ) {
         def dbCompareProperties
         if (sourceDb != "" && sourceSql != "") {
-            dbCompareProperties = new DbCompareProperties("$row : $rowLine", sourceDb, sourceSql, targetDb, targetSql, threshold, comments, by, tableFieldsFileColumn, tableFieldToExclude, actionTypeColumn)
+            dbCompareProperties = new DbCompareProperties("$row : $rowLine", sourceDb, sourceSql, targetDb, targetSql, threshold, comments, by, considerSystemTableColumnAnalyse, tableFieldToExclude, actionTypeColumn)
             result.add(new CompareS2T_Test(dbCompareProperties))
         }
     }
