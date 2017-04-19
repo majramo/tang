@@ -8,6 +8,7 @@ public final class SystemPropertiesInitation {
 
     static SettingsHelper settingsHelper = SettingsHelper.getInstance()
     static settings = settingsHelper.settings
+    public static final String ENABLED = "enabled"
 
     public static List getSystemData(String systemColumn) {
         def targetDb = systemColumn.toLowerCase() + "_Target"
@@ -27,5 +28,20 @@ public final class SystemPropertiesInitation {
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(systemInputFile)
         [excelObjectProvider, system, targetDb, sourceDb]
+    }
+
+    public static  ArrayList<Object[][]> readExcel(excelObjectProvider){
+        def columnsCapabilitiesToRetrieve = (settingsHelper.settings.columnsCapabilitiesToRetrieve.enabled).toString()
+        if(columnsCapabilitiesToRetrieve != "[:]" && columnsCapabilitiesToRetrieve != ""){
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, columnsCapabilitiesToRetrieve )
+        }
+        def excelBodyRows
+        def excelRowsToRead = (settingsHelper.settings.excelRowsToRead).toString()
+        if(excelRowsToRead != "[:]" && excelRowsToRead != "") {
+            excelBodyRows = excelObjectProvider.getGdcRows(Integer.parseInt(excelRowsToRead))
+        }else{
+            excelBodyRows = excelObjectProvider.getGdcRows()
+        }
+        return excelBodyRows
     }
 }
