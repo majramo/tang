@@ -53,7 +53,7 @@ public final class SystemPropertiesInitation {
         return excelBodyRows
     }
 
-    public static  ArrayList<Object[][]> readExcel(excelObjectProvider){
+    public static  ArrayList<Object[][]> readExcel(ExcelObjectProvider excelObjectProvider){
         def excelBodyRows
         def excelRowsToRead = (settingsHelper.settings.excelRowsToRead).toString()
         if(excelRowsToRead != "[:]" && excelRowsToRead != "") {
