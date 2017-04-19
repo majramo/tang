@@ -1,7 +1,6 @@
 package db.CompareDbsBase
 
 import base.AnySqlCompareTest
-import base.InitDbSettings
 import excel.ExcelObjectProvider
 import org.testng.ITestContext
 import org.testng.annotations.Test
@@ -16,7 +15,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
     private String comments;
     private String tableFieldsFileColumn;
     private String tableFieldToExclude;
-    private String lastSourceColumn;
+    private String actionTypeColumn;
     private String by;
     private DbCompareProperties dbCompareProperties
 
@@ -28,13 +27,13 @@ public class CompareS2T_Test extends AnySqlCompareTest{
         comments = dbCompareProperties.comments
         tableFieldsFileColumn = dbCompareProperties.tableFieldsFileColumn
         tableFieldToExclude = dbCompareProperties.tableFieldToExclude
-        lastSourceColumn = dbCompareProperties.lastSourceColumn
+        actionTypeColumn = dbCompareProperties.actionTypeColumn
         by = dbCompareProperties.by
 
         String dbSourceOwner = settings."$sourceDb".owner
         String dbTargetOwner = settings."$targetDb".owner
-        sourceSql = String.format(dbCompareProperties.sourceSql, dbSourceOwner.toUpperCase())
-        targetSql = String.format(dbCompareProperties.targetSql, dbTargetOwner.toUpperCase())
+        sourceSql = String.format(dbCompareProperties.sourceSql, dbSourceOwner.toUpperCase()).replaceAll(/\$\$\$/, /\%\$\%/)
+        targetSql = String.format(dbCompareProperties.targetSql, dbTargetOwner.toUpperCase()).replaceAll(/\$\$\$/, /\%\$\%/)
 
         threshold = dbCompareProperties.fields["threshold"]
 
@@ -53,7 +52,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
         reporterLogLn("Row: <$row> $comments ");
         reporterLogLn("By: <$by>");
 
-        if(!lastSourceColumn.isEmpty()){
+        if(!actionTypeColumn.isEmpty()){
             super.setRepositorySqlHelper(testContext, "repository")
         }
 
@@ -67,7 +66,7 @@ public class CompareS2T_Test extends AnySqlCompareTest{
         }
 
 
-        compareAllFromDb1InDb2(testContext, sourceSql, targetSql, threshold, comments, tableFieldsToExcludeMap, tableFieldToExclude, lastSourceColumn, system)
+        compareAllFromDb1InDb2(testContext, sourceSql, targetSql, threshold, comments, tableFieldsToExcludeMap, tableFieldToExclude, actionTypeColumn, system)
     }
 
     private getTableFieldsToExcludeMap (inputFile, schema){

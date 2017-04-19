@@ -19,9 +19,9 @@ public class DbCompareProperties {
         fields["enabled"] = ""
         fields["tableFieldsFileColumn"] = ""
         fields["tableFieldToExcludetableFieldToExclude"] = ""
-        fields["lastSourceColumn"] = ""
+        fields["actionTypeColumn"] = ""
     }
-    public DbCompareProperties(row, String sourceDb, String sourceSql, String targetDb, String targetSql, threshold = 0, comments = "", by = "", tableFieldsFileColumn = "", tableFieldToExclude = "", lastSourceColumn = ""){
+    public DbCompareProperties(row, String sourceDb, String sourceSql, String targetDb, String targetSql, threshold = 0, comments = "", by = "", tableFieldsFileColumn = "", tableFieldToExclude = "", actionTypeColumn = ""){
         fields["row"] = row
         fields["sourceDb"] = sourceDb
         fields["sourceSql"] = sourceSql
@@ -30,7 +30,7 @@ public class DbCompareProperties {
         fields["by"] = by
         fields["tableFieldsFileColumn"] = tableFieldsFileColumn
         fields["tableFieldToExclude"] = tableFieldToExclude
-        fields["lastSourceColumn"] = lastSourceColumn
+        fields["actionTypeColumn"] = actionTypeColumn
 
         if(targetSql == "" || targetSql == "-") {
             fields["targetSql"] =  sourceSql
@@ -106,8 +106,8 @@ public class DbCompareProperties {
         fields["tableFieldToExclude"]
     }
 
-   def getLastSourceColumn() {
-        fields["lastSourceColumn"]
+   def getactionTypeColumn() {
+        fields["actionTypeColumn"]
     }
 
     
