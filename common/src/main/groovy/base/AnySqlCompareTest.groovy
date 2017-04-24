@@ -555,25 +555,6 @@ $fieldsStr
            return
         }
 
-//         ToDO: Fix switch!
-//        switch (sourceSqlUpperCase) {
-//            case ~/.*ALL_TAB_COLS.*/:
-//                repositoryTable = DATABASE_STRUCTURE
-//                break
-//            case ~/USER_CONSTRAINTS/:
-//                repositoryTable = DATABASE_CONSTRAINTS
-//                break
-//            case ~/DBA_SOURCE/:
-//                repositoryTable = DATABASE_SOURCE
-//                break
-//            case ~/USER_INDEXES/:
-//                repositoryTable = DATABASE_INDEXES
-//                 break
-//            default:
-//                return
-//        }
-
-
         reporterLogLn("Reading Targetsaved system<$system> from Table <$repositoryTable>")
 
         def savedSourceSql = cleanUp(comments)
@@ -646,20 +627,25 @@ $fieldsStr
 
     private getRepositoryDatabase(String sourceSql) {
         def repositoryTable
-        def sourceSqlUpperCase = sourceSql.toUpperCase()
-        if (sourceSqlUpperCase.contains("USER_TAB_COLS")) {
-            repositoryTable = DATABASE_STRUCTURE
+        def sourceSqlUpperCase = sourceSql.toUpperCase().replaceAll(/\n/, ' ').replaceAll(/\n/, ' ')
+        switch (sourceSqlUpperCase) {
+            case ~/.*USER_TAB_COLS.*/:
+                repositoryTable = DATABASE_STRUCTURE
+                break
+            case ~/.*USER_CONSTRAINTS.*/:
+                repositoryTable = DATABASE_CONSTRAINTS
+                break
+            case ~/.*DBA_SOURCE.*/:
+                repositoryTable = DATABASE_SOURCE
+                break
+            case ~/.*USER_INDEXES.*/:
+                repositoryTable = DATABASE_INDEXES
+                 break
+            default:
+                return
         }
-        if (sourceSqlUpperCase.contains("USER_CONSTRAINTS")) {
-            repositoryTable = DATABASE_CONSTRAINTS
-        }
-        if (sourceSqlUpperCase.contains("DBA_SOURCE")) {
-            repositoryTable = DATABASE_SOURCE
-        }
-        if (sourceSqlUpperCase.contains("USER_INDEXES")) {
-            repositoryTable = DATABASE_INDEXES
-        }
-        def fields = sourceSqlUpperCase.replaceAll(/\n/, ' ').replaceAll(/\n/, ' ').replaceAll(/FROM.*/, '').replaceAll(/.*(DISTINCT|SELECT)/, '').replaceAll("FROM.*", '').replaceAll(" ", "")
+
+        def fields = sourceSqlUpperCase.replaceAll(/FROM.*/, '').replaceAll(/.*(DISTINCT|SELECT)/, '').replaceAll("FROM.*", '').replaceAll(" ", "")
         reporterLogLn("Repository table <$repositoryTable>")
         reporterLogLn("Fields <$fields>")
         return [repositoryTable, fields]
