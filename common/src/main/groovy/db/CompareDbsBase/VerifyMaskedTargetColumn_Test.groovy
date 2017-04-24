@@ -57,7 +57,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         def TARGET_TABLE_QUERY_ORACLE = "SELECT %s FROM %s\n" +
                 " WHERE NOT %s IS NULL\n" +
                 " AND ROWNUM < 1000\n"
-        def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns WHERE table_name = '%s'" //Todo: change this and check
+        def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns WHERE table_name = '%s'" //Todo: change this  sqlserver sql and check in
         if(checkColumnTypeResult[0] == "CLOB" || checkColumnTypeResult[0] == "BLOB"){
             tmpColumn = "dbms_lob.substr( $column, 4000,1)"
             reporterLogLn("checkColumnType:\n$checkColumnType\n")
@@ -68,7 +68,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         sourceTargetSql = "-- Verify masked column<$tmpColumn> in table <$tmpTable> in target<$targetDb> mot source<$sourceDb>\n"
         sourceTargetSql += String.format(TARGET_TABLE_QUERY_ORACLE, "$tmpColumn", "$tmpTable",  "$tmpColumn")
 
-        if(getDbType(targetDb).equals("sqlserver")){//Todo: fix this code
+        if(getDbType(targetDb).equals("sqlserver")){//Todo: fix this code for sqlserver
 //            sourceTargetSql = "-- Verify masked column<$column> in table <$table> in system <$system> \n"
 //            sourceTargetSql = String.format(TARGET_TABLE_QUERY_SQLSERVER, table)
         }
