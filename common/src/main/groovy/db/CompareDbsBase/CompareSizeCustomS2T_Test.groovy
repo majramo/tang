@@ -222,7 +222,6 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                 }
                 def expectedMaximumDiff_Ok  = false
                 if (expectedMaximumDiff > 0) {
-                    //Todo: Att hantera vid generering då vi kan utöka och få en diff >100%
                     if (diffCountPercent > expectedMaximumDiff || loopException) {
                         icon = "*"
                         numberOfTableDiff++
@@ -243,7 +242,6 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                 reporterLogLn("$icon D " + "$diffCount".padLeft(12) + " | S " + "$sourceSize".padLeft(12) + " | T " + "$targetSize".padLeft(12)+ " | " + row.padRight(25) )
                 def expectedMinimumDiff_Ok = false
                 if (expectedMinimumDiff > 0) {
-                    //Todo: Att hantera vid generering då vi kan utöka och få en diff >100%
                     if (diffCountPercent < expectedMinimumDiff || loopException) {
                         numberOfTableDiff++
                         nok = aggregate(nok, "$str a. Table $table has <$diffCount> diff, <$diffCountPercent %>, expected minimum diff in target was <$expectedMinimumDiff %>\n\n")
