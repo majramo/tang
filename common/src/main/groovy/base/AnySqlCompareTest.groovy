@@ -113,6 +113,11 @@ public class AnySqlCompareTest {
         println sqlHelper.executeAndSkipException(sqlHelper.dbName, targetSql, skipException)
     }
 
+    protected void execute(SqlHelper sqlHelper, String targetSql) {
+        def dbResult = sqlHelper.execute(sqlHelper.dbName, targetSql)
+        log.info("DbResult\n$dbResult")
+    }
+
     protected void compareSourceEqualsTarget(sourceValue, targetSql, threshold) {
         compareSourceValueToTarget(sourceValue, targetSql, threshold)
     }
