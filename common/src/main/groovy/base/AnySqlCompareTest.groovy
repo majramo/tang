@@ -355,7 +355,7 @@ public class AnySqlCompareTest {
         tangAssert.assertTrue(thresholdPassed, "List should be equal", "Diff is <Size $diffCount: $diffSizeProc%> <Data $diffDataCounter: $diffDataCounterProc>");
     }
 
-    protected void compare( differenceMap, thresholdString, count,  msg = "") {
+    protected void compare( differenceMap, thresholdString, int count,  msg = "") {
         boolean thresholdPassed = true
         ArrayList tableFieldsToExcludeMap
         Float thresholdValue = 0
@@ -370,10 +370,16 @@ public class AnySqlCompareTest {
         int diffDataCounter = 0
 //        reporterLogLn "\n#$msg:"
         float tmpDiffProc = 0
-        try {
-            tmpDiffProc = (100 * diffCount / count).toFloat().trunc(2)
-        } catch (Exception e) {
-            tmpDiffProc = 100
+        if(!count.equals(0)){
+            try {
+                tmpDiffProc = (100 * diffCount / count).toFloat().trunc(2)
+            } catch (Exception e) {
+                tmpDiffProc = 100
+            }
+        }else{
+            if(diffCount>0){
+                tmpDiffProc = 100
+            }
         }
         differenceMap.eachWithIndex { it, index ->
             if (diffDataCounter >= settings.maxDiffsToShow) {
