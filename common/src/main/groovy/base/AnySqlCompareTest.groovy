@@ -10,6 +10,7 @@ import org.testng.SkipException
 import org.testng.annotations.*
 import reports.ReporterHelper
 
+import java.sql.SQLSyntaxErrorException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
@@ -139,9 +140,14 @@ public class AnySqlCompareTest {
         }
         reporterLogLn("");
         reporterLogLn "####################"
-        def sourceResult = getSourceDbRowsResult(sourceSql)
-        def targetResult = getTargetDbRowsResult(targetSql)
-
+        def sourceResult
+        def targetResult
+        try {
+            sourceResult = getSourceDbRowsResult(sourceSql)
+            targetResult = getTargetDbRowsResult(targetSql)
+        }catch (SQLSyntaxErrorException e){
+            skipTest("Can't run, got error:\n$e")
+        }
 
         def size = sourceResult.size()
             //Save sourceResult in Repository database
