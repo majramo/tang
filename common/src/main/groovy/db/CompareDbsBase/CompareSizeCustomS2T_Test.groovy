@@ -24,9 +24,9 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
 
 
-    @Parameters(["systemColumn", "numberOfTablesToCheckColumn"] )
+    @Parameters(["systemColumn"] )
     @Test
-    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("0") int numberOfTablesToCheckColumn, ITestContext testContext){
+    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, ITestContext testContext){
         super.setup()
 
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
@@ -47,7 +47,6 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
         reporterLogLn("Source: <$sourceDb>");
         reporterLogLn("Target: <$targetDb>");
-        reporterLogLn("Number of tables to check: <$numberOfTablesToCheckColumn>\n");
 
         def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
         def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
@@ -57,6 +56,14 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         boolean noExceptionAtRun
         def sourceDbResultTableToCheck = sourceDbResult.size()-1
         def targetDbResultTableToCheck = targetDbResult.size()-1
+
+        def numberOfTablesToCheckColumn = (settingsHelper.settings.numberOfTablesToCheckColumn).toString()
+        if(numberOfTablesToCheckColumn != "[:]" && numberOfTablesToCheckColumn != "") {
+            numberOfTablesToCheckColumn = Integer.parseInt(numberOfTablesToCheckColumn)
+        }else{
+            numberOfTablesToCheckColumn = 0
+        }
+        reporterLogLn("Number of tables to check: <$numberOfTablesToCheckColumn>\n");
 
         /*
         If numberOfTablesToCheckColumn parameter is set then the db result set is reduced to this size before compare id executed
@@ -78,7 +85,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
     }
 
-    private compareTableSizes(sourceDb, SqlHelper dbDriverSource, sourceDbResult, targetDb, dbDriverTarget, targetDbResult, String system, String inputFile) {
+    private compareTableSizes(sourceDb, SqlHelper sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult, String system, String inputFile) {
         int totalDiffCount = 0
         float expectedMaximumDiff = 0
         float expectedMinimumDiff = 0
@@ -159,7 +166,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
             def sourceSize = 0
             def targetSize = 0
             try {
-                def dbSourceSizeResult = dbDriverSource.sqlConRun(" $sourceDb", dbRunTypeFirstRow, sqlSourceTarget, 0, sourceDb)
+                def dbSourceSizeResult = sourceDbSqlDriver.sqlConRun(" $sourceDb", dbRunTypeFirstRow, sqlSourceTarget, 0, sourceDb)
                 sourceSize = dbSourceSizeResult["COUNT_"]
             }catch (Exception e){
                 loopException = true
@@ -168,7 +175,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
             }
             str = aggregate(str, "Source size <$sourceSize>")
             try {
-                def dbTargetSizeResult = dbDriverTarget.sqlConRun("$targetDb", dbRunTypeFirstRow, sqlSourceTarget, 0, targetDb)
+                def dbTargetSizeResult = targetDbSqlDriver.sqlConRun("$targetDb", dbRunTypeFirstRow, sqlSourceTarget, 0, targetDb)
                 targetSize = dbTargetSizeResult["COUNT_"]
             }catch (Exception e){
                 loopException = true
