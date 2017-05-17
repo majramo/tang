@@ -21,7 +21,6 @@ public class ReportSourceTableSizes_Test extends AnySqlCompareTest{
     def TARGET_TABLE_QUERY_ORACLE = "SELECT DISTINCT table_name FROM all_tab_cols WHERE NOT table_name IN (select view_name from all_views) AND OWNER = '%s' ORDER BY 1"
     def SOURCE_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
     def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
-    def MESSAGE = "Comparing tables"
 
 
 
@@ -35,12 +34,8 @@ public class ReportSourceTableSizes_Test extends AnySqlCompareTest{
         String sourceDbOwner = settings."$sourceDb".owner
         String targetDbOwner = settings."$targetDb".owner
         def sourceTableSql = String.format(SOURCE_TABLE_QUERY_ORACLE, sourceDbOwner.toUpperCase())
-        def targetTableSql = String.format(TARGET_TABLE_QUERY_ORACLE, targetDbOwner.toUpperCase())
         if(getDbType(sourceDb).equals("sqlserver")){
             sourceTableSql = SOURCE_TABLE_QUERY_SQLSERVER
-        }
-        if(getDbType(targetDb).equals("sqlserver")){
-            targetTableSql = TARGET_TABLE_QUERY_SQLSERVER
         }
         super.setSourceSqlHelper(testContext, sourceDb)
         reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb)))
@@ -105,7 +100,7 @@ public class ReportSourceTableSizes_Test extends AnySqlCompareTest{
         tablesSizes.each {tableName, value->
             def sourceTableSizeSql = String.format(SOURCE_TABLE_SIZE_QUERY_ORACLE, tableName)
             def sourceDbTableSizeResult = sourceDbSqlDriver.sqlConRun("Get table <$tableName> size from $sourceDb", dbRunTypeRows, sourceTableSizeSql, 0, sourceDb)
-            sizeMap[tableName] =  new BigInteger(sourceDbTableSizeResult["COUNT_"][0].toString(), 32)
+            sizeMap[tableName] =  new BigInteger(sourceDbTableSizeResult["COUNT_"][0].toString(), 10)
         }
         int i = 1
         sizeMap.sort{ it.value }.reverseEach{tableName, size->
