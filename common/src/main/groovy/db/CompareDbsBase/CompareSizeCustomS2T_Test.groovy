@@ -24,12 +24,15 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
 
 
-    @Parameters(["systemColumn"] )
+    @Parameters(["systemColumn", "excelModifiedTablesOnly"] )
     @Test
-    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, ITestContext testContext){
+    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("false")boolean excelModifiedTablesOnly, ITestContext testContext){
         super.setup()
-
+        def inputFile = ""
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
+        if(excelModifiedTablesOnly){
+            inputFile = excelObjectProvider.inputFile
+        }
 
         String sourceDbOwner = settings."$sourceDb".owner
         String targetDbOwner = settings."$targetDb".owner
@@ -78,7 +81,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                 targetDbResult = targetDbResult[0..targetDbResultTableToCheck]
             }
         }
-        (diffCount, totalDiffCountExpected, noExceptionAtRun)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult, system, excelObjectProvider.inputFile)
+        (diffCount, totalDiffCountExpected, noExceptionAtRun)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult, system, inputFile)
 
         tangAssert.assertTrue(noExceptionAtRun, "No exception", "Got exception")
         tangAssert.assertEquals(diffCount, totalDiffCountExpected, "$MESSAGE: should have no diff", "$MESSAGE: diffCount $diffCount <> $totalDiffCountExpected ")

@@ -142,17 +142,21 @@ public class AnySqlCompareTest {
         reporterLogLn "####################"
         def sourceResult
         def targetResult
+        def sourceSize
+        def targetSize
         try {
             sourceResult = getSourceDbRowsResult(sourceSql)
+            sourceSize = sourceResult.size()
             targetResult = getTargetDbRowsResult(targetSql)
+            targetSize = targetResult.size()
         }catch (SQLSyntaxErrorException e){
             skipTest("Can't run, got error:\n$e")
         }
 
-        def size = sourceResult.size()
+
             //Save sourceResult in Repository database
         if(actionTypeColumn == "SAVE"){
-            reporterLogLn("Saving system <$system> <$size> rows to db #Hour")
+            reporterLogLn("Saving system <$system> <$sourceSize> rows to db #Hour")
             saveResultToDb(testContext, system, comments, sourceResult, sourceSql, getCurrentDateHour())
             reporterLogLn("Saved to database #Hour")
             return
@@ -160,10 +164,14 @@ public class AnySqlCompareTest {
             if(actionTypeColumn == "READ"){
                 //READ sourceResult from Repository database
                 reporterLogLn("Reading system <$system> from db")
-                reporterLogLn("Saving system <$system> <$size> rows to db, #Current")
+                reporterLogLn("Saving system <$system> <$sourceSize> rows to db, #Current")
                 saveResultToDb(testContext, system, comments, sourceResult, sourceSql)
                 reporterLogLn("Saved to database #Current")
                 targetResult = compareDbResults(testContext, system, comments, sourceSql, threshold, "should be the same" )
+            }else{
+                reporterLogLn("Source size <$sourceSize>")
+                reporterLogLn("Target size <$targetSize>")
+
             }
         }
 
@@ -614,10 +622,12 @@ $fieldsStr
         def temporaryDbQuery = "SELECT $fields FROM $repositoryTable\n" +
                 "WHERE $SCHEMA_NAME = '$system' \n" +
                 "AND $SOURCE_SQL =  '$savedSourceSql'\n" +
+                "AND NOT upper(TABLE_NAME) in ('TOAD_PLAN_TABLE') " +
                 "AND time = $temporary" + "\n";
         def lastSavedDbQuery = "SELECT $fields FROM $repositoryTable\n" +
                 "WHERE $SCHEMA_NAME = '$system' \n" +
                 "AND $SOURCE_SQL =  '$savedSourceSql'\n" +
+                "AND NOT upper(TABLE_NAME) in ('TOAD_PLAN_TABLE') " +
                 "AND time = (SELECT max(time) FROM $repositoryTable WHERE SCHEMA_NAME = '$system' AND SOURCE_SQL = '$savedSourceSql' AND time != $temporary ) \n"
 
         def dbResult = getDbResult(repositroyDbSqlDriver, lastSavedDbQuery, Constants.dbRunTypeRows)

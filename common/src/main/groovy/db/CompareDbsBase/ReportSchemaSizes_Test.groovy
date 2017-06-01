@@ -8,6 +8,8 @@ import org.testng.annotations.Optional
 import org.testng.annotations.Parameters
 import org.testng.annotations.Test
 
+import java.sql.SQLSyntaxErrorException
+
 import static dtos.base.Constants.dbRunTypeRows
 
 public class ReportSchemaSizes_Test extends AnySqlCompareTest{
@@ -47,7 +49,13 @@ order by Size_MB DESC"""
 
         def sourceTableSql = String.format(SOURCE_SIZE_SYSTEM_QUERY_ORACLE, sourceDbOwner.toUpperCase())
         //read database
-        def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
+        def sourceDbResult
+        try {
+            sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
+        }catch (SQLSyntaxErrorException e){
+            skipTest("Can't run, got error:\n$e")
+        }
+
         reporterLogLn("System/owner $sourceDbOwner tables <" + sourceDbResult.size() + ">:")
         reporterLogLn("   No   " + "Size (MB)".padRight(13)+ "Table".padRight(50) + "Owner")
         reporterLogLn("------------------------------------------------------------------------------------------")

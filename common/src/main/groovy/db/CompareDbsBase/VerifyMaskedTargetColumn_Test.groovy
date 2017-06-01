@@ -40,7 +40,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     public void verifyTruncatedTargetTest(ITestContext testContext){
         def tmpColumn = column
         def tmpTable = table
-        reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(targetDb)))
+        reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(sourceDb), getDbType(targetDb)))
         row++
         reporterLogLn("Row: <$row> Verify masked TABLE/COLUMN ");
         reporterLogLn("Source Db: <$sourceDb> ");
