@@ -9,6 +9,8 @@ import org.testng.annotations.Parameters
 import org.testng.annotations.Test
 import org.testng.annotations.Optional
 
+import java.text.DecimalFormat
+
 import static dtos.base.Constants.dbRunTypeFirstRow
 import static dtos.base.Constants.dbRunTypeRows
 import static dtos.base.Constants.CompareType.DIFF
@@ -22,7 +24,10 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
     def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
     def MESSAGE = "Comparing tables"
 
-
+    DecimalFormat thousandSeparatorFormat = new DecimalFormat("###,###");
+    def sourceSizeOut
+    def targetSizeOut
+    def diffCountOut
 
     @Parameters(["systemColumn", "excelModifiedTablesOnly"] )
     @Test
@@ -176,16 +181,19 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                 noExceptionAtRun = false
                 str = aggregate(str, "Exception i source <$sourceDb> $e")
             }
-            str = aggregate(str, "Source size <$sourceSize>")
+            sourceSizeOut = thousandSeparatorFormat.format(new BigDecimal(sourceSize))
+
+            str = aggregate(str, "Source size <$sourceSizeOut>")
             try {
                 def dbTargetSizeResult = targetDbSqlDriver.sqlConRun("$targetDb", dbRunTypeFirstRow, sqlSourceTarget, 0, targetDb)
                 targetSize = dbTargetSizeResult["COUNT_"]
+                targetSizeOut = thousandSeparatorFormat.format(new BigDecimal(targetSize))
             }catch (Exception e){
                 loopException = true
                 noExceptionAtRun = false
                 str = aggregate(str, "Exception i target <$targetDb> $e")
             }
-            str = aggregate(str, "target size <$targetSize>")
+            str = aggregate(str, "target size <$targetSizeOut>")
             String truncateTable = truncateTables[table]
             String expectedMaximumDiffTableValue = expectedMaximumDiffValues[table]
             String expectedMinimumDiffTableValue = expectedMinimumDiffValues[table]
@@ -203,17 +211,23 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
             //Comparing
             if(truncateTables[table]){
+                icon = "-"
                 if (targetSize > 0 || loopException) {
-                    icon = "t"
+                    diffCount = targetSize
+                    diffCountOut = thousandSeparatorFormat.format(new BigDecimal(diffCount))
+                    totalDiffCount += diffCount
+                    icon = "T"
                     numberOfTableDiff++
-                    nok = aggregate(nok, "$str a. Table $table has <$targetSize> rows, expected to be truncated\n\n")
+                    nok = aggregate(nok, "$str a. Table $table has <$targetSizeOut> rows, expected to be truncated\n\n")
+                    reporterLogLn("$icon D " + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * should be truncated" )
                 } else {
-                    ok = aggregate(ok, "$str a. Table $table has <$targetSize> rows as expected, is truncated\n\n")
+                    ok = aggregate(ok, "$str a. Table $table has <$targetSizeOut> rows as expected, is truncated\n\n")
+                    reporterLogLn("$icon D " + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * is truncated" )
                 }
-                reporterLogLn("$icon D " + "$diffCount".padLeft(12) + " | S " + "$sourceSize".padLeft(12) + " | T " + "$targetSize".padLeft(12)+ " | " + row.padRight(45) + " * should be truncated" )
 
             }else {
                 diffCount = (sourceSize - targetSize).abs()
+                diffCountOut = thousandSeparatorFormat.format(new BigDecimal(diffCount))
                 def SourceTargetMax = sourceSize
                 if (targetSize > sourceSize) {
                     SourceTargetMax = targetSize
@@ -235,34 +249,34 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                     if (diffCountPercent > expectedMaximumDiff || loopException) {
                         icon = "*"
                         numberOfTableDiff++
-                        nok = aggregate(nok, "$str Table $table has <$diffCount> diff, <$diffCountPercent %>, expected maximum diff in target was <$expectedMaximumDiff %>\n\n")
+                        nok = aggregate(nok, "$str Table $table has <$diffCountOut> diff, <$diffCountPercent %>, expected maximum diff in target was <$expectedMaximumDiff %>\n\n")
                     } else {
-                        ok = aggregate(ok, "$str Table $table has <$diffCount> diff, <$diffCountPercent %>, expected maximum diff in target was <$expectedMaximumDiff %>\n\n")
+                        ok = aggregate(ok, "$str Table $table has <$diffCountOut> diff, <$diffCountPercent %>, expected maximum diff in target was <$expectedMaximumDiff %>\n\n")
 
                     }
                 } else {
                     if (diffCountPercent > 0 || loopException) {
                         icon = "*"
                         numberOfTableDiff++
-                        nok = aggregate(nok, "$str table $table has <$diffCount> diff, <$diffCountPercent>, expected maximum diff in target was <0.0 %>\n\n")
+                        nok = aggregate(nok, "$str table $table has <$diffCountOut> diff, <$diffCountPercent>, expected maximum diff in target was <0.0 %>\n\n")
                     } else {
                         expectedMaximumDiff_Ok = true
                     }
                 }
-                reporterLogLn("$icon D " + "$diffCount".padLeft(12) + " | S " + "$sourceSize".padLeft(12) + " | T " + "$targetSize".padLeft(12)+ " | " + row.padRight(25) )
+                reporterLogLn("$icon D " + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(25) )
                 def expectedMinimumDiff_Ok = false
                 if (expectedMinimumDiff > 0) {
                     if (diffCountPercent < expectedMinimumDiff || loopException) {
                         numberOfTableDiff++
-                        nok = aggregate(nok, "$str a. Table $table has <$diffCount> diff, <$diffCountPercent %>, expected minimum diff in target was <$expectedMinimumDiff %>\n\n")
+                        nok = aggregate(nok, "$str a. Table $table has <$diffCountOut> diff, <$diffCountPercent %>, expected minimum diff in target was <$expectedMinimumDiff %>\n\n")
                     } else {
-                        ok = aggregate(ok, "$str b. Table $table has <$diffCount> diff, <$diffCountPercent %>, expected minimum diff in target was <$expectedMinimumDiff %>\n\n")
+                        ok = aggregate(ok, "$str b. Table $table has <diffCountOut> diff, <$diffCountPercent %>, expected minimum diff in target was <$expectedMinimumDiff %>\n\n")
                     }
 
                 } else {
                     if (diffCountPercent < 0 || loopException) {
                         numberOfTableDiff++
-                        nok = aggregate(nok, "$str c. table $table has <$diffCount> diff, <$diffCountPercent %>, expected minimum diff in target was <0.0 %>\n\n")
+                        nok = aggregate(nok, "$str c. table $table has <$diffCountOut> diff, <$diffCountPercent %>, expected minimum diff in target was <0.0 %>\n\n")
                     } else {
                         expectedMinimumDiff_Ok = true
                     }
@@ -278,8 +292,9 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
         }
         if (numberOfTableDiff > 0 ){
+            def totalDiffCountOut = thousandSeparatorFormat.format(new BigDecimal(totalDiffCount))
             reporterLogLn("Tables with diff <$numberOfTableDiff>")
-            reporterLogLn("Total diff count <$totalDiffCount>")
+            reporterLogLn("Total diff count <$totalDiffCountOut>")
             reporterLogLn(nok)
         }
         if(settings.printOkCheck == true){

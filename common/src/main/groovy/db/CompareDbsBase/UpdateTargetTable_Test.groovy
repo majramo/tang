@@ -23,7 +23,7 @@ public class UpdateTargetTable_Test extends AnySqlCompareTest{
     }
 
     @Test
-    public void truncateTargetTest(ITestContext testContext){
+    public void updateTargetTest(ITestContext testContext){
         super.setTargetSqlHelper(testContext, targetDb)
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(targetDb)))
 

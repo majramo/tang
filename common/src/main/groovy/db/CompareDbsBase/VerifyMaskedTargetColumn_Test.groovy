@@ -21,14 +21,16 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     private String targetDbOwner;
     def table
     def column
+    def actionColumn
 
-    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column) {
+    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn) {
         super.setup()
         this.targetDb = targetDb
         this.sourceDb = sourceDb
         this.system = system.toLowerCase()
         this.table = table.toLowerCase()
         this.column = column.toLowerCase()
+        this.actionColumn = actionColumn
         targetDbOwner = settings."$targetDb".owner
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
@@ -37,12 +39,12 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     }
 
     @Test
-    public void verifyTruncatedTargetTest(ITestContext testContext){
+    public void verifyMaskedTargetTest(ITestContext testContext){
         def tmpColumn = column
         def tmpTable = table
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(sourceDb), getDbType(targetDb)))
         row++
-        reporterLogLn("Row: <$row> Verify masked TABLE/COLUMN ");
+        reporterLogLn("Row: <$row> Verify <$actionColumn> TABLE/COLUMN ");
         reporterLogLn("Source Db: <$sourceDb> ");
         reporterLogLn("Target Db: <$targetDb> ");
         reporterLogLn("Tmp Table: <$tmpTable> ");
@@ -58,8 +60,8 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                 " WHERE NOT %s IS NULL\n" +
                 " AND ROWNUM < 1000\n"
         def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns WHERE table_name = '%s'" //Todo: change this  sqlserver sql and check in
-        if(checkColumnTypeResult[0] == "CLOB" || checkColumnTypeResult[0] == "BLOB"){
-            tmpColumn = "dbms_lob.substr( $column, 4000,1)"
+        if(checkColumnTypeResult[0] == "CLOB" ){
+            tmpColumn = "substr( $column, 20000)"
             reporterLogLn("checkColumnType:\n$checkColumnType\n")
             reporterLogLn("Column <$table> <$column> is xLOB type<$checkColumnTypeResult> ==> <$tmpColumn>")
         }
@@ -81,7 +83,11 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
 
         boolean sameData = false
         if(sourceDbResult != null && targetDbResult != null ) {
-            sameData = (targetDbResult == sourceDbResult)
+            if(targetDbResult.size().equals(0)){
+                sameData = false
+            }else {
+                sameData = (targetDbResult == sourceDbResult)
+            }
             int index = 0
             if (sameData){
                 def maxRows= settings.maxDiffsToShow
@@ -99,7 +105,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                 }
             }
         }
-        tangAssert.assertTrue(!sameData, "Table/Column <$table/$column> should be masked", "Table/Column unmasked rows is expected to be <0> ");
+        tangAssert.assertTrue(!sameData, "Table/Column <$table/$column> should be masked", "Table/Column seems to be unmasked ");
 
     }
 
