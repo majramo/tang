@@ -58,9 +58,10 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
 
         def TARGET_TABLE_QUERY_ORACLE = "SELECT %s FROM %s\n" +
                 " WHERE NOT %s IS NULL\n" +
-                " AND ROWNUM < 1000\n"
+                " AND ROWNUM < 21\n"
         def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns WHERE table_name = '%s'" //Todo: change this  sqlserver sql and check in
         if(checkColumnTypeResult[0] == "CLOB" ){
+            reporterLogLn("Clob: <$column> ");
             tmpColumn = "substr( $column, 20000)"
             reporterLogLn("checkColumnType:\n$checkColumnType\n")
             reporterLogLn("Column <$table> <$column> is xLOB type<$checkColumnTypeResult> ==> <$tmpColumn>")
@@ -84,9 +85,15 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         boolean sameData = false
         if(sourceDbResult != null && targetDbResult != null ) {
             if(targetDbResult.size().equals(0)){
+                reporterLogLn("Target size is zero")
+
                 sameData = false
             }else {
-                sameData = (targetDbResult == sourceDbResult)
+                if (checkColumnTypeResult[0] == "CLOB") {
+                    sameData = (targetDbResult.collect {}.toString() == sourceDbResult.collect {}.toString())
+                } else {
+                   sameData = (targetDbResult == sourceDbResult)
+                }
             }
             int index = 0
             if (sameData){

@@ -266,7 +266,7 @@ public class SeleniumHelper implements ISeleniumHelper {
 
 
     private static boolean setFirefoxProfileAddOns(FirefoxProfile firefoxProfile) {
-        File addOnFile = new File("/Users/majidaram/dev/tang/firebug@software.joehewitt.com.xpi");
+        File addOnFile = new File("");
         if (addOnFile.exists()) {
             firefoxProfile.addExtension(addOnFile);
         }
@@ -291,7 +291,7 @@ public class SeleniumHelper implements ISeleniumHelper {
                             }
                         };
                     }
-                    setFirefoxProfileAddOns(firefoxProfile);
+                    //setFirefoxProfileAddOns(firefoxProfile);
                     capability.setCapability(FIREFOX_PROFILE, firefoxProfile)
 
                     FirefoxBinary binary = new FirefoxBinary();
