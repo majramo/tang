@@ -32,8 +32,8 @@ public class CompareS2T_Test extends AnySqlCompareTest{
 
         String dbSourceOwner = settings."$sourceDb".owner
         String dbTargetOwner = settings."$targetDb".owner
-        sourceSql = String.format(dbCompareProperties.sourceSql, dbSourceOwner.toUpperCase()).replaceAll(/\$\$\$/, /\%\$\%/)
-        targetSql = String.format(dbCompareProperties.targetSql, dbTargetOwner.toUpperCase()).replaceAll(/\$\$\$/, /\%\$\%/)
+        sourceSql = String.format(dbCompareProperties.sourceSql, dbSourceOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
+        targetSql = String.format(dbCompareProperties.targetSql, dbTargetOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
 
         threshold = dbCompareProperties.fields["threshold"]
 

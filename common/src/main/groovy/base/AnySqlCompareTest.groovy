@@ -125,10 +125,14 @@ public class AnySqlCompareTest {
 
     protected void compareAllFromDb1InDb2(ITestContext testContext, String sourceSql, String targetSql, threshold, comments, ArrayList tableFieldsToExcludeMap = [], String tableFieldToExclude = "", actionTypeColumn = "", system = "") {
         boolean isCountQuery
-        if(!(actionTypeColumn == "SAVE")) {
+        if(actionTypeColumn == "READ") {
             reporterLogLn("\nComparing (reading) structure from db\n#######\n");
         }else{
-            reporterLogLn("\nSaving structure in db\n#######\n");
+            if(actionTypeColumn == "SAVE") {
+                reporterLogLn("\nSaving structure in db\n#######\n");
+            }else{
+                reporterLogLn("\nComparing (source to target) structure from db\n#######\n");
+            }
         }
         reporterLogLn("Source: <${sourceDbSqlDriver.dbName}> ");
         reporterLogLn("Source Sql:\n$sourceSql\n");
@@ -171,6 +175,7 @@ public class AnySqlCompareTest {
             }else{
                 reporterLogLn("Source size <$sourceSize>")
                 reporterLogLn("Target size <$targetSize>")
+                equals(sourceResult, targetResult, threshold, false, "should be the same")
 
             }
         }
@@ -622,14 +627,15 @@ $fieldsStr
         def temporaryDbQuery = "SELECT $fields FROM $repositoryTable\n" +
                 "WHERE $SCHEMA_NAME = '$system' \n" +
                 "AND $SOURCE_SQL =  '$savedSourceSql'\n" +
-                "AND NOT upper(TABLE_NAME) in ('TOAD_PLAN_TABLE') " +
-                "AND time = $temporary" + "\n";
+                "AND time = $temporary" + "\n"
         def lastSavedDbQuery = "SELECT $fields FROM $repositoryTable\n" +
                 "WHERE $SCHEMA_NAME = '$system' \n" +
                 "AND $SOURCE_SQL =  '$savedSourceSql'\n" +
-                "AND NOT upper(TABLE_NAME) in ('TOAD_PLAN_TABLE') " +
                 "AND time = (SELECT max(time) FROM $repositoryTable WHERE SCHEMA_NAME = '$system' AND SOURCE_SQL = '$savedSourceSql' AND time != $temporary ) \n"
-
+        if(sourceSql.toLowerCase().contains("table_name")){
+            temporaryDbQuery +=  "AND NOT upper(TABLE_NAME) in ('TOAD_PLAN_TABLE') \n"
+            lastSavedDbQuery +=  "AND NOT upper(TABLE_NAME) in ('TOAD_PLAN_TABLE') \n"
+        }
         def dbResult = getDbResult(repositroyDbSqlDriver, lastSavedDbQuery, Constants.dbRunTypeRows)
         def lastSavedCount = dbResult.size()
         def lastSavedDbQueryMinusTemporaryDbQuery = "$lastSavedDbQuery MINUS $temporaryDbQuery"
