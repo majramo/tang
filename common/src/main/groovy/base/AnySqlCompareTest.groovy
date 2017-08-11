@@ -299,6 +299,7 @@ public class AnySqlCompareTest {
         try {
             sourceMap.eachWithIndex { it, index ->
                 if (diffDataCounter >= settings.maxDiffsToShow) {
+                    reporterLogLn "\n#maxDiffsToShow ($settings.maxDiffsToShow) reached. Diff could be more than $settings.maxDiffsToShow"
                     throw new Exception(BREAK_CLOSURE, new Throwable(BREAK_CLOSURE))
                 }
                 if (!targetMap.contains(it)) {
@@ -320,6 +321,7 @@ public class AnySqlCompareTest {
         try {
             targetMap.eachWithIndex { it, index ->
                 if (diffDataCounter >= settings.maxDiffsToShow) {
+                    reporterLogLn "\n#maxDiffsToShow ($settings.maxDiffsToShow) reached. Diff could be more than $settings.maxDiffsToShow"
                     throw new Exception(BREAK_CLOSURE, new Throwable(BREAK_CLOSURE))
                 }
                 if (!sourceMap.contains(it)) {
@@ -402,6 +404,7 @@ public class AnySqlCompareTest {
         }
         differenceMap.eachWithIndex { it, index ->
             if (diffDataCounter >= settings.maxDiffsToShow) {
+                reporterLogLn "\n#maxDiffsToShow ($settings.maxDiffsToShow) reached. Diff could be more than $settings.maxDiffsToShow"
                 throw new Exception(BREAK_CLOSURE, new Throwable(BREAK_CLOSURE))
             }
             reporterLogLn "  Missing in target: $diffDataCounter:$index <$it>"
@@ -430,6 +433,7 @@ public class AnySqlCompareTest {
         try {
             map1.eachWithIndex { key, value, index ->
                 if (diffCounter >= settings.maxDiffsToShow) {
+                    reporterLogLn "\n#maxDiffsToShow ($settings.maxDiffsToShow) reached. Diff could be more than $settings.maxDiffsToShow"
                     throw new Exception(BREAK_CLOSURE)
                 }
                 try {
