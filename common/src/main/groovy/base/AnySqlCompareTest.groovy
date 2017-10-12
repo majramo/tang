@@ -672,7 +672,7 @@ $fieldsStr
             case ~/.*USER_CONSTRAINTS.*/:
                 repositoryTable = DATABASE_CONSTRAINTS
                 break
-            case ~/.*DBA_SOURCE.*/:
+            case ~/.*ALL_SOURCE.*/:
                 repositoryTable = DATABASE_SOURCE
                 break
             case ~/.*USER_INDEXES.*/:
