@@ -74,6 +74,7 @@ public class SocialSecurityNumberFactory implements Serializable {
 
     public AbstractMap getPersonNummer(String yearMonthDayNumIn, int maxNoOfPnrs = 0) {
 //        LOG.info("\n###yearMonthDayNumIn <$yearMonthDayNumIn>")
+        count = 0
         socialSecurityNumbers.clear()
 
         this.yearMonthDayN = yearMonthDayNumIn.replaceAll("[^0-9]", "")
