@@ -175,7 +175,7 @@ public class AnySqlCompareTest {
             }else{
                 reporterLogLn("Source size <$sourceSize>")
                 reporterLogLn("Target size <$targetSize>")
-                equals(sourceResult, targetResult, threshold, false, "should be the same")
+                equals(sourceSql, sourceResult, targetResult, threshold, false, "should be the same")
 
             }
         }
@@ -243,7 +243,7 @@ public class AnySqlCompareTest {
     }
 
 
-    protected void equals(ArrayList sourceMap, ArrayList targetMap, thresholdString, isCountQuery = false, msg = "", String tableFieldsFileColumn = "", String tableFieldToExclude = "", sourceDb = "") {
+    protected void equals(String sourceSql, ArrayList sourceMap, ArrayList targetMap, thresholdString, isCountQuery = false, msg = "", String tableFieldsFileColumn = "", String tableFieldToExclude = "", sourceDb = "") {
         boolean thresholdPassed = true
         ArrayList tableFieldsToExcludeMap
         Float thresholdValue = 0
@@ -257,7 +257,7 @@ public class AnySqlCompareTest {
         }
         def sourceMapSize = sourceMap.size()
         def targetMapSize = targetMap.size()
-        if(sourceMap.size() == 1){
+        if(sourceMap.size() == 1 && sourceSql.toLowerCase().contains("count")){
             try{
                 sourceMapSize = sourceMap[0]["COUNT_"]
                 targetMapSize = targetMap[0]["COUNT_"]
