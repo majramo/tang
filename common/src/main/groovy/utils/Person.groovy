@@ -1,0 +1,60 @@
+package utils
+
+import org.apache.log4j.Logger
+import org.testng.Reporter
+
+import static org.apache.log4j.Logger.getLogger
+
+public class Person implements Serializable {
+    int no
+    int age
+    String firstName
+    String firstNameLc
+    String firstNameShort
+    String lastName
+    String lastNameLc
+    String lastNameShort
+    String socialSecurityNumberLong
+    String socialSecurityNumberLongDashLess
+    String gender
+    String address
+    String zip
+    String city
+    String emailDomain
+    String tel
+    String mobile
+    String user
+    String pwd
+    String email
+    String url
+
+    public Person(int i, age, firstName, lastName, socialSecurityNumberLong, socialSecurityNumberLongDashLess, gender, address, zip, city, emailDomain){
+        no = i
+        this.age = age
+        this.firstName = firstName
+        this.firstNameLc = firstName.toLowerCase().replaceAll(/[^a-z ]/,'')
+        this.firstNameShort =  firstNameLc + "abc"
+        this.lastName = lastName
+        this.lastNameLc = lastName.toLowerCase().replaceAll(/[^a-z ]/,'')
+        this.lastNameShort =  lastNameLc + "abc"
+        this.socialSecurityNumberLong = socialSecurityNumberLong
+        this.socialSecurityNumberLongDashLess = socialSecurityNumberLongDashLess
+        this.gender = gender
+        this.address = address
+        this.zip = zip
+        this.city = city
+        this.emailDomain = emailDomain
+        tel = '0' + zip[2] + socialSecurityNumberLongDashLess[2..9]
+        mobile = '076' + socialSecurityNumberLongDashLess[3..8]
+        user = "${firstNameShort}abc"[0..2] + "_" +  "${lastNameShort}abc"[0..2] + "_$no"
+        pwd  = "${lastNameShort}abc"[0..2] + "_" + "${firstNameShort}abc"[0..2] + "_$no"
+        email = firstNameLc + "."  + lastNameLc + ".$no@$emailDomain"
+        url = "www." + firstNameLc + "."  + lastNameLc + ".$no.$emailDomain"
+     }
+
+    public String toString(){
+        return [no, age, firstName, lastName, socialSecurityNumberLong, socialSecurityNumberLongDashLess, gender, address, zip, city, tel, mobile, user, pwd, email, url].join(";")
+    }
+
+
+}
