@@ -27,8 +27,9 @@ public class Person implements Serializable {
     String pwd
     String email
     String url
+    String delimiter
 
-    public Person(int i, age, firstName, lastName, socialSecurityNumberLong, socialSecurityNumberLongDashLess, gender, address, zip, city, emailDomain){
+    public Person(int i, age, firstName, lastName, socialSecurityNumberLong, socialSecurityNumberLongDashLess, gender, address, zip, city, emailDomain, String delimiter = ";"){
         no = i
         this.age = age
         this.firstName = firstName
@@ -44,17 +45,44 @@ public class Person implements Serializable {
         this.zip = zip
         this.city = city
         this.emailDomain = emailDomain
+        this.delimiter = delimiter
         tel = '0' + zip[2] + socialSecurityNumberLongDashLess[2..9]
         mobile = '076' + socialSecurityNumberLongDashLess[3..8]
         user = "${firstNameShort}abc"[0..2] + "_" +  "${lastNameShort}abc"[0..2] + "_$no"
         pwd  = "${lastNameShort}abc"[0..2] + "_" + "${firstNameShort}abc"[0..2] + "_$no"
         email = firstNameLc + "."  + lastNameLc + ".$no@$emailDomain"
-        url = "www." + firstNameLc + "."  + lastNameLc + ".$no.$emailDomain"
+        url = "www." + "${firstNameShort}abc"[0..2]  + "."  + "${lastNameShort}abc"[0..2]  + ".$no.$emailDomain"
      }
 
     public String toString(){
-        return [no, age, firstName, lastName, socialSecurityNumberLong, socialSecurityNumberLongDashLess, gender, address, zip, city, tel, mobile, user, pwd, email, url].join(";")
+        return [no, age, firstName, lastName, socialSecurityNumberLong, socialSecurityNumberLongDashLess, gender, address, zip, city, tel, mobile, user, pwd, email, url].join(delimiter)
     }
+
+    public String getHeader(){
+        return ['no', 'age', 'firstName', 'lastName', 'socialSecurityNumberLong', 'socialSecurityNumberLongDashLess', 'gender', 'address', 'zip', 'city', 'tel', 'mobile', 'user', 'pwd', 'email', 'url'].join(delimiter)
+    }
+
+    public getJsonMap(){
+        return [
+                no                              : no,
+                age                             : age,
+                firstName                       : firstName,
+                lastName                        : lastName,
+                socialSecurityNumberLong        : socialSecurityNumberLong,
+                socialSecurityNumberLongDashLess: socialSecurityNumberLongDashLess,
+                gender                          : gender,
+                address                         : address,
+                zip                             : zip,
+                city                            : city,
+                tel                             : tel,
+                mobile                          : mobile,
+                user                            : user,
+                pwd                             : pwd,
+                email                           : email,
+                url                             : url
+        ]
+    }
+
 
 
 }

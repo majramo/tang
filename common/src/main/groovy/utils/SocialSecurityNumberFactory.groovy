@@ -51,6 +51,22 @@ public class SocialSecurityNumberFactory implements Serializable {
         return getPersonNummer(yearMonthDayN, maxNoOfPnrs)
     }
 
+    public AbstractMap getPersonsMixedAges(int maxNoOfPnrs = 0, int fromAge, int toAge) {
+        def socialSecurityNumbers = [:]
+
+        Calendar date = Calendar.getInstance();
+        (fromAge..toAge).each { age ->
+            date.setTime(new Date());
+            date.add(Calendar.YEAR, -age)
+            Format f = new SimpleDateFormat("yyyyMMddSS");
+            yearMonthDayN = f.format(date.getTime())
+            yearMonthDayN = yearMonthDayN.substring(0, 10)
+    //        yearMonthDayN = yearMonthDayN.substring(0, 8) + yearMonthDayN.substring(yearMonthDayN.length() - 1, yearMonthDayN.length())
+            socialSecurityNumbers += (getPersonNummer(yearMonthDayN, maxNoOfPnrs))
+        }
+        return socialSecurityNumbers
+    }
+
     public AbstractMap getMalePersonNummer(int maxNoOfPnrs = 0) {
         gender = MALE
         getPersonNummerAtAge(20, maxNoOfPnrs * 2)
