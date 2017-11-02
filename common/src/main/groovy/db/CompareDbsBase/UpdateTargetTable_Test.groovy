@@ -32,7 +32,17 @@ public class UpdateTargetTable_Test extends AnySqlCompareTest{
         reporterLogLn("Target Db: <$targetDb> ");
         reporterLogLn("Action:    <$action> ");
         reporterLogLn("Target Sql:\n$targetSql\n");
-        execute(targetDbSqlDriver, targetSql)
+        def queries = targetSql.split(";")
+        queries.eachWithIndex {query, i->
+            reporterLogLn("\n###\nQuery <$i>:\n$query");
+            if(query.replaceAll(/\s/,'') != "") {
+                reporterLogLn(">Executing target Sql <$i>:\n$query\n");
+                execute(targetDbSqlDriver, query)
+            }else{
+                reporterLogLn(">Skipping empty Sql <$i>:\n$query\n");
+            }
+
+        }
     }
 
 }
