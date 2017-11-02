@@ -54,12 +54,12 @@ public class PersonFactory implements Serializable {
         returnPersons(socialSecurityNumberFactory.getPersonsMixedAges(maxNoOfPnrs, fromAge, toAge), format)
     }
 
-    public getPersonsAtAgesWitDelimiterOrFormat(int maxNoOfPnrs, int fromAge, int toAge, delimiter = ";", format = "") {
+    public getPeopleAtAgesWitDelimiterOrFormat(int maxNoOfPnrs, int fromAge, int toAge, delimiter = ";", format = "") {
         return getData(getPeopleAtAges(maxNoOfPnrs, fromAge, toAge, delimiter), format)
     }
 
 
-    public getPersonsOnDateWitDelimiterOrFormat(int maxNoOfPnrs, String yearMonthDayNum, delimiter = ";", format = "") {
+    public getPeopleOnDateWitDelimiterOrFormat(int maxNoOfPnrs, String yearMonthDayNum, delimiter = ";", format = "") {
         return getData(getPeopleOnDate(maxNoOfPnrs, yearMonthDayNum, delimiter), format)
     }
 
