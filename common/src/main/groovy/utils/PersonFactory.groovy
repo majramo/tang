@@ -5,6 +5,8 @@ import groovy.json.JsonBuilder
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
 import org.apache.log4j.Logger
+import org.testng.Reporter
+import org.testng.SkipException
 
 import static org.apache.log4j.Logger.getLogger
 
@@ -27,12 +29,23 @@ public class PersonFactory implements Serializable {
     def lastNames = []
 
     public PersonFactory(){
+        def addressFile = settings.addressFile
         if(settings["emailDomain"].size() != 0 && settings["emailDomain"] != ""){
             settingsEmailDomain = settings.emailDomain
         }
-        if(settings["addresses"].size() != 0 && settings["addresses"] != ""){
-            settingAddresses = settings.addresses
+        try {
+           def addressEntries = this.getClass().getResourceAsStream(addressFile).text
+            addressEntries.eachLine {
+                it = it.trim()
+                if (it != ""){
+                    settingAddresses.add(it.split(","))
+                }
+            }
+        } catch (NullPointerException e) {
+            Reporter.log("Can't find setting file $addressFile")
+            throw new SkipException("")
         }
+
         if(settings["addressRange"].size() != 0 && settings["addressRange"] != ""){
             settingsAddressRange = settings.addressRange
         }
@@ -208,14 +221,13 @@ public class PersonFactory implements Serializable {
 
     private initAddresses(){
 
-   def adr = []
-    settingAddresses.each {address->
-        settingsAddressRange.each { no ->
-            adr.add([address[0] + " $no", address[1], address[2]])
+        settingAddresses.each { address ->
+            settingsAddressRange.each { no ->
+                println "$no $address"
+                addresses.add([address[0].trim() + " $no", address[1].trim(), address[2].trim()])
+            }
         }
-    }
 
-       addresses= adr
     }
 
 //    private initAddresses(){
