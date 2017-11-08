@@ -1,15 +1,11 @@
 package db.CompareDbsBase
 
 import base.AnySqlCompareTest
-import javafx.scene.layout.ColumnConstraints
 import org.apache.log4j.Logger
 import org.testng.ITestContext
-import org.testng.Reporter
-import org.testng.SkipException
 import org.testng.annotations.Test
 
 import static dtos.base.Constants.dbRunTypeFirstRow
-import static dtos.base.Constants.dbRunTypeRows
 
 public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     private final static Logger log = Logger.getLogger("VMT   ")
@@ -22,8 +18,9 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     def table
     def column
     def actionColumn
+    def criteria
 
-    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn, id) {
+    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn, criteria = "") {
         super.setup()
         this.targetDb = targetDb
         this.sourceDb = sourceDb
@@ -31,6 +28,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         this.table = table.toLowerCase()
         this.column = column.toLowerCase()
         this.actionColumn = actionColumn
+        this.criteria = criteria
         targetDbOwner = settings."$targetDb".owner
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
@@ -72,7 +70,10 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         sourceTargetSql += "SELECT $tmpColumn FROM $table\n" +
                 " WHERE NOT $tmpColumn IS NULL\n" +
                 " AND ROWNUM < 21\n"
-
+        if (criteria != ""){
+            sourceTargetSql += " AND $criteria < (SELECT MAX($criteria)-100 FROM $table)\n" +
+                    "ORDER BY 1\n"
+        }
         if(getDbType(targetDb).equals("sqlserver")){//Todo: fix this code for sqlserver
 //            sourceTargetSql = "-- Verify masked column<$column> in table <$table> in system <$system> \n"
 //            sourceTargetSql = String.format(TARGET_TABLE_QUERY_SQLSERVER, table)

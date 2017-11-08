@@ -15,7 +15,7 @@ class  VerifyMaskedTargetDb_TestFactory {
 
         def (ExcelObjectProvider excelObjectProviderMaskAction, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         def inputFile = excelObjectProviderMaskAction.inputFile
-        excelObjectProviderMaskAction.addColumnsToRetriveFromFile(["System", "Table", "Column", "Action"])
+        excelObjectProviderMaskAction.addColumnsToRetriveFromFile(["System", "Table", "Column", "Action", "Criteria"])
         excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
         def excelBodyRowsMaskAction = SystemPropertiesInitation.readExcel(excelObjectProviderMaskAction)
@@ -28,8 +28,9 @@ class  VerifyMaskedTargetDb_TestFactory {
         excelBodyRowsMaskAction.unique().eachWithIndex { excelRow, index ->
             def table = excelRow["Table"]
             def column = excelRow["Column"]
+            def criteria = excelRow["Criteria"]
 
-            result.add(new VerifyMaskedTargetColumn_Test(testContext, targetDb, sourceDb, excelRow["System"], table, column, actionColumn))
+            result.add(new VerifyMaskedTargetColumn_Test(testContext, targetDb, sourceDb, excelRow["System"], table, column, actionColumn, criteria))
 
         }
 
