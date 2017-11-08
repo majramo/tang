@@ -23,7 +23,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     def column
     def actionColumn
 
-    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn) {
+    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn, id) {
         super.setup()
         this.targetDb = targetDb
         this.sourceDb = sourceDb
@@ -41,24 +41,21 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     @Test
     public void verifyMaskedTargetTest(ITestContext testContext){
         def tmpColumn = column
-        def tmpTable = table
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(sourceDb), getDbType(targetDb)))
         row++
         reporterLogLn("Row: <$row> Verify <$actionColumn> TABLE/COLUMN ");
         reporterLogLn("Source Db: <$sourceDb> ");
         reporterLogLn("Target Db: <$targetDb> ");
-        reporterLogLn("Tmp Table: <$tmpTable> ");
+        reporterLogLn("Tmp Table: <$table> ");
         //reporterLogLn("column: <$column> ");
 
 
-        def checkColumnType = "SELECT data_type FROM USER_TAB_COLS WHERE lower(table_name) = '$tmpTable' AND lower(column_name) = '$column'"
+        def checkColumnType = "SELECT data_type FROM USER_TAB_COLS WHERE lower(table_name) = '$table' AND lower(column_name) = '$column'"
         reporterLogLn("Sql to check column type:\n$checkColumnType\n")
         def checkColumnTypeResult = getDbResult(targetDbSqlDriver, checkColumnType, dbRunTypeFirstRow)
 
 
-        def TARGET_TABLE_QUERY_ORACLE = "SELECT %s FROM %s\n" +
-                " WHERE NOT %s IS NULL\n" +
-                " AND ROWNUM < 21\n"
+
         def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns WHERE table_name = '%s'" //Todo: change this  sqlserver sql and check in
         if(checkColumnTypeResult[0] == "CLOB" ){
             reporterLogLn("Clob: <$column> ");
@@ -68,8 +65,13 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         }
         reporterLogLn("tmpColumn: <$tmpColumn> ");
 
-        sourceTargetSql = "-- Verify masked column<$tmpColumn> in table <$tmpTable> in target<$targetDb> mot source<$sourceDb>\n"
-        sourceTargetSql += String.format(TARGET_TABLE_QUERY_ORACLE, "$tmpColumn", "$tmpTable",  "$tmpColumn")
+        def TARGET_TABLE_QUERY_ORACLE = "SELECT $tmpColumn FROM $table\n" +
+                " WHERE NOT $tmpColumn IS NULL\n" +
+                " AND ROWNUM < 21\n"
+        sourceTargetSql = "-- Verify masked column<$tmpColumn> in table <$table> in target<$targetDb> mot source<$sourceDb>\n"
+        sourceTargetSql += "SELECT $tmpColumn FROM $table\n" +
+                " WHERE NOT $tmpColumn IS NULL\n" +
+                " AND ROWNUM < 21\n"
 
         if(getDbType(targetDb).equals("sqlserver")){//Todo: fix this code for sqlserver
 //            sourceTargetSql = "-- Verify masked column<$column> in table <$table> in system <$system> \n"
