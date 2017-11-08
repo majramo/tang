@@ -19,11 +19,13 @@ public class CompareS2T_TestFactoryBase {
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
 
-    protected ArrayList runCommon(String inputFileColumn, String systemColumn, String considerSystemTableColumnAnalyse, String actionTypeColumn) {
+    protected ArrayList runCommon(String inputFileColumn, String systemColumn, String considerSystemTableColumnAnalyse, String actionTypeColumn, String enabledColumn) {
         def result = [];
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn, inputFileColumn)
         excelObjectProvider.addColumnsToRetriveFromFile([ROW, ENABLED, SOURCE_SQL, TARGET_SQL, THRESHOLD, COMMENTS, TABLE_FIELD_TO_EXCLUDE, BY])
-        excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, "true")
+        if(enabledColumn != ""){
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve(ENABLED, enabledColumn)
+        }
         def excelBodyRows = SystemPropertiesInitation.readExcelEnabled(excelObjectProvider)
 
         excelBodyRows.eachWithIndex { excelRow, index ->
