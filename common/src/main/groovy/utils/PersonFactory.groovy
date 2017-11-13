@@ -6,7 +6,6 @@ import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
 import org.apache.log4j.Logger
 import org.testng.Reporter
-import org.testng.SkipException
 
 import static org.apache.log4j.Logger.getLogger
 
@@ -16,35 +15,44 @@ public class PersonFactory implements Serializable {
     private static final Logger LOG = getLogger(PersonFactory.class.getName());
     private static String settingsEmailDomain = "test.addtest.se"
     private settingsFirstNames = ['Female', 'Male']
+    private settingsMaleFirstNames = ['Male1', 'Male2']
+    private settingsFemaleFirstNames = ['Female1', 'Female2']
     private settingsLastNames = ['Family', 'Family']
-    private settingAddresses = [ ['Gatan','68680','Sunne'], ['Vägen','11863','Stockholm']]
+    private addressesDefault = [['Vegagatan 1', '68680', 'Sunne'], ['Rådmansgatan 2', '11863', 'Stockholm']]
     private static settingsAddressRange = (1..9)
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
     SocialSecurityNumberFactory socialSecurityNumberFactory = new SocialSecurityNumberFactory()
 
-    def names = []
+    def femaleNames = []
+    def maleNames = []
     def addresses = []
     def firstNames = []
     def lastNames = []
 
     public PersonFactory(){
-        def addressFile = settings.addressFile
+        //def addressFile = settings.addressFile
+        def addressFile = settings.addressCompleteFile
         if(settings["emailDomain"].size() != 0 && settings["emailDomain"] != ""){
             settingsEmailDomain = settings.emailDomain
         }
         try {
+            def addressesFromFile = []
            def addressEntries = this.getClass().getResourceAsStream(addressFile).text
             addressEntries.eachLine {
                 it = it.trim()
                 if (it != ""){
-                    settingAddresses.add(it.split(","))
+                    addressesFromFile.add(it.split(","))
                 }
             }
+            addresses = addressesFromFile
         } catch (NullPointerException e) {
             Reporter.log("Can't find setting file $addressFile")
-            throw new SkipException("")
+            Reporter.log("Using default values")
+            addresses = addressesDefault
+
         }
+
 
         if(settings["addressRange"].size() != 0 && settings["addressRange"] != ""){
             settingsAddressRange = settings.addressRange
@@ -54,6 +62,12 @@ public class PersonFactory implements Serializable {
         }
         if(settings["firstNames"].size() != 0 && settings["firstNames"] != ""){
             settingsFirstNames = settings.firstNames
+        }
+        if(settings["firstNamesMale"].size() != 0 && settings["firstNamesMale"] != ""){
+            settingsMaleFirstNames = settings.firstNamesMale
+        }
+        if(settings["firstNamesFemale"].size() != 0 && settings["firstNamesFemale"] != ""){
+            settingsFemaleFirstNames = settings.firstNamesFemale
         }
      }
 
@@ -157,21 +171,35 @@ public class PersonFactory implements Serializable {
         ArrayList<Person[]> people = new ArrayList<Person[]>()
         def addressSize = addresses.size()
         def adressCounter = 0
-        def nameSize = names.size()
-        def nameCounter = 0
+        def femaleNameSize = femaleNames.size()
+        def maleNameSize = maleNames.size()
+        def femaleNameCounter = 0
+        def maleNameCounter = 0
         ssns.eachWithIndex{ ssn, int i ->
             if(i.mod(addressSize) == 0|| i >= addressSize){
                 adressCounter = 0
             }else{
                 adressCounter++
             }
-            if(i.mod(nameSize) == 0 || i >= nameSize){
-                nameCounter = 0
+            def firstName = femaleNames[femaleNameCounter][0]
+            def lastName = femaleNames[femaleNameCounter][1]
+            if(ssn.value.gender == "Female") {
+                if (i.mod(femaleNameSize) == 0 || i >= femaleNameSize) {
+                    femaleNameCounter = 0
+                } else {
+                    femaleNameCounter++
+                }
             }else{
-                nameCounter++
+                firstName = maleNames[femaleNameCounter][0]
+                lastName = maleNames[femaleNameCounter][1]
+                if(i.mod(maleNameSize) == 0 || i >= maleNameSize){
+                    maleNameCounter = 0
+                }else{
+                    maleNameCounter++
+                }
             }
             println i
-            people.add(new  Person(i+1, ssn.value.age, names[nameCounter][0], names[nameCounter][1], ssn.value.socialSecurityNumberLong, ssn.value.socialSecurityNumberLongDashLess,  ssn.value.gender,
+            people.add(new  Person(i+1, ssn.value.age, firstName, lastName, ssn.value.socialSecurityNumberLong, ssn.value.socialSecurityNumberLongDashLess,  ssn.value.gender,
                     addresses[adressCounter][0],  addresses[adressCounter][1],  addresses[adressCounter][2], settingsEmailDomain, delimiter))
          }
         return people
@@ -188,16 +216,32 @@ public class PersonFactory implements Serializable {
     }
 
     private void initNames(int maxNoOfPnrs = 0) {
-        def maxFirstNameListCount = 10
+        def maxFirstNameFemaleListCount = 10
+        def maxFirstNameMaleListCount = 10
         def maxLastNameListCount = 10
 //        initFirstNames()
 //        initLastNames()
-        initAddresses()
-        if(maxNoOfPnrs < settingsFirstNames.size()){
-            maxFirstNameListCount = maxNoOfPnrs
+        //initAddresses()
+        if(maxNoOfPnrs < settingsMaleFirstNames.size()){
+            if(maxFirstNameMaleListCount > settingsMaleFirstNames.size()){
+                maxFirstNameMaleListCount = settingsMaleFirstNames.size()
+            }else{
+                maxFirstNameMaleListCount = maxNoOfPnrs
+            }
         }else{
-            if(maxNoOfPnrs > settingsFirstNames.size()){
-                maxFirstNameListCount = settingsFirstNames.size()
+            if(maxNoOfPnrs > settingsMaleFirstNames.size()){
+                maxFirstNameMaleListCount = settingsMaleFirstNames.size()
+            }
+        }
+        if(maxNoOfPnrs < settingsFemaleFirstNames.size()){
+            if(maxFirstNameFemaleListCount > settingsFemaleFirstNames.size()){
+                maxFirstNameFemaleListCount = settingsFemaleFirstNames.size()
+            }else{
+                maxFirstNameFemaleListCount = maxNoOfPnrs
+            }
+        }else{
+            if(maxNoOfPnrs > settingsFemaleFirstNames.size()){
+                maxFirstNameFemaleListCount = settingsFemaleFirstNames.size()
             }
         }
         if(maxNoOfPnrs < settingsLastNames.size()){
@@ -209,26 +253,33 @@ public class PersonFactory implements Serializable {
         }
 
         Collections.shuffle(settingsLastNames)
-        Collections.shuffle(settingsLastNames)
+        Collections.shuffle(settingsFemaleFirstNames)
+        Collections.shuffle(settingsMaleFirstNames)
         Collections.shuffle(addresses)
-        settingsFirstNames[0..maxFirstNameListCount-1].each { firstName ->
+        settingsFemaleFirstNames[0..maxFirstNameFemaleListCount-1].each { femaleFirstName ->
             settingsLastNames[0..maxLastNameListCount-1].each { lastName ->
-                names.add([firstName, lastName])
+                femaleNames.add([femaleFirstName, lastName])
             }
         }
-        Collections.shuffle(names)
-    }
-
-    private initAddresses(){
-
-        settingAddresses.each { address ->
-            settingsAddressRange.each { no ->
-                println "$no $address"
-                addresses.add([address[0].trim() + " $no", address[1].trim(), address[2].trim()])
+        settingsMaleFirstNames[0..maxFirstNameMaleListCount-1].each { maleFirstName ->
+            settingsLastNames[0..maxLastNameListCount-1].each { lastName ->
+                maleNames.add([maleFirstName, lastName])
             }
         }
-
+        Collections.shuffle(femaleNames)
+        Collections.shuffle(maleNames)
     }
+
+//    private initAddresses(){
+//
+//        addressesDefault.each { address ->
+//            settingsAddressRange.each { no ->
+//                println "$no $address"
+//                addresses.add([address[0].trim() + " $no", address[1].trim(), address[2].trim()])
+//            }
+//        }
+//
+//    }
 
 //    private initAddresses(){
 //       addresses=[
