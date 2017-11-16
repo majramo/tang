@@ -18,9 +18,9 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     def table
     def column
     def actionColumn
-    def criteria
+    def searchCriteria
 
-    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn, criteria = "") {
+    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn, searchCriteria = "") {
         super.setup()
         this.targetDb = targetDb
         this.sourceDb = sourceDb
@@ -28,7 +28,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         this.table = table.toLowerCase()
         this.column = column.toLowerCase()
         this.actionColumn = actionColumn
-        this.criteria = criteria
+        this.searchCriteria = searchCriteria
         targetDbOwner = settings."$targetDb".owner
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
@@ -57,7 +57,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns WHERE table_name = '%s'" //Todo: change this  sqlserver sql and check in
         if(checkColumnTypeResult[0] == "CLOB" ){
             reporterLogLn("Clob: <$column> ");
-            tmpColumn = "substr( $column, 20000)"
+            tmpColumn = "to_char( $column)"
             reporterLogLn("checkColumnType:\n$checkColumnType\n")
             reporterLogLn("Column <$table> <$column> is xLOB type<$checkColumnTypeResult> ==> <$tmpColumn>")
         }
@@ -70,8 +70,8 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         sourceTargetSql += "SELECT $tmpColumn FROM $table\n" +
                 " WHERE NOT $tmpColumn IS NULL\n" +
                 " AND ROWNUM < 21\n"
-        if (criteria != ""){
-            sourceTargetSql += " AND $criteria < (SELECT MAX($criteria)-100 FROM $table)\n" +
+        if (searchCriteria != ""){
+            sourceTargetSql += " AND $searchCriteria < (SELECT MAX($searchCriteria)-100 FROM $table)\n" +
                     "ORDER BY 1\n"
         }
         if(getDbType(targetDb).equals("sqlserver")){//Todo: fix this code for sqlserver
