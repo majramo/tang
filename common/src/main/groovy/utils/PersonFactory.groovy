@@ -19,7 +19,7 @@ public class PersonFactory implements Serializable {
     private settingsFemaleFirstNames = ['Female1', 'Female2']
     private settingsLastNames = ['Family', 'Family']
     private addressesDefault = [['Vegagatan 1', '68680', 'Sunne'], ['Rådmansgatan 2', '11863', 'Stockholm']]
-    private static settingsAddressRange = (1..9)
+//    private static settingsAddressRange = (1..9)
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
     SocialSecurityNumberFactory socialSecurityNumberFactory = new SocialSecurityNumberFactory()
@@ -38,7 +38,7 @@ public class PersonFactory implements Serializable {
         }
         try {
             def addressesFromFile = []
-           def addressEntries = this.getClass().getResourceAsStream(addressFile).text
+            def addressEntries = this.getClass().getResourceAsStream(addressFile).text
             addressEntries.eachLine {
                 it = it.trim()
                 if (it != ""){
@@ -54,9 +54,9 @@ public class PersonFactory implements Serializable {
         }
 
 
-        if(settings["addressRange"].size() != 0 && settings["addressRange"] != ""){
-            settingsAddressRange = settings.addressRange
-        }
+//        if(settings["addressRange"].size() != 0 && settings["addressRange"] != ""){
+//            settingsAddressRange = settings.addressRange
+//        }
         if(settings["lastNames"].size() != 0 && settings["lastNames"] != ""){
             settingsLastNames = settings.lastNames
         }
@@ -81,25 +81,25 @@ public class PersonFactory implements Serializable {
         returnPersons(socialSecurityNumberFactory.getPersonsMixedAges(maxNoOfPnrs, fromAge, toAge), format)
     }
 
-    public getPeopleAtAgesWitDelimiterOrFormat(int maxNoOfPnrs, int fromAge, int toAge, delimiter = ";", format = "") {
+    public String getPeopleAtAgesWitDelimiterOrFormat(int maxNoOfPnrs, int fromAge, int toAge, delimiter = ";", format = "") {
         return getData(getPeopleAtAges(maxNoOfPnrs, fromAge, toAge, delimiter), format)
     }
 
 
-    public getPeopleOnDateWitDelimiterOrFormat(int maxNoOfPnrs, String yearMonthDayNum, delimiter = ";", format = "") {
+    public String getPeopleOnDateWitDelimiterOrFormat(int maxNoOfPnrs, String yearMonthDayNum, delimiter = ";", format = "") {
         return getData(getPeopleOnDate(maxNoOfPnrs, yearMonthDayNum, delimiter), format)
     }
 
-    private getData(ArrayList<Object[]> people, String format){
+    private String getData(ArrayList<Object[]> people, String format){
         switch (format.toUpperCase()) {
             case "JSON":
-                return [people.size(), getJsonPrettyString(people)]
+                return getJsonPrettyString(people)
                 break
             case "XML":
-                return [people.size(), getXmlPrettyString(people)]
+                return getXmlPrettyString(people)
                 break
             default:
-                return [people.size(),getPrettyString(people)]
+                return getPrettyString(people)
         }
 
     }
