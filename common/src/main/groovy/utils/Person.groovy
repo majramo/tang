@@ -3,9 +3,14 @@ package utils
 import org.apache.log4j.Logger
 import org.testng.Reporter
 
+import java.text.Format
+import java.text.SimpleDateFormat
+
 import static org.apache.log4j.Logger.getLogger
 
 public class Person implements Serializable {
+    static  Calendar date = Calendar.getInstance();
+    static Format f = new SimpleDateFormat("S");
     int no
     int age
     String firstName
@@ -27,6 +32,9 @@ public class Person implements Serializable {
     String pwd
     String email
     String url
+    static String ipBase = f.format(date.getTime());
+    String ip
+    String pin
     String delimiter
 
     public Person(int i, age, firstName, lastName, socialSecurityNumberLong, socialSecurityNumberLongDashLess, gender, address, zip, city, emailDomain, String delimiter = ";"){
@@ -52,14 +60,16 @@ public class Person implements Serializable {
         pwd  = "${lastNameShort}abc"[0..2] + "_" + "${firstNameShort}abc"[0..2] + "_$no"
         email = firstNameLc + "."  + lastNameLc + ".$no@$emailDomain"
         url = "www." + "${firstNameShort}abc"[0..2]  + "."  + "${lastNameShort}abc"[0..2]  + ".$no.$emailDomain"
+        ip = "${ipBase}." + socialSecurityNumberLongDashLess[9..11] + "." + socialSecurityNumberLongDashLess[6..8] + "." + socialSecurityNumberLongDashLess[9..11]
+        pin = socialSecurityNumberLongDashLess[9..11]
      }
 
     public String toString(){
-        return [no, age, firstName, lastName, socialSecurityNumberLong, socialSecurityNumberLongDashLess, gender, address, zip, city, tel, mobile, user, pwd, email, url].join(delimiter)
+        return [no, age, firstName, lastName, socialSecurityNumberLong, socialSecurityNumberLongDashLess, gender, address, zip, city, tel, mobile, user, pwd, email, url, ip, pin].join(delimiter)
     }
 
     public String getHeader(){
-        return ['no', 'age', 'firstName', 'lastName', 'socialSecurityNumberLong', 'socialSecurityNumberLongDashLess', 'gender', 'address', 'zip', 'city', 'tel', 'mobile', 'user', 'pwd', 'email', 'url'].join(delimiter)
+        return ['no', 'age', 'firstName', 'lastName', 'socialSecurityNumberLong', 'socialSecurityNumberLongDashLess', 'gender', 'address', 'zip', 'city', 'tel', 'mobile', 'user', 'pwd', 'email', 'url', 'ip', 'pin'].join(delimiter)
     }
 
     public getJsonMap(){
@@ -79,7 +89,9 @@ public class Person implements Serializable {
                 user                            : user,
                 pwd                             : pwd,
                 email                           : email,
-                url                             : url
+                url                             : url,
+                ip                              : ip,
+                pin                             : pin
         ]
     }
 
