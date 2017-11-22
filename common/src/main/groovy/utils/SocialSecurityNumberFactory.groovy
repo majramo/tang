@@ -61,6 +61,14 @@ public class SocialSecurityNumberFactory implements Serializable {
             Format f = new SimpleDateFormat("yyyyMMddSS");
             yearMonthDayN = f.format(date.getTime())
             yearMonthDayN = yearMonthDayN.substring(0, 10)
+            if(maxNoOfPnrs > 10){
+                if(maxNoOfPnrs > 100) {
+                    yearMonthDayN = yearMonthDayN.substring(0, 8)
+                }else{
+                    yearMonthDayN = yearMonthDayN.substring(0, 9)
+                }
+            }
+
     //        yearMonthDayN = yearMonthDayN.substring(0, 8) + yearMonthDayN.substring(yearMonthDayN.length() - 1, yearMonthDayN.length())
             socialSecurityNumbers += (getPersonNummer(yearMonthDayN, maxNoOfPnrs))
         }
