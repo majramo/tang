@@ -150,6 +150,8 @@ public class PersonFactory implements Serializable {
                             pwd personIt.pwd
                             email personIt.email
                             url personIt.url
+                            ip personIt.ip
+                            pin personIt.pin
                         }
                     }
                 }
@@ -184,15 +186,15 @@ public class PersonFactory implements Serializable {
             def firstName = femaleNames[femaleNameCounter][0]
             def lastName = femaleNames[femaleNameCounter][1]
             if(ssn.value.gender == "Female") {
-                if (i.mod(femaleNameSize) == 0 || i >= femaleNameSize) {
+                if (femaleNameCounter > 0 && i.mod(femaleNameSize) == 0 || i >= femaleNameSize) {
                     femaleNameCounter = 0
                 } else {
                     femaleNameCounter++
                 }
             }else{
-                firstName = maleNames[femaleNameCounter][0]
-                lastName = maleNames[femaleNameCounter][1]
-                if(i.mod(maleNameSize) == 0 || i >= maleNameSize){
+                firstName = maleNames[maleNameCounter][0]
+                lastName = maleNames[maleNameCounter][1]
+                if(maleNameCounter > 0 && i.mod(maleNameSize) == 0 || i >= maleNameSize){
                     maleNameCounter = 0
                 }else{
                     maleNameCounter++
@@ -216,13 +218,13 @@ public class PersonFactory implements Serializable {
     }
 
     private void initNames(int maxNoOfPnrs = 0) {
-        def maxFirstNameFemaleListCount = 10
-        def maxFirstNameMaleListCount = 10
-        def maxLastNameListCount = 10
+        def maxFirstNameFemaleListCount = 33
+        def maxFirstNameMaleListCount = 33
+        def maxLastNameListCount = 33
 //        initFirstNames()
 //        initLastNames()
         //initAddresses()
-        if(maxNoOfPnrs < settingsMaleFirstNames.size()){
+        if(maxNoOfPnrs <= settingsMaleFirstNames.size()){
             if(maxFirstNameMaleListCount > settingsMaleFirstNames.size()){
                 maxFirstNameMaleListCount = settingsMaleFirstNames.size()
             }else{
@@ -233,7 +235,7 @@ public class PersonFactory implements Serializable {
                 maxFirstNameMaleListCount = settingsMaleFirstNames.size()
             }
         }
-        if(maxNoOfPnrs < settingsFemaleFirstNames.size()){
+        if(maxNoOfPnrs <= settingsFemaleFirstNames.size()){
             if(maxFirstNameFemaleListCount > settingsFemaleFirstNames.size()){
                 maxFirstNameFemaleListCount = settingsFemaleFirstNames.size()
             }else{
