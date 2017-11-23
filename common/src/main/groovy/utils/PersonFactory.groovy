@@ -71,12 +71,12 @@ public class PersonFactory implements Serializable {
         }
      }
 
-    private  ArrayList<Person[]> getPeopleOnDate(int maxNoOfPnrs, String yearMonthDayNumIn, String delimiter){
+    public  ArrayList<Person[]> getPeopleOnDate(int maxNoOfPnrs, String yearMonthDayNumIn, String delimiter){
         initNames(maxNoOfPnrs)
         returnPersons(socialSecurityNumberFactory.getPersonNummer(yearMonthDayNumIn, maxNoOfPnrs), delimiter)
     }
 
-    private  ArrayList<Person[]> getPeopleAtAges(int maxNoOfPnrs = 0, int fromAge, int toAge, format = ""){
+    public  ArrayList<Person[]> getPeopleAtAges(int maxNoOfPnrs = 0, int fromAge, int toAge, format = ""){
         initNames(maxNoOfPnrs * (toAge - fromAge + 1))
         returnPersons(socialSecurityNumberFactory.getPersonsMixedAges(maxNoOfPnrs, fromAge, toAge), format)
     }
