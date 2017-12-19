@@ -4,7 +4,7 @@ import java.text.Format
 import java.text.SimpleDateFormat
 
 import static corebase.GlobalConstants.*
-
+import java.time.*
 /**
  * Created with IntelliJ IDEA.
  * User: majidaram
@@ -59,7 +59,7 @@ class SocialSecurityNumber {
         socialSecurityNumberLongDashLess = "${birthDateLong}$socialSecurityNumberPostFix"
         socialSecurityNumberShort = "${birthDateShort}-$socialSecurityNumberPostFix"
         socialSecurityNumberShortDashLess = "${birthDateShort}$socialSecurityNumberPostFix"
-        age = currentYear - Integer.parseInt(year)
+        age = Period.between(LocalDate.of(Integer.parseInt(year),Integer.parseInt(month),Integer.parseInt(day)), LocalDate.now()).years
     }
 
     public SocialSecurityNumber(String socialSecurityNumber) {
