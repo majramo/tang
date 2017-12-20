@@ -29,17 +29,17 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
     def targetSizeOut
     def diffCountOut
 
-    @Parameters(["systemColumn", "excelModifiedTablesOnly", "targetDb"] )
+    @Parameters(["systemColumn", "excelModifiedTablesOnly", "sourceDbColumn", "targetDbColumn"] )
     @Test
-    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("false")boolean excelModifiedTablesOnly, @Optional String sourceDbParameter, @Optional String targetDbParameter, ITestContext testContext){
+    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("false")boolean excelModifiedTablesOnly, @Optional String sourceDbColumn, @Optional String targetDbColumn, ITestContext testContext){
         super.setup()
         def inputFile = ""
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
-        if(!targetDbParameter.isEmpty()){
-            targetDb = targetDbParameter
+        if(!targetDbColumn.isEmpty()){
+            targetDb = targetDbColumn
         }
-        if(!sourceDbParameter.isEmpty()){
-            sourceDb = sourceDbParameter
+        if(!sourceDbColumn.isEmpty()){
+            sourceDb = sourceDbColumn
         }
         if(excelModifiedTablesOnly){
             inputFile = excelObjectProvider.inputFile
