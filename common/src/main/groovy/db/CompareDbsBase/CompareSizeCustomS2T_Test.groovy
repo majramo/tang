@@ -29,12 +29,18 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
     def targetSizeOut
     def diffCountOut
 
-    @Parameters(["systemColumn", "excelModifiedTablesOnly"] )
+    @Parameters(["systemColumn", "excelModifiedTablesOnly", "targetDb"] )
     @Test
-    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("false")boolean excelModifiedTablesOnly, ITestContext testContext){
+    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("false")boolean excelModifiedTablesOnly, @Optional String sourceDbParameter, @Optional String targetDbParameter, ITestContext testContext){
         super.setup()
         def inputFile = ""
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
+        if(!targetDbParameter.isEmpty()){
+            targetDb = targetDbParameter
+        }
+        if(!sourceDbParameter.isEmpty()){
+            sourceDb = sourceDbParameter
+        }
         if(excelModifiedTablesOnly){
             inputFile = excelObjectProvider.inputFile
         }
@@ -157,7 +163,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         def numberOfTablesChecked = 0
         boolean noExceptionAtRun = true
         uniqueDbResult.eachWithIndex { it, i ->
-            def icon = " "
+            def icon = "   "
             def j = i + 1
             boolean  loopException = false
             expectedMaximumDiff = 0
@@ -211,12 +217,12 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
             //Comparing
             if(truncateTables[table]){
-                icon = "-"
+                icon = "-  "
                 if (targetSize > 0 || loopException) {
                     diffCount = targetSize
                     diffCountOut = thousandSeparatorFormat.format(new BigDecimal(diffCount))
                     totalDiffCount += diffCount
-                    icon = "T"
+                    icon = "T  "
                     numberOfTableDiff++
                     nok = aggregate(nok, "$str a. Table $table has <$targetSizeOut> rows, expected to be truncated\n\n")
                     reporterLogLn("$icon D " + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * should be truncated" )
@@ -247,7 +253,13 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                 def expectedMaximumDiff_Ok  = false
                 if (expectedMaximumDiff > 0) {
                     if (diffCountPercent > expectedMaximumDiff || loopException) {
-                        icon = "*"
+                        icon = "t>s"
+                        if(sourceSize > targetSize){
+                            icon = "s>t"
+                            if(targetSize == 0){
+                                icon = "t=0"
+                            }
+                        }
                         numberOfTableDiff++
                         nok = aggregate(nok, "$str Table $table has <$diffCountOut> diff, <$diffCountPercent %>, expected maximum diff in target was <$expectedMaximumDiff %>\n\n")
                     } else {
@@ -256,7 +268,13 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                     }
                 } else {
                     if (diffCountPercent > 0 || loopException) {
-                        icon = "*"
+                         icon = "t>s"
+                        if(sourceSize > targetSize){
+                            icon = "s>t"
+                            if(targetSize == 0) {
+                                icon = "t=0"
+                            }
+                        }
                         numberOfTableDiff++
                         nok = aggregate(nok, "$str table $table has <$diffCountOut> diff, <$diffCountPercent>, expected maximum diff in target was <0.0 %>\n\n")
                     } else {
