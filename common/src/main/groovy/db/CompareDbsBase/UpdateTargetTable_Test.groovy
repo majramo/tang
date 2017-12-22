@@ -3,7 +3,9 @@ package db.CompareDbsBase
 import base.AnySqlCompareTest
 import org.testng.ITestContext
 import org.testng.annotations.Test
-
+/*
+ this class uses split of incoming query by ";" and will execute each sub query
+ */
 public class UpdateTargetTable_Test extends AnySqlCompareTest{
     private static int row = 0
     private String targetDb;
