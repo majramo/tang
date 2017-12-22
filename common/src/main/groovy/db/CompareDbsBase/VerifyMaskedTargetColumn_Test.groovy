@@ -19,7 +19,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     def column
     def actionColumn
     def searchCriteria
-
+    def numberOfLinesInSqlCompare = 101
     public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn, searchCriteria = "") {
         super.setup()
         this.targetDb = targetDb
@@ -32,6 +32,9 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         targetDbOwner = settings."$targetDb".owner
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
+        if(settings["numberOfLinesInSqlCompare"] != "" && settings["numberOfLinesInSqlCompare"].size() != 0 ){
+            numberOfLinesInSqlCompare = settings["numberOfLinesInSqlCompare"]
+        }
 
         log.info("sourceTargetSql <$sourceTargetSql>")
     }
@@ -66,12 +69,19 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         def TARGET_TABLE_QUERY_ORACLE = "SELECT $tmpColumn FROM $table\n" +
                 " WHERE NOT $tmpColumn IS NULL\n" +
                 " AND ROWNUM < 21\n"
-        sourceTargetSql = "-- Verify masked column<$tmpColumn> in table <$table> in target<$targetDb> mot source<$sourceDb>\n"
-        sourceTargetSql += "SELECT $tmpColumn FROM $table\n" +
-                " WHERE NOT $tmpColumn IS NULL\n" +
-                " AND ROWNUM < 21\n"
-        if (searchCriteria != ""){
-            sourceTargetSql += " AND $searchCriteria < (SELECT MAX($searchCriteria)-100 FROM $table)\n" +
+
+        if (searchCriteria != "") {
+            sourceTargetSql = "-- Verify search criteria and masked column<$searchCriteria, $tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
+            sourceTargetSql += "SELECT $searchCriteria, $tmpColumn FROM $table\n" +
+                    " WHERE NOT $tmpColumn IS NULL\n" +
+                    " AND $searchCriteria < (SELECT MAX($searchCriteria)- $numberOfLinesInSqlCompare FROM $table)\n" +
+                    " AND ROWNUM < $numberOfLinesInSqlCompare\n" +
+                    "ORDER BY 1,2\n"
+        }else{
+            sourceTargetSql = "-- Verify masked column<$tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
+            sourceTargetSql += "SELECT $tmpColumn FROM $table\n" +
+                    " WHERE NOT $tmpColumn IS NULL\n" +
+                    " AND ROWNUM < $numberOfLinesInSqlCompare\n" +
                     "ORDER BY 1\n"
         }
         if(getDbType(targetDb).equals("sqlserver")){//Todo: fix this code for sqlserver
