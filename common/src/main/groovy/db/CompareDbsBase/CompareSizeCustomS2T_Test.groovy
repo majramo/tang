@@ -25,9 +25,6 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
     def MESSAGE = "Comparing tables"
 
     DecimalFormat thousandSeparatorFormat = new DecimalFormat("###,###");
-    def sourceSizeOut
-    def targetSizeOut
-    def diffCountOut
 
     @Parameters(["systemColumn", "excelModifiedTablesOnly", "sourceDbColumn", "targetDbColumn"] )
     @Test
@@ -128,7 +125,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
             excelBodyRows = excelObjectProvider.getGdcRows()
             excelObjectProvider.printRow(excelBodyRows.unique(), ["System", "Table", "Truncate"])
             excelBodyRows.unique().each{
-               truncateTables[it["Table"] ] = "Truncate"
+                truncateTables[it["Table"] ] = "Truncate"
             }
 
             excelObjectProvider = new ExcelObjectProvider(inputFile)
@@ -158,18 +155,23 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         }
         def ok = aggregate("", "\n#####################\n")
         ok = aggregate(ok, "These comparasions were ok:\n")
-        BigDecimal  diffCount = 0
         def numberOfTableDiff = 0
         def numberOfTablesChecked = 0
         boolean noExceptionAtRun = true
         uniqueDbResult.eachWithIndex { it, i ->
+            def sourceSizeOut
+            def targetSizeOut
+            BigDecimal  diffCount = 0
+            def diffCountOut = 0
             def icon = "   "
+            def proc = "    "
             def j = i + 1
             boolean  loopException = false
             expectedMaximumDiff = 0
             expectedMinimumDiff = 0
             def table = it[0]
             def row = "$j:$dbSourceResultCount $table"
+            def rowNumber = "$j".padLeft(5)
             log.info("$row")
             def str =""
             str = aggregate(str, "$j:$dbSourceResultCount table <$table>")
@@ -198,6 +200,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                 loopException = true
                 noExceptionAtRun = false
                 str = aggregate(str, "Exception i target <$targetDb> $e")
+                targetSizeOut = 0
             }
             str = aggregate(str, "target size <$targetSizeOut>")
             String truncateTable = truncateTables[table]
@@ -219,16 +222,28 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
             if(truncateTables[table]){
                 icon = "-  "
                 if (targetSize > 0 || loopException) {
-                    diffCount = targetSize
-                    diffCountOut = thousandSeparatorFormat.format(new BigDecimal(diffCount))
-                    totalDiffCount += diffCount
-                    icon = "T  "
+                    if (targetSize == sourceSize && targetSize == 0) {
+                        icon = "-  "
+                    } else {
+                        diffCount = targetSize
+                        diffCountOut = thousandSeparatorFormat.format(new BigDecimal(diffCount))
+                        totalDiffCount += diffCount
+                        icon = "T  "
+                        if (targetSize > 0) {
+                            try {
+                                def procent = 100 * Math.round(targetSize / sourceSize)
+                                proc = "$procent%"
+                            } catch (Exception e) {
+                                proc = "100%"
+                            }
+                        }
+                    }
                     numberOfTableDiff++
                     nok = aggregate(nok, "$str a. Table $table has <$targetSizeOut> rows, expected to be truncated\n\n")
-                    reporterLogLn("$icon D " + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * should be truncated" )
+                    reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * should be truncated" )
                 } else {
                     ok = aggregate(ok, "$str a. Table $table has <$targetSizeOut> rows as expected, is truncated\n\n")
-                    reporterLogLn("$icon D " + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * is truncated" )
+                    reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * is truncated" )
                 }
 
             }else {
@@ -258,6 +273,14 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                             icon = "s>t"
                             if(targetSize == 0){
                                 icon = "t=0"
+                                proc="100%"
+                            }else{
+                                try {
+                                    def procent= 100 * Math.round(targetSize/sourceSize)
+                                    proc = "$procent%"
+                                }catch (Exception e){
+                                    proc = "100%"
+                                }
                             }
                         }
                         numberOfTableDiff++
@@ -268,11 +291,22 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                     }
                 } else {
                     if (diffCountPercent > 0 || loopException) {
-                         icon = "t>s"
-                        if(sourceSize > targetSize){
-                            icon = "s>t"
-                            if(targetSize == 0) {
-                                icon = "t=0"
+                        icon = "t>s"
+                        if(sourceSize == targetSize){
+                            icon = "   "
+                        }else {
+                            if (sourceSize > targetSize) {
+                                icon = "s>t"
+                                try {
+                                    def procent = 100 * Math.round(targetSize / sourceSize)
+                                    proc = "$procent%"
+                                } catch (Exception e) {
+                                    proc = "100%"
+                                }
+                                if (targetSize == 0) {
+                                    icon = "t=0"
+                                    proc = "100%"
+                                }
                             }
                         }
                         numberOfTableDiff++
@@ -281,7 +315,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                         expectedMaximumDiff_Ok = true
                     }
                 }
-                reporterLogLn("$icon D " + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(25) )
+                reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(25) )
                 def expectedMinimumDiff_Ok = false
                 if (expectedMinimumDiff > 0) {
                     if (diffCountPercent < expectedMinimumDiff || loopException) {
