@@ -19,8 +19,9 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     def column
     def actionColumn
     def searchCriteria
+    def searchExtraCondition
     def numberOfLinesInSqlCompare = 101
-    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn, searchCriteria = "") {
+    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn, searchCriteria = "", searchExtraCondition = "") {
         super.setup()
         this.targetDb = targetDb
         this.sourceDb = sourceDb
@@ -29,6 +30,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         this.column = column.toLowerCase()
         this.actionColumn = actionColumn
         this.searchCriteria = searchCriteria
+        this.searchExtraCondition = searchExtraCondition
         targetDbOwner = settings."$targetDb".owner
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
@@ -71,19 +73,29 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                 " AND ROWNUM < 21\n"
 
         if (searchCriteria != "") {
+            def numberOfLinesInSqlCompareTemp = numberOfLinesInSqlCompare
+            if(numberOfLinesInSqlCompare.class.equals(String)){
+                numberOfLinesInSqlCompareTemp  = Integer.parseInt(numberOfLinesInSqlCompare) + 1000
+            }else {
+                numberOfLinesInSqlCompareTemp = numberOfLinesInSqlCompare + 1000
+            }
+
             sourceTargetSql = "-- Verify search criteria and masked column<$searchCriteria, $tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
-            sourceTargetSql += "SELECT $searchCriteria, $tmpColumn FROM $table\n" +
-                    " WHERE NOT $tmpColumn IS NULL\n" +
-                    " AND $searchCriteria BETWEEN (SELECT MAX($searchCriteria)- $numberOfLinesInSqlCompare FROM $table) AND (SELECT MAX($searchCriteria) FROM $table)\n" +
-                    " AND ROWNUM < $numberOfLinesInSqlCompare\n" +
-                    "ORDER BY 1,2\n"
+                sourceTargetSql += "SELECT $searchCriteria, $tmpColumn FROM $table\n" +
+                        " WHERE NOT $tmpColumn IS NULL\n" +
+                        " AND $searchCriteria BETWEEN (SELECT MAX($searchCriteria)- $numberOfLinesInSqlCompare FROM $table) AND (SELECT MAX($searchCriteria) FROM $table)\n" +
+                    " AND ROWNUM < $numberOfLinesInSqlCompareTemp\n"
         }else{
             sourceTargetSql = "-- Verify masked column<$tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
             sourceTargetSql += "SELECT $tmpColumn FROM $table\n" +
                     " WHERE NOT $tmpColumn IS NULL\n" +
-                    " AND ROWNUM < $numberOfLinesInSqlCompare\n" +
-                    "ORDER BY 1\n"
+                    " AND ROWNUM < $numberOfLinesInSqlCompare\n"
         }
+        if( searchExtraCondition != ""){
+            sourceTargetSql += "AND $searchExtraCondition\n"
+        }
+        sourceTargetSql += "ORDER BY 1\n"
+
         if(getDbType(targetDb).equals("sqlserver")){//Todo: fix this code for sqlserver
 //            sourceTargetSql = "-- Verify masked column<$column> in table <$table> in system <$system> \n"
 //            sourceTargetSql = String.format(TARGET_TABLE_QUERY_SQLSERVER, table)
