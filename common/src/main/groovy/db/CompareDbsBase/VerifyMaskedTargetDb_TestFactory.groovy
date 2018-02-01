@@ -14,7 +14,7 @@ class  VerifyMaskedTargetDb_TestFactory {
 
         def (ExcelObjectProvider excelObjectProviderMaskAction, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         def inputFile = excelObjectProviderMaskAction.inputFile
-        excelObjectProviderMaskAction.addColumnsToRetriveFromFile(["System", "Table", "Column", "Action", "SearchCriteria"])
+        excelObjectProviderMaskAction.addColumnsToRetriveFromFile(["System", "Table", "Column", "Action", "SearchCriteria", "SearchExtraCondition"])
         excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
         def excelBodyRowsMaskAction = SystemPropertiesInitation.readExcel(excelObjectProviderMaskAction)
@@ -28,8 +28,15 @@ class  VerifyMaskedTargetDb_TestFactory {
             def table = excelRow["Table"]
             def column = excelRow["Column"]
             def searchCriteria = excelRow["SearchCriteria"]
+            def searchExtraCondition = excelRow["SearchExtraCondition"]
+            if (searchCriteria == null || searchCriteria == "-" ){
+                searchCriteria = ""
+            }
+            if (searchExtraCondition == null || searchExtraCondition == "-" ){
+                searchExtraCondition = ""
+            }
 
-            result.add(new VerifyMaskedTargetColumn_Test(testContext, targetDb, sourceDb, excelRow["System"], table, column, actionColumn, searchCriteria))
+            result.add(new VerifyMaskedTargetColumn_Test(testContext, targetDb, sourceDb, excelRow["System"], table, column, actionColumn, searchCriteria, searchExtraCondition))
 
         }
 
