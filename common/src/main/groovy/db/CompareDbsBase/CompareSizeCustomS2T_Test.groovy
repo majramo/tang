@@ -18,8 +18,8 @@ import static dtos.base.Constants.CompareType.DIFF
 public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
     private final static Logger log = Logger.getLogger("CSC  ")
 
-    def SOURCE_TABLE_QUERY_ORACLE = "SELECT DISTINCT table_name FROM all_tab_cols WHERE NOT table_name IN (select view_name from all_views) AND OWNER = '%s' ORDER BY 1"
-    def TARGET_TABLE_QUERY_ORACLE = "SELECT DISTINCT table_name FROM all_tab_cols WHERE NOT table_name IN (select view_name from all_views) AND OWNER = '%s' ORDER BY 1"
+    def SOURCE_TABLE_QUERY_ORACLE = "SELECT DISTINCT table_name FROM all_tab_cols WHERE NOT table_name IN (select view_name from all_views) AND OWNER = '_OWNER_' And NOT Table_Name Like 'EXT___---' And Not Table_Name Like '---\\\$\\\$\\\$---' ORDER BY 1"
+    def TARGET_TABLE_QUERY_ORACLE = SOURCE_TABLE_QUERY_ORACLE
     def SOURCE_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
     def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
     def MESSAGE = "Comparing tables"
@@ -44,8 +44,8 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
         String sourceDbOwner = settings."$sourceDb".owner
         String targetDbOwner = settings."$targetDb".owner
-        def sourceTableSql = String.format(SOURCE_TABLE_QUERY_ORACLE, sourceDbOwner.toUpperCase())
-        def targetTableSql = String.format(TARGET_TABLE_QUERY_ORACLE, targetDbOwner.toUpperCase())
+        def sourceTableSql = SOURCE_TABLE_QUERY_ORACLE.replaceAll("_OWNER_", sourceDbOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
+        def targetTableSql = TARGET_TABLE_QUERY_ORACLE.replaceAll("_OWNER_", sourceDbOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
         if(getDbType(sourceDb).equals("sqlserver")){
             sourceTableSql = SOURCE_TABLE_QUERY_SQLSERVER
         }
@@ -231,18 +231,20 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                         icon = "T  "
                         if (targetSize > 0) {
                             try {
-                                def procent = 100 * Math.round(targetSize / sourceSize)
+                                def procent = Math.round(100 * targetSize / sourceSize)
                                 proc = "$procent%"
                             } catch (Exception e) {
-                                proc = "100%"
+                                proc = "0%"
                             }
                         }
                     }
                     numberOfTableDiff++
                     nok = aggregate(nok, "$str a. Table $table has <$targetSizeOut> rows, expected to be truncated\n\n")
+                    proc = "$proc".padLeft(5)
                     reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * should be truncated" )
                 } else {
                     ok = aggregate(ok, "$str a. Table $table has <$targetSizeOut> rows as expected, is truncated\n\n")
+                    proc = "$proc".padLeft(5)
                     reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * is truncated" )
                 }
 
@@ -273,13 +275,13 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                             icon = "s>t"
                             if(targetSize == 0){
                                 icon = "t=0"
-                                proc="100%"
+                                proc="0%"
                             }else{
                                 try {
-                                    def procent= 100 * Math.round(targetSize/sourceSize)
+                                    def procent= Math.round(100 * targetSize / sourceSize)
                                     proc = "$procent%"
                                 }catch (Exception e){
-                                    proc = "100%"
+                                    proc = "0%"
                                 }
                             }
                         }
@@ -298,14 +300,14 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                             if (sourceSize > targetSize) {
                                 icon = "s>t"
                                 try {
-                                    def procent = 100 * Math.round(targetSize / sourceSize)
+                                    def procent =  Math.round(100 * targetSize / sourceSize)
                                     proc = "$procent%"
                                 } catch (Exception e) {
-                                    proc = "100%"
+                                    proc = "0%"
                                 }
                                 if (targetSize == 0) {
                                     icon = "t=0"
-                                    proc = "100%"
+                                    proc = "0%"
                                 }
                             }
                         }
@@ -315,6 +317,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
                         expectedMaximumDiff_Ok = true
                     }
                 }
+                proc = "$proc".padLeft(5)
                 reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(25) )
                 def expectedMinimumDiff_Ok = false
                 if (expectedMinimumDiff > 0) {

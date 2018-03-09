@@ -16,9 +16,9 @@ import static dtos.base.Constants.dbRunTypeRows
 public class ReportSourceTableSizes_Test extends AnySqlCompareTest{
     private final static Logger log = Logger.getLogger("CSC  ")
 
-    def SOURCE_TABLE_QUERY_ORACLE = "SELECT DISTINCT table_name FROM all_tab_cols WHERE NOT table_name IN (select view_name from all_views) AND OWNER = '%s' ORDER BY 1"
+    def SOURCE_TABLE_QUERY_ORACLE = "SELECT DISTINCT table_name FROM all_tab_cols WHERE NOT table_name IN (select view_name from all_views) AND OWNER = '_OWNER_' And NOT Table_Name Like 'EXT___---'  And NOT Table_Name Like 'TMPEXT___---' And Not Table_Name Like '---\\\$\\\$\\\$---' ORDER BY 1"
     def SOURCE_TABLE_SIZE_QUERY_ORACLE = "SELECT COUNT(1) COUNT_  FROM %s "
-    def TARGET_TABLE_QUERY_ORACLE = "SELECT DISTINCT table_name FROM all_tab_cols WHERE NOT table_name IN (select view_name from all_views) AND OWNER = '%s' ORDER BY 1"
+    def TARGET_TABLE_QUERY_ORACLE = SOURCE_TABLE_QUERY_ORACLE
     def SOURCE_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
     def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
 
@@ -33,7 +33,8 @@ public class ReportSourceTableSizes_Test extends AnySqlCompareTest{
 
         String sourceDbOwner = settings."$sourceDb".owner
         String targetDbOwner = settings."$targetDb".owner
-        def sourceTableSql = String.format(SOURCE_TABLE_QUERY_ORACLE, sourceDbOwner.toUpperCase())
+//        def sourceTableSql = String.format(SOURCE_TABLE_QUERY_ORACLE, sourceDbOwner.toUpperCase())
+        def sourceTableSql = SOURCE_TABLE_QUERY_ORACLE.replaceAll("_OWNER_", sourceDbOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
         if(getDbType(sourceDb).equals("sqlserver")){
             sourceTableSql = SOURCE_TABLE_QUERY_SQLSERVER
         }
@@ -53,7 +54,7 @@ public class ReportSourceTableSizes_Test extends AnySqlCompareTest{
         }else{
             numberOfTablesToCheckColumn = 0
         }
-        reporterLogLn("Number of tables to check: <$numberOfTablesToCheckColumn>\n");
+        reporterLogLn("Max number of tables to check: <$numberOfTablesToCheckColumn>\n");
         def tablesSizes = [:]
         if(excelModifiedTablesOnly){
             //read file
@@ -71,7 +72,6 @@ public class ReportSourceTableSizes_Test extends AnySqlCompareTest{
                             tablesSizes[it["Table"]] = 0
                         }
                     }else {
-
                         tablesSizes[it["Table"]] = 0
                     }
                 }
@@ -99,8 +99,18 @@ public class ReportSourceTableSizes_Test extends AnySqlCompareTest{
         def sizeMap = [:]
         tablesSizes.each {tableName, value->
             def sourceTableSizeSql = String.format(SOURCE_TABLE_SIZE_QUERY_ORACLE, tableName)
-            def sourceDbTableSizeResult = sourceDbSqlDriver.sqlConRun("Get table <$tableName> size from $sourceDb", dbRunTypeRows, sourceTableSizeSql, 0, sourceDb)
-            sizeMap[tableName] =  new BigInteger(sourceDbTableSizeResult["COUNT_"][0].toString(), 10)
+            def sourceDbTableSizeResult
+            try{
+                    sourceDbTableSizeResult = sourceDbSqlDriver.sqlConRun("Get table <$tableName> size from $sourceDb", dbRunTypeRows, sourceTableSizeSql, 0, sourceDb)
+                    sizeMap[tableName] = new BigInteger(sourceDbTableSizeResult["COUNT_"][0].toString(), 10)
+            }catch(Exception e){
+                if(e.toString().contains("ORA-06564")){
+                    reporterLogLn("Exception ORA-06564: can't find <$tableName>")
+                    sizeMap["* n/a $tableName"] = 0
+                }else{
+                    throw e
+                }
+            }
         }
         int i = 1
         sizeMap.sort{ it.value }.reverseEach{tableName, size->

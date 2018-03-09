@@ -30,7 +30,7 @@ public class UpdateTargetTable_Test extends AnySqlCompareTest{
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(targetDb)))
 
         row++
-        reporterLogLn("Row: <$row> TRUNCATE TABLE ");
+        reporterLogLn("Row: <$row> UPDATE TABLE ");
         reporterLogLn("Target Db: <$targetDb> ");
         reporterLogLn("Action:    <$action> ");
         reporterLogLn("Target Sql:\n$targetSql\n");
