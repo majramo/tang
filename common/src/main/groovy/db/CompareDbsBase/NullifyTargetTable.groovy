@@ -41,7 +41,7 @@ public class NullifyTargetTable extends AnySqlCompareTest{
         def targetSql = "UPDATE $table SET $column = null " +
                 "where $column IS NOT NULL"
         if(!searchExtraCondition.isEmpty() && searchExtraCondition != "-"){
-            targetSql += " AND $searchExtraCondition"
+            targetSql += "\nAND $searchExtraCondition"
         }
         targetSql += "-- Execute is <$execute>"
         reporterLogLn("$targetSql")
