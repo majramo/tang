@@ -41,7 +41,7 @@ public class UpdatePhoneNumberFields extends AnySqlCompareTest{
         def targetSql = "UPDATE $table SET $column = '010-' || substr( (rownum + 12345678)  ,1,8) " +
                 "where $column IS NOT NULL"
         if(!searchExtraCondition.isEmpty() && searchExtraCondition != "-"){
-            targetSql += " AND $searchExtraCondition"
+            targetSql += "\nAND $searchExtraCondition"
         }
         targetSql += "-- Execute is <$execute>"
         reporterLogLn("$targetSql")
