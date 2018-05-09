@@ -16,6 +16,7 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
     private String searchExtraCondition;
     private String maskingColumn;
     private boolean execute;
+    private static String settingsEmailDomain = "test.addtest.se"
 
     public UpdateTextFieldsTable(targetDb, system, table, action, column, searchExtraCondition, String maskingColumn, boolean execute = false) {
         super.setup()
@@ -43,7 +44,9 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
         reporterLogLn("Column:    <$column>");
 
         def targetSql = "UPDATE $table \nSET $column = "
-
+        if(settings["emailDomain"].size() != 0 && settings["emailDomain"] != ""){
+            settingsEmailDomain = settings.emailDomain
+        }
         switch (maskingColumn) {
             case ~/DD_Fritext/:
                 targetSql += " 'Text ' || substr( (rownum + 12345678)  ,1,8) "
@@ -51,20 +54,20 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
             case ~/DD_Telefonnummer/:
                 targetSql += " '010-' || substr( (rownum + 12345678)  ,1,8) "
                 break
-            case ~/DD_Password/:
+            case ~/DD_Losenord/:
                 targetSql += '1234'
                 break
             case ~/DD_Url/:
-                targetSql += " 'test.' || substr( (rownum + 12345678)  ,1,8) || '.test.arbetsformedlingen.se' "
+                targetSql += " 'test.' || substr( (rownum + 12345678)  ,1,8) || '.@settingsEmailDomain' "
                 break
             case ~/DD_Epost/:
-                targetSql += " 'test.' || substr( (rownum + 12345678)  ,1,8) || '@test.arbetsformedlingen.se' "
+                targetSql += " 'test.' || substr( (rownum + 12345678)  ,1,8) || '@$settingsEmailDomain' "
                 break
         }
 
         targetSql += "\nwhere $column IS NOT NULL"
         if(!searchExtraCondition.isEmpty() && searchExtraCondition != "-"){
-            targetSql += " AND $searchExtraCondition"
+            targetSql += "\nAND $searchExtraCondition"
         }
         targetSql += "-- Execute is <$execute>"
         reporterLogLn("")
