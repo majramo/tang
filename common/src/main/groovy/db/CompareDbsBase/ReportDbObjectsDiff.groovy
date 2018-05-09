@@ -18,9 +18,9 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
 
 
 
-    @Parameters(["systemColumn", "objectType", "queryFirst" ,"sourceQuerySettings", "targetQuerySettings"] )
+    @Parameters(["systemColumn", "objectType", "queryFirst" ,"sourceQuerySettings", "targetQuerySettings", "sqlCriteriaColumn"] )
     @Test
-    public void reportDbObjectsDiff_Test(String systemColumn, String objectType, String queryFirst, String sourceQuerySettings, String targetQuerySettings, ITestContext testContext){
+    public void reportDbObjectsDiff_Test(String systemColumn, String objectType, String queryFirst, String sourceQuerySettings, String targetQuerySettings, @Optional ("") String sqlCriteriaColumn, ITestContext testContext){
         super.setup()
 
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
@@ -32,7 +32,10 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
 //        def sourceTableSql = String.format(SOURCE_TABLE_QUERY_ORACLE, sourceDbOwner.toUpperCase())
         def sourceTableSql = SOURCE_TABLE_QUERY_ORACLE.replaceAll("_OWNER_", sourceDbOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
         def targetTableSql = TARGET_TABLE_QUERY_ORACLE.replaceAll("_OWNER_", sourceDbOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
-
+        if(!sqlCriteriaColumn.isEmpty()){
+            sourceTableSql += "AND $sqlCriteriaColumn"
+            targetTableSql += "AND $sqlCriteriaColumn"
+        }
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
         reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb)))
@@ -45,19 +48,23 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
         def diffDbResult
             //read database
         if(queryFirst.equals("target")){
+            reporterLogLn("\n### targetTableSql: \n$targetTableSql");
             def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
             def dataFromTarget = targetDbResult.collect{it[0]}.join(",")
             def targetCount = targetDbResult.size()
             reporterLogLn("Target <$objectType>: <$targetCount>");
             sourceTableSql = sourceTableSql.replaceAll("__-DATA-__", dataFromTarget)
+            reporterLogLn("\n### sourceTableSql: \n$sourceTableSql");
             def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
             diffDbResult = sourceDbResult
         }else{
+            reporterLogLn("\n### sourceTableSql: \n$sourceTableSql");
             def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
             def dataFromSource = sourceDbResult.collect{it[0]}.join(",")
             def sourceCount = dataFromSource.size()
             reporterLogLn("Source <$objectType>: <$sourceCount>");
             targetTableSql = targetTableSql.replaceAll("__-DATA-__", dataFromSource)
+            reporterLogLn("\n### targetTableSql: \n$targetTableSql");
             def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
             diffDbResult = targetDbResult
         }
