@@ -4,54 +4,58 @@ import org.apache.log4j.Logger
 import org.testng.Reporter
 import org.testng.SkipException
 
+import java.sql.PreparedStatement
+
 import static dtos.base.Constants.*
 
 public class SqlHelper {
 
-	protected dbRun
-	protected dbName = ""
-	protected log
-	def queryConditionsTextList = [:]
-	def queryConditionsXmlList = [:]
-	protected boolean sqlHelperMock = false
-	def String dbQuery =""
-	def dbQueryType =""
-	def dbQueryExtension = ""
-	def dbResult = [:]
-	String dbQueryRun
-	private jdbcConnections = [:]
-	private static dbRecordLine
-	private File sqlFile
+    protected dbRun
+    protected dbName = ""
+    protected log
+    def queryConditionsTextList = [:]
+    def queryConditionsXmlList = [:]
+    protected boolean sqlHelperMock = false
+    def String dbQuery = ""
+    def dbQueryType = ""
+    def dbQueryExtension = ""
+    def dbResult = [:]
+    String dbQueryRun
+    private jdbcConnections = [:]
+    private static dbRecordLine
+    private File sqlFile
     private final static Logger logger = Logger.getLogger("SqH  ")
 
-	public SqlHelper(File sqlFile, log, dbName, dbRun, settings){
-		this.dbRun = dbRun
-		this.dbName = dbName
+    public SqlHelper(File sqlFile, log, dbName, dbRun, settings) {
+        this.dbRun = dbRun
+        this.dbName = dbName
         this.sqlFile = sqlFile
-        if(log == null){
+        if (log == null) {
             this.log = logger
-        }else{
+        } else {
             this.log = log
         }
-        if(dbRun == false){
-            if(!jdbcConnections [dbName]){
-			    jdbcConnections [dbName] = new JdbcConnection()
+        if (dbRun == false) {
+            if (!jdbcConnections[dbName]) {
+                jdbcConnections[dbName] = new JdbcConnection()
             }
             sqlHelperMock = true
 
-        }else{
+        } else {
             this.log.info "##SqlHelper " + this
             this.log.info "##Init dbName $dbName"
             this.log.info jdbcConnections
-            this.log.info jdbcConnections [dbName]
-            try{
-                JdbcConnection jDbcConnection =null
-                if(!jdbcConnections [dbName]){
+            this.log.info jdbcConnections[dbName]
+            try {
+                JdbcConnection jDbcConnection = null
+                if (!jdbcConnections[dbName]) {
                     settings."$dbName".with {
-                        jDbcConnection  = new JdbcConnection(dbUrl, dbDriverName, dbUserName, dbPassword, dbTestDataBase, dbDriver)
+                        Reporter.log("### Connection <$dbName>: url<$dbUrl> usr<$dbUserName> db<$dbTestDataBase> driver <$dbDriverName>")
+                        this.log.info("### Connection <$dbName>: url<$dbUrl> usr<$dbUserName> db<$dbTestDataBase> driver <$dbDriverName>")
+                        jDbcConnection = new JdbcConnection(dbUrl, dbDriverName, dbUserName, dbPassword, dbTestDataBase, dbDriver)
                         this.log.info "##Init jDbcConnection $jDbcConnection"
                     }
-                    jdbcConnections [dbName] = jDbcConnection
+                    jdbcConnections[dbName] = jDbcConnection
 
                     this.log.info "# JDbcConnection $jdbcConnections"
                     jdbcConnections.each {
@@ -59,19 +63,19 @@ public class SqlHelper {
                     }
                 }
 
-            }catch (RuntimeException e){
-                this.log.error ("Can't get connection")
+            } catch (RuntimeException e) {
+                this.log.error("Can't get connection")
                 throw e
             }
         }
-	}
+    }
 
-    public boolean isConnectionOk(dbName){
-        if(!dbRun){
+    public boolean isConnectionOk(dbName) {
+        if (!dbRun) {
             return true
         }
-        JdbcConnection jDbcConnection = jdbcConnections [dbName]
-        if(jDbcConnection == null){
+        JdbcConnection jDbcConnection = jdbcConnections[dbName]
+        if (jDbcConnection == null) {
             Reporter.log("Can't connect to db: $dbName")
             throw new SkipException("Can't connect to db: $dbName")
 
@@ -79,130 +83,130 @@ public class SqlHelper {
         return jDbcConnection.isConnectionOk()
     }
 
-	private sqlConRun(dbLoggInfo, dbRunType ,dbQueryRun, dbRecordLine=-1, dbName){
+    private sqlConRun(dbLoggInfo, dbRunType, dbQueryRun, dbRecordLine = -1, dbName) {
         this.log.info "##SqlHelper " + this
         this.log.info "##Run dbName $dbName"
         jdbcConnections.each {
-             this.log.info "##jDbcConnections " + it
+            this.log.info "##jDbcConnections " + it
         }
         log.debug "$dbLoggInfo\n$dbQueryRun"
-		this.dbRecordLine = dbRecordLine
-        JdbcConnection jDbcConnection = jdbcConnections [dbName]
+        this.dbRecordLine = dbRecordLine
+        JdbcConnection jDbcConnection = jdbcConnections[dbName]
         this.log.info "$dbLoggInfo $dbQueryRun "
         this.log.info "##Run jDbcConnection $jDbcConnection"
         dbResult = null
 
-        if(jDbcConnection != null){
-			if(sqlHelperMock){
+        if (jDbcConnection != null) {
+            if (sqlHelperMock) {
                 dbResult = [:]
-				dbResult[DB_MOCK_DATA] =  DB_MOCK_DATA
+                dbResult[DB_MOCK_DATA] = DB_MOCK_DATA
                 return dbResult
-			}else{
-				switch (dbRunType){
-					case dbRunTypeFirstRow:
-                        dbResult = jDbcConnection.firstRow (dbQueryRun)
+            } else {
+                switch (dbRunType) {
+                    case dbRunTypeFirstRow:
+                        dbResult = jDbcConnection.firstRow(dbQueryRun)
                         break
 
-					case dbRunTypeRows:
-						dbResult = jDbcConnection.rows (dbQueryRun)
-						break
-						
-					case dbRunTypeRowsSelects:
-						dbResult = jDbcConnection.rows (dbQueryRun)
-						if(dbRecordLine>0){
-							dbResult = dbResult[dbRecordLine-1]
-						}else{
-							dbResult = dbResult[0]
-						}
-						break
-				}
-			}
-		}
-		return dbResult
-	}
-	
-	
-	public String getQueryConditions(){
+                    case dbRunTypeRows:
+                        dbResult = jDbcConnection.rows(dbQueryRun)
+                        break
 
-		def queryConditions = ""
-		
-		queryConditionsTextList.each {k, v->
-			def val
-			if (v.isString){
-				val  = "'$v.value'"
-			}else{
-				val = v.value
-			}
-			def qCondition =  v.field + " " + val
-			if(queryConditions){
-				queryConditions += "\n AND " + qCondition
-			}else{
-				queryConditions = qCondition
-			}
-		}
-		queryConditionsXmlList.each {k, v->
-			def val
-			if (v.isString){
-				val  = "'$v.value'"
-			}else{
-				val = v.value
-			}
-			def qCondition =  v.field + " " + val
-			if(queryConditions){
-				queryConditions += "\n AND " + qCondition
-			}else{
-				queryConditions = qCondition
-			}
-		}
-		
-		if(dbQueryExtension != ""){
-			if(queryConditions != ""){
-				queryConditions += " $dbQueryExtension"
-			}
-		}
-		return queryConditions
-	}
+                    case dbRunTypeRowsSelects:
+                        dbResult = jDbcConnection.rows(dbQueryRun)
+                        if (dbRecordLine > 0) {
+                            dbResult = dbResult[dbRecordLine - 1]
+                        } else {
+                            dbResult = dbResult[0]
+                        }
+                        break
+                }
+            }
+        }
+        return dbResult
+    }
 
 
-    public String getInsertValues(){
+    public String getQueryConditions() {
+
+        def queryConditions = ""
+
+        queryConditionsTextList.each { k, v ->
+            def val
+            if (v.isString) {
+                val = "'$v.value'"
+            } else {
+                val = v.value
+            }
+            def qCondition = v.field + " " + val
+            if (queryConditions) {
+                queryConditions += "\n AND " + qCondition
+            } else {
+                queryConditions = qCondition
+            }
+        }
+        queryConditionsXmlList.each { k, v ->
+            def val
+            if (v.isString) {
+                val = "'$v.value'"
+            } else {
+                val = v.value
+            }
+            def qCondition = v.field + " " + val
+            if (queryConditions) {
+                queryConditions += "\n AND " + qCondition
+            } else {
+                queryConditions = qCondition
+            }
+        }
+
+        if (dbQueryExtension != "") {
+            if (queryConditions != "") {
+                queryConditions += " $dbQueryExtension"
+            }
+        }
+        return queryConditions
+    }
+
+
+    public String getInsertValues() {
 
         def queryConditions = ""
         def qValues = ""
 
-        queryConditionsTextList.each {k, v->
+        queryConditionsTextList.each { k, v ->
             def val
-            if (v.isString){
-                val  = "'$v.value'"
-            }else{
+            if (v.isString) {
+                val = "'$v.value'"
+            } else {
                 val = v.value
             }
-            def qCondition =  v.field + " " + val
-            if(queryConditions){
+            def qCondition = v.field + " " + val
+            if (queryConditions) {
                 queryConditions += " , " + qCondition
-            }else{
+            } else {
                 queryConditions = qCondition
             }
         }
-        queryConditionsXmlList.each {k, v->
+        queryConditionsXmlList.each { k, v ->
             def val
-            if (v.isString){
-                val  = "'$v.value'"
-            }else{
+            if (v.isString) {
+                val = "'$v.value'"
+            } else {
                 val = v.value
             }
-            def qCondition =  v.field.replaceAll("=", "")
-            def qValue =   val
-            if(queryConditions){
+            def qCondition = v.field.replaceAll("=", "")
+            def qValue = val
+            if (queryConditions) {
                 queryConditions += " , " + qCondition
                 qValues += " , " + qValue
-            }else{
+            } else {
                 queryConditions = qCondition
                 qValues = qValue
             }
         }
 
-        if(dbQueryExtension != ""){
-            if(queryConditions != ""){
+        if (dbQueryExtension != "") {
+            if (queryConditions != "") {
                 queryConditions += " $dbQueryExtension"
             }
         }
@@ -210,56 +214,58 @@ public class SqlHelper {
     }
 
 
-	protected getDb_result(dbName){
+    protected getDb_result(dbName) {
         isConnectionOk(dbName)
-		def queryConditions = getQueryConditions()
-		dbQueryRun = "$dbQuery\n $queryConditions\n "
-		dbResult = [:]
-        String dbInsertStatement = dbQuery.replaceAll("SELECT \\* FROM" , "INSERT INTO").replaceAll(" WHERE", "")
+        def queryConditions = getQueryConditions()
+        dbQueryRun = "$dbQuery\n $queryConditions\n "
+        dbResult = [:]
+        String dbInsertStatement = dbQuery.replaceAll("SELECT \\* FROM", "INSERT INTO").replaceAll(" WHERE", "")
         dbInsertStatement += getInsertValues() + "\n"
         log.debug dbQueryRun
         log.debug dbInsertStatement
-        if(sqlFile != null && sqlFile.exists()){
+        if (sqlFile != null && sqlFile.exists()) {
             sqlFile.append(dbQueryRun)
             sqlFile.append(dbInsertStatement)
         }
- 		if(dbQueryType ==  dbRunTypeCount || dbQueryType ==  dbRunTypeFirstRow ) {
-			dbResult =  sqlConRun("dbQueryRun", dbRunTypeFirstRow ,dbQueryRun, dbName)
-	    }else{if(dbQueryType ==  dbRunTypeRowsSelects){
-			   dbResult = sqlConRun("dbQueryRun",dbRunTypeRowsSelects ,dbQueryRun, dbRecordLine, dbName)
-		   }else{
-               dbResult = sqlConRun("dbQueryRun",dbRunTypeRows ,dbQueryRun, dbName)
-		   }
-	   }
-	    return dbResult
-	}
+        if (dbQueryType == dbRunTypeCount || dbQueryType == dbRunTypeFirstRow) {
+            dbResult = sqlConRun("dbQueryRun", dbRunTypeFirstRow, dbQueryRun, dbName)
+        } else {
+            if (dbQueryType == dbRunTypeRowsSelects) {
+                dbResult = sqlConRun("dbQueryRun", dbRunTypeRowsSelects, dbQueryRun, dbRecordLine, dbName)
+            } else {
+                dbResult = sqlConRun("dbQueryRun", dbRunTypeRows, dbQueryRun, dbName)
+            }
+        }
+        return dbResult
+    }
 
-    protected execute(dbName, dbExecuteStatement){
+    public execute(dbName, String dbExecuteStatement) {
         log.info dbQueryRun
         log.info dbExecuteStatement
-        if(sqlFile != null && sqlFile.exists()){
+        if (sqlFile != null && sqlFile.exists()) {
             sqlFile.append(dbQueryRun)
             sqlFile.append(dbExecuteStatement)
         }
-        JdbcConnection jDbcConnection = jdbcConnections [dbName]
-        if(jDbcConnection != null){
-            return jDbcConnection.execute (dbExecuteStatement)
+        JdbcConnection jDbcConnection = jdbcConnections[dbName]
+        if (jDbcConnection != null) {
+            jDbcConnection.execute(dbExecuteStatement)
+            return true
         }
     }
 
-    protected executeAndSkipException(dbName, dbExecuteStatement, skipException){
+    protected executeAndSkipException(dbName, String dbExecuteStatement, skipException) {
         log.info dbQueryRun
         log.info dbExecuteStatement
-        if(sqlFile != null && sqlFile.exists()){
+        if (sqlFile != null && sqlFile.exists()) {
             sqlFile.append(dbQueryRun)
             sqlFile.append(dbExecuteStatement)
         }
-        JdbcConnection jDbcConnection = jdbcConnections [dbName]
-        if(jDbcConnection != null){
+        JdbcConnection jDbcConnection = jdbcConnections[dbName]
+        if (jDbcConnection != null) {
             try {
-                return jDbcConnection.execute (dbExecuteStatement)
-            } catch (java.sql.SQLSyntaxErrorException|java.sql.SQLException e) {
-                if(e.toString().contains(skipException)){
+                return jDbcConnection.execute(dbExecuteStatement)
+            } catch (java.sql.SQLSyntaxErrorException | java.sql.SQLException e) {
+                if (e.toString().contains(skipException)) {
                     Reporter.log("Error skipped: " + e.toString())
                     throw new SkipException("Skip error: " + e.toString())
                 }
@@ -268,8 +274,63 @@ public class SqlHelper {
         }
     }
 
-	public boolean isQueryOk(){
-		return (queryConditionsTextList.size() || queryConditionsXmlList.size() || dbQuery != "")
-	}
-	 
+    protected executeAndIgnoreException(dbName, String dbExecuteStatement, skipException) {
+        log.info dbQueryRun
+        log.info dbExecuteStatement
+        if (sqlFile != null && sqlFile.exists()) {
+            sqlFile.append(dbQueryRun)
+            sqlFile.append(dbExecuteStatement)
+        }
+        JdbcConnection jDbcConnection = jdbcConnections[dbName]
+        if (jDbcConnection != null) {
+            try {
+                return jDbcConnection.execute(dbExecuteStatement)
+            } catch (java.sql.SQLSyntaxErrorException | java.sql.SQLException e) {
+                if (e.toString().contains(skipException)) {
+                    Reporter.log("Error skipped: " + e.toString())
+                }else{
+                    throw e
+                }
+            }
+        }
+    }
+
+    public boolean isQueryOk() {
+        return (queryConditionsTextList.size() || queryConditionsXmlList.size() || dbQuery != "")
+    }
+
+    public JdbcConnection getConnection(dbName) {
+        return jdbcConnections[dbName]
+    }
+
+    public boolean setAutoCommitOn(dbName) {
+        JdbcConnection jDbcConnection = getConnection(dbName)
+        if (jDbcConnection != null) {
+            //TODO Error handling
+            ((groovy.sql.Sql) jDbcConnection.jDbcConnection).getConnection().setAutoCommit(true)
+            return true
+        }else{
+            //TODO else
+        }
+    }
+
+    public boolean setAutoCommitOff(dbName) {
+        JdbcConnection jDbcConnection = getConnection(dbName)
+        if (jDbcConnection != null) {
+            //TODO Error handling
+            ((groovy.sql.Sql) jDbcConnection.jDbcConnection).getConnection().setAutoCommit(false)
+            return true
+        }else{
+             //TODO else
+        }
+    }
+    public PreparedStatement setPreparedStatement(dbName, preparedStatement) {
+        JdbcConnection jDbcConnection = getConnection(dbName)
+        if (jDbcConnection != null) {
+            //TODO Error handling
+            return ((groovy.sql.Sql) jDbcConnection.jDbcConnection).getConnection().prepareStatement(preparedStatement)
+        }else{
+             //TODO else
+        }
+    }
 }
