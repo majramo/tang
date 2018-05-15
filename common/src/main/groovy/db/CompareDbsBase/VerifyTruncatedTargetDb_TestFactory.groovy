@@ -1,5 +1,6 @@
 package db.CompareDbsBase
 
+import dtos.SettingsHelper
 import excel.ExcelObjectProvider
 import org.testng.Reporter
 import org.testng.annotations.Factory
@@ -12,6 +13,8 @@ class VerifyTruncatedTargetDb_TestFactory {
     @Parameters(["systemColumn", "actionColumn"] )
     @Factory
     public Object[] createVerifyTruncatedInstances(String systemColumn, String actionColumn) {
+        SettingsHelper settingsHelper = SettingsHelper.getInstance()
+        def settings = settingsHelper.settings
 
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
 
@@ -23,11 +26,18 @@ class VerifyTruncatedTargetDb_TestFactory {
 
         Reporter.log("Number of lines read <$excelBodyRows.size>")
         def result = [];
+        def excludeTablesStr = settings.truncateExcludeTables
+        if(!excludeTablesStr.isEmpty()){
+            def excludeTables = excludeTablesStr.split(";")
+            excludeTables.each {tableNameToExclude->
+                excelBodyRows = excelBodyRows.findAll{!it["Table"].contains(tableNameToExclude)}
+            }
+            Reporter.log("Lines read after removing settings.excludeTables <$excludeTablesStr> <$excelBodyRows.size>")
+
+        }
         excelBodyRows.eachWithIndex { excelRow, index ->
             def table = excelRow["Table"]
-
             result.add(new VerifyTruncatedTargetTable_Test(targetDb, excelRow["System"], table, actionColumn))
-
         }
         return result;
     }
