@@ -17,9 +17,12 @@ import static dtos.base.Constants.CompareType.DIFF
 
 public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
     private final static Logger log = Logger.getLogger("CSC  ")
-
-    def SOURCE_TABLE_QUERY_ORACLE = "SELECT DISTINCT table_name FROM all_tab_cols WHERE NOT table_name IN (select view_name from all_views) AND OWNER = '_OWNER_' And NOT Table_Name Like 'EXT___---' And Not Table_Name Like '---\\\$\\\$\\\$---' ORDER BY 1"
-    def TARGET_TABLE_QUERY_ORACLE = SOURCE_TABLE_QUERY_ORACLE
+    private final static String AND_QUERY_EXTENSION = "AND_QUERY_EXTENSION"
+    def SOURCE_TABLE_QUERY_ORACLE = """SELECT DISTINCT table_name FROM user_tab_cols 
+WHERE NOT table_name IN (select view_name from all_views) 
+-- add query extension here if it exists in settings
+$AND_QUERY_EXTENSION --
+ORDER BY 1"""
     def SOURCE_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
     def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
     def MESSAGE = "Comparing tables"
@@ -41,16 +44,19 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         if(excelModifiedTablesOnly){
             inputFile = excelObjectProvider.inputFile
         }
-
-        String sourceDbOwner = settings."$sourceDb".owner
-        String targetDbOwner = settings."$targetDb".owner
-        def sourceTableSql = SOURCE_TABLE_QUERY_ORACLE.replaceAll("_OWNER_", sourceDbOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
-        def targetTableSql = TARGET_TABLE_QUERY_ORACLE.replaceAll("_OWNER_", sourceDbOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
-        if(getDbType(sourceDb).equals("sqlserver")){
-            sourceTableSql = SOURCE_TABLE_QUERY_SQLSERVER
-        }
-        if(getDbType(targetDb).equals("sqlserver")){
-            targetTableSql = TARGET_TABLE_QUERY_SQLSERVER
+        def dbType = getDbType(sourceDb)
+        def tablesQuery
+        //TODO: change code to take care in case DB is SqlServer
+        if(dbType.equals("oracle")) {
+            def queryExtension = settings.compareTablesQuery.oracle
+            if (!queryExtension.isEmpty()) {
+                tablesQuery = SOURCE_TABLE_QUERY_ORACLE.replace(AND_QUERY_EXTENSION, queryExtension)
+            } else {
+                tablesQuery = SOURCE_TABLE_QUERY_ORACLE.replace(AND_QUERY_EXTENSION, "")
+            }
+            tablesQuery = tablesQuery.replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
+        }else {
+            tablesQuery = SOURCE_TABLE_QUERY_SQLSERVER
         }
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
@@ -58,9 +64,10 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
 
         reporterLogLn("Source: <$sourceDb>");
         reporterLogLn("Target: <$targetDb>");
+        reporterLogLn("Query: <$tablesQuery>");
 
-        def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
-        def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
+        def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, tablesQuery, 0, sourceDb)
+        def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, tablesQuery, 0, targetDb)
 
         def diffCount
         def totalDiffCountExpected
@@ -74,7 +81,7 @@ public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
         }else{
             numberOfTablesToCheckColumn = 0
         }
-        reporterLogLn("Number of tables to check: <$numberOfTablesToCheckColumn>\n");
+        reporterLogLn("Max number of tables to check: <$numberOfTablesToCheckColumn>\n");
 
         /*
         If numberOfTablesToCheckColumn parameter is set then the db result set is reduced to this size before compare id executed
