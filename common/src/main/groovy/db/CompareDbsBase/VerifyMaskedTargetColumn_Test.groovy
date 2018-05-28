@@ -83,7 +83,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
             sourceTargetSql = "-- Verify search criteria and masked column<$searchCriteria, $tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
                 sourceTargetSql += "SELECT $searchCriteria, $tmpColumn FROM $table\n" +
                         " WHERE NOT $tmpColumn IS NULL\n" +
-                        " AND REPLACE($tmpColumn, ' ' , '') != ''\n" +
+                        " AND LENGTH(REPLACE($tmpColumn, ' ' , '')) > 0\n" +
                         " AND $searchCriteria BETWEEN (SELECT MAX($searchCriteria)- $numberOfLinesInSqlCompare FROM $table where NOT $tmpColumn IS NULL) AND (SELECT MAX($searchCriteria) FROM $table where NOT $tmpColumn IS NULL)\n" +
                     " AND ROWNUM < $numberOfLinesInSqlCompareTemp\n"
         }else{
