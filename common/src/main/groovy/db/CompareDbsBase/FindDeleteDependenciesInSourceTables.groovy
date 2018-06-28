@@ -65,7 +65,6 @@ order by 7,6,4,2
     public void findDependenciesInSourceTables_test(String systemColumn, String startTableColumn, String deleteStatementColumn, ITestContext testContext) {
         super.setup()
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
-        sourceDb = 'atg_Target'
         reporterLogLn("Source: <$sourceDb>");
         reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb)))
         super.setSourceSqlHelper(testContext, sourceDb)
