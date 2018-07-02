@@ -104,7 +104,7 @@ public class ReportSourceTableSizes_Test extends AnySqlCompareTest{
                     sourceDbTableSizeResult = sourceDbSqlDriver.sqlConRun("Get table <$tableName> size from $sourceDb", dbRunTypeRows, sourceTableSizeSql, 0, sourceDb)
                     sizeMap[tableName] = new BigInteger(sourceDbTableSizeResult["COUNT_"][0].toString(), 10)
             }catch(Exception e){
-                if(e.toString().contains("ORA-06564")){
+                if(e.toString().contains("ORA-06564") || e.toString().contains("ORA-29913")){
                     reporterLogLn("Exception ORA-06564: can't find <$tableName>")
                     sizeMap["* n/a $tableName"] = 0
                 }else{
