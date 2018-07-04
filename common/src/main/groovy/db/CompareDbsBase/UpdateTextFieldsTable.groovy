@@ -52,7 +52,7 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
                 targetSql += " 'Text ' || substr( (rownum + 12345678)  ,1,8) "
                 break
             case ~/DD_Telefonnummer/:
-                targetSql += " '010-' || substr( (rownum + 12345678)  ,1,8) "
+                targetSql += " '010' || substr( (rownum + 12345678)  ,1,8) "
                 break
             case ~/DD_Losenord/:
                 targetSql += '1234'
