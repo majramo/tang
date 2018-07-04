@@ -13,7 +13,7 @@ public class TruncateTargetTable_Test extends AnySqlCompareTest{
     private String action;
 //    private final static String TRUNCATE_TABLE_QUERY = "SELECT COUNT(*) COUNT_ FROM %s"
 //    private final static String TRUNCATE_TABLE_QUERY = "TRUNCATE TABLE %s"
-    private final static String TRUNCATE_TABLE_QUERY = "DELETE %s"
+    private final static String TRUNCATE_TABLE_QUERY = "TRUNCATE TABLE %s"
 
     public TruncateTargetTable_Test(targetDb, system, table, action) {
         super.setup()
@@ -26,6 +26,7 @@ public class TruncateTargetTable_Test extends AnySqlCompareTest{
         targetSql = "-- Truncate table <$table> in system <$system>\n"
         targetSql += String.format(TRUNCATE_TABLE_QUERY, "$table")
 
+        reporterLogLn("$targetSql")
         println "$targetSql "
     }
 
