@@ -98,15 +98,19 @@ order by 7,6,4,2
             def childTable = child["CHILD_TABLE"].toString().toUpperCase()
             if (!startTable.contains(childTable) && childTable != parent)  {
                 def deleteRule = child["DELETE_RULE"]
+                def childConstraint = child["CHILD_CONSTRAINT"]
+                def parentConstraint = child["PARENT_CONSTRAINT"]
                 def indentNoStr = "$indentNo "
                 if(indentNo.equals(1)){
                     indentNoStr = "\n$indentNo*"
                 }
                 if(deleteRule != "CASCADE") {
                     reporterLogLn("$indentNoStr!" + "$counter".padLeft(4) + " $indentString $childTable    $deleteRule");
+                    reporterLogLn(" -- alter table $childTable drop constraint $childConstraint;--    $parentConstraint");
                     actionTables[childTable] = childTable
                 }else {
                     reporterLogLn("$indentNoStr " + "$counter".padLeft(4) + " $indentString $childTable    -- CASCADE IGNORE");
+                    reporterLogLn(" -- alter table $childTable drop constraint $childConstraint;--   $parentConstraint");
                 }
                 printRelations(childTable)
                 childTables["$parentTable: $childTable"] = childTable
