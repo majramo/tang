@@ -112,11 +112,18 @@ public class ReportSourceTableSizes_Test extends AnySqlCompareTest{
                 }
             }
         }
+        reporterLogLn("Sort by size:")
         int i = 1
         sizeMap.sort{ it.value }.reverseEach{tableName, size->
             reporterLogLn( String.format("%04d:", i++) + String.format("%,d", size).padLeft(20) + " $tableName")
-
         }
+
+        reporterLogLn("\n\nSort by name:")
+        i = 1
+        sizeMap.sort().each{tableName, size->
+            reporterLogLn( String.format("%04d:", i++) + String.format("%,d", size).padLeft(20) + " $tableName")
+        }
+
 
     }
 
