@@ -12,6 +12,7 @@ import org.testng.Reporter
 import static dtos.base.Constants.CompareType.DIFF
 import static dtos.base.Constants.CompareType.EQUAL
 import static dtos.base.Constants.CompareType.NOT_EMPTY
+import static dtos.base.Constants.CompareType.LIKE
 
 /**
  * This class reads an Excel file and creates an ExcelData object that contains all rows and columns from the first sheet
@@ -388,6 +389,12 @@ public class ExcelFileObjectReader {
                     if (value.compareType == NOT_EMPTY) {
                         excelBodyMap = excelBodyMap.findAll { excelBodyRow->
                             excelBodyRow.value[value["column"]] != ""
+                        }
+                    }else {
+                        if (value.compareType == LIKE) {
+                            excelBodyMap = excelBodyMap.findAll { excelBodyRow->
+                                excelBodyRow.value[value["column"]].contains(value["valueToComprae"])
+                            }
                         }
                     }
                 }

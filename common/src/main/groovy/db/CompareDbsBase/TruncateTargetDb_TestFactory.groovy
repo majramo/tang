@@ -5,6 +5,7 @@ import excel.ExcelObjectProvider
 import org.testng.Reporter
 import org.testng.annotations.Factory
 import org.testng.annotations.Parameters
+import static dtos.base.Constants.CompareType.LIKE
 
 class TruncateTargetDb_TestFactory {
 
@@ -19,7 +20,7 @@ class TruncateTargetDb_TestFactory {
 
         excelObjectProvider.addColumnsToRetriveFromFile(["System", "Table", "Action"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
-        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
+        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", actionColumn, LIKE)
         def excelBodyRows = SystemPropertiesInitation.readExcel(excelObjectProvider)
         excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "Action"])
 
