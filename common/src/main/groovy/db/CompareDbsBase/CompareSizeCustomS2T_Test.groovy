@@ -11,6 +11,7 @@ import org.testng.annotations.Optional
 
 import java.text.DecimalFormat
 
+import static dtos.base.Constants.CompareType.LIKE
 import static dtos.base.Constants.dbRunTypeFirstRow
 import static dtos.base.Constants.dbRunTypeRows
 import static dtos.base.Constants.CompareType.DIFF
@@ -128,7 +129,7 @@ ORDER BY 1"""
             ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(inputFile)
             excelObjectProvider.addColumnsToRetriveFromFile(["Table", "Action"])
             excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
-            excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", "Truncate")
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", "Truncate", LIKE)
             excelBodyRows = excelObjectProvider.getGdcRows()
             excelObjectProvider.printRow(excelBodyRows.unique(), ["System", "Table", "Truncate"])
             excelBodyRows.unique().each{
@@ -231,24 +232,32 @@ ORDER BY 1"""
                 if (targetSize > 0 || loopException) {
                     if (targetSize == sourceSize && targetSize == 0) {
                         icon = "-  "
+                        ok = aggregate(ok, "$str a. Table $table has <$targetSizeOut> rows as expected, is truncated\n\n")
+                        proc = "$proc".padLeft(5)
+                        reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * is truncated" )
                     } else {
                         diffCount = targetSize
                         diffCountOut = thousandSeparatorFormat.format(new BigDecimal(diffCount))
                         totalDiffCount += diffCount
-                        icon = "T  "
                         if (targetSize > 0) {
+                            icon = "T  "
                             try {
                                 def procent = Math.round(100 * targetSize / sourceSize)
                                 proc = "$procent%"
                             } catch (Exception e) {
                                 proc = "0%"
                             }
+                            numberOfTableDiff++
+                            nok = aggregate(nok, "$str a. Table $table has <$targetSizeOut> rows, expected to be truncated\n\n")
+                            proc = "$proc".padLeft(5)
+                            reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * should be truncated" )
+                        }else {
+                            ok = aggregate(ok, "$str a. Table $table has <$targetSizeOut> rows as expected, is truncated\n\n")
+                            proc = "$proc".padLeft(5)
+                            reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * is truncated" )
                         }
-                    }
-                    numberOfTableDiff++
-                    nok = aggregate(nok, "$str a. Table $table has <$targetSizeOut> rows, expected to be truncated\n\n")
-                    proc = "$proc".padLeft(5)
-                    reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * should be truncated" )
+
+                     }
                 } else {
                     ok = aggregate(ok, "$str a. Table $table has <$targetSizeOut> rows as expected, is truncated\n\n")
                     proc = "$proc".padLeft(5)
