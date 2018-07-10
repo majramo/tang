@@ -37,10 +37,11 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(targetDb)))
 
         row++
-        reporterLogLn("Row: <$row> TRUNCATE TABLE ");
+        reporterLogLn("Row: <$row> UPDATE TABLE ");
         reporterLogLn("Target Db: <$targetDb> ");
+        reporterLogLn("table: <$table   $table   $table   $table> ");
         reporterLogLn("Action:    <$action> ");
-        reporterLogLn("Masking:   <$maskingColumn>");
+        reporterLogLn("Masking:   <$maskingColumn   $maskingColumn   $maskingColumn   $maskingColumn>");
         reporterLogLn("Column:    <$column>");
 
         def targetSql = "UPDATE $table \nSET $column = "
