@@ -22,8 +22,11 @@ the "delete statments" will be in the report
 
 public class FindDeleteDependenciesInSourceTables extends AnySqlCompareTest{
     private final static Logger log = Logger.getLogger("FDDS ")
+    def recurse = false
     def actionTables = [:]
     def childTables = [:]
+    def printRelationsTables = []
+    def deleteRelationsTables = []
     def deleteRelations = [:]
     private String SOURCE_TABLE_QUERY_ORACLE_FIND = """
 SELECT CHILD_TABLE, CHILDCOL, position, PARENT_TABLE, PARENTCOL, delete_rule, bt,  
@@ -59,11 +62,14 @@ order by 7,6,4,2
     def indentString = ""
     def startTable
     def source_R_Relations
+    def parentRelations
 
-    @Parameters(["systemColumn", "startTableColumn", "deleteStatementColumn"] )
+    @Parameters(["systemColumn", "recurse", "startTableColumn", "deleteStatementColumn"] )
     @Test
-    public void findDependenciesInSourceTables_test(String systemColumn, String startTableColumn, String deleteStatementColumn, ITestContext testContext) {
+    public void findDependenciesInSourceTables_test(String systemColumn, boolean recurse,   String startTableColumn, String deleteStatementColumn, ITestContext testContext) {
         super.setup()
+        this.recurse = recurse
+
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         reporterLogLn("Source: <$sourceDb>");
         reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb)))
@@ -71,6 +77,9 @@ order by 7,6,4,2
         source_R_Relations = sourceDbSqlDriver.sqlConRun("Get data ", dbRunTypeRows, SOURCE_TABLE_QUERY_ORACLE_FIND, 0, sourceDb)
 
         startTable = startTableColumn.trim().toUpperCase()
+        parentRelations = source_R_Relations.findAll {it["PARENT_TABLE"]== "$startTable"}
+        reporterLogLn("Relations size <" + parentRelations.size() + ">")
+
         indentString = ""
         indentNo = 0
         reporterLogLn("");
@@ -79,7 +88,13 @@ order by 7,6,4,2
         actionTables[startTable] = startTable
         printRelations(startTable)
 
-        reporterLogLn("\n\n--Delete");
+        reporterLogLn("\n\n--###############");
+        reporterLogLn("--###############");
+        reporterLogLn("--Delete");
+        reporterLogLn("--Delete $startTable $deleteStatementColumn;");
+        reporterLogLn("--Delete");
+        reporterLogLn("--###############");
+        reporterLogLn("--###############\n");
         findDeleteRelations(startTable, deleteStatementColumn)
         deleteRelations["$startTable"] = "DELETE $startTable $deleteStatementColumn;"
 
@@ -87,30 +102,41 @@ order by 7,6,4,2
         deleteRelations.eachWithIndex { k, v, i->
             reporterLogLn("--${i + 1}:$deleteRelationsCount  ($startTable-->) $k\n$v")
         }
+        reporterLogLn("\n--###############");
+        reporterLogLn("--###############");
+        reporterLogLn("--###############");
     }
 
     private String printRelations(String parent) {
         def parentTable = parent.toUpperCase()
+        if(!printRelationsTables.contains(parentTable)){
+            printRelationsTables.add(parentTable)
+        }else{
+            if(!recurse) {
+                return
+            }
+        }
         indentString += "-"
 
         indentNo++
-        source_R_Relations.findAll {it["PARENT_TABLE"]== "$parent"}.each { child->
+
+        parentRelations.each { child->
             def childTable = child["CHILD_TABLE"].toString().toUpperCase()
             if (!startTable.contains(childTable) && childTable != parent)  {
                 def deleteRule = child["DELETE_RULE"]
                 def childConstraint = child["CHILD_CONSTRAINT"]
                 def parentConstraint = child["PARENT_CONSTRAINT"]
-                def indentNoStr = "$indentNo "
+                def indentNoStr = "--$indentNo "
                 if(indentNo.equals(1)){
-                    indentNoStr = "\n$indentNo*"
+                    indentNoStr = "\n -- $indentNo*"
                 }
                 if(deleteRule != "CASCADE") {
                     reporterLogLn("$indentNoStr!" + "$counter".padLeft(4) + " $indentString $childTable    $deleteRule");
-                    reporterLogLn(" -- alter table $childTable drop constraint $childConstraint;--    $parentConstraint");
+                    reporterLogLn("alter table $childTable drop constraint $childConstraint;--    $parentConstraint");
                     actionTables[childTable] = childTable
                 }else {
                     reporterLogLn("$indentNoStr " + "$counter".padLeft(4) + " $indentString $childTable    -- CASCADE IGNORE");
-                    reporterLogLn(" -- alter table $childTable drop constraint $childConstraint;--   $parentConstraint");
+                    reporterLogLn("alter table $childTable drop constraint $childConstraint;--   $parentConstraint");
                 }
                 printRelations(childTable)
                 childTables["$parentTable: $childTable"] = childTable
@@ -122,7 +148,14 @@ order by 7,6,4,2
 
     private String findDeleteRelations(String parent, whereParentDelete) {
         def parentTable = parent.toUpperCase()
-        source_R_Relations.findAll {it["PARENT_TABLE"]== "$parent"}.each { actionTable->
+        if(!deleteRelationsTables.contains(parentTable)){
+            deleteRelationsTables.add(parentTable)
+        }else{
+            if(!recurse) {
+                return
+            }
+        }
+        parentRelations.each { actionTable->
             def whereChildtDelete = ""
             def childTable = actionTable["CHILD_TABLE"].toString().toUpperCase()
             def childColumn = actionTable["CHILDCOL"]
