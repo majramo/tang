@@ -22,7 +22,7 @@ public class ScreenshotReportNGUtils extends ReportNGUtils {
     }
     private static List<String> addTestAttributes(ITestResult result, List<String> outputIn) {
         List<String> outputOut = new ArrayList<String>();
-        String out = ""
+        String out = "Executed: " + new Date().format( 'yyyy-MM-dd HH:mm' ) + "<br>"
         if (StringUtils.isNotBlank((String) result.getAttribute(TEST_STATUS))) {
             out += result.getAttribute(TEST_STATUS)
         }
