@@ -50,14 +50,14 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         reporterLogLn("Source Db: <$sourceDb> ");
         reporterLogLn("Target Db: <$targetDb> ");
         reporterLogLn("Tmp Table: <$table> ");
-        //reporterLogLn("column: <$column> ");
+        reporterLogLn("Column: <$column> ");
 
 
         def checkColumnType = "SELECT data_type FROM USER_TAB_COLS WHERE lower(table_name) = '$table' AND lower(column_name) = '$column'"
-        reporterLogLn("Sql to check column type:\n$checkColumnType\n")
+//        reporterLogLn("Sql to check column type:\n$checkColumnType\n")
         def checkColumnTypeResult = getDbResult(targetDbSqlDriver, checkColumnType, dbRunTypeFirstRow)
-
-
+        def columnType = checkColumnTypeResult[0]
+        reporterLogLn("ColumnType: <$columnType> ");
 
         def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns WHERE table_name = '%s'" //Todo: change this  sqlserver sql and check in
         if(checkColumnTypeResult[0] == "CLOB" ){
