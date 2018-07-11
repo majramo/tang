@@ -5,20 +5,31 @@ import org.testng.ITestContext
 import org.testng.Reporter
 import org.testng.annotations.Factory
 import org.testng.annotations.Parameters
+import static dtos.base.Constants.CompareType.DIFF
+
 
 class  VerifyMaskedTargetDb_TestFactory {
 
-    @Parameters(["systemColumn", "actionColumn"] )
+    @Parameters(["systemColumn", "actionColumn", "tableColumn", "maskingColumn", "excludeMaskingColumn"] )
     @Factory
-    public Object[] createVerifyTruncatedInstances(ITestContext testContext, String systemColumn, String actionColumn) {
+    public Object[] createVerifyTruncatedInstances(ITestContext testContext, String systemColumn, String actionColumn, String tableColumn, String maskingColumn, String  excludeMaskingColumn) {
 
         def (ExcelObjectProvider excelObjectProviderMaskAction, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         def inputFile = excelObjectProviderMaskAction.inputFile
-        excelObjectProviderMaskAction.addColumnsToRetriveFromFile(["System", "Table", "Column", "Action", "SearchCriteria", "SearchExtraCondition"])
+        excelObjectProviderMaskAction.addColumnsToRetriveFromFile(["System", "Table", "Column", "Masking", "Action", "SearchCriteria", "SearchExtraCondition"])
         excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
+        if(!tableColumn.isEmpty()){
+            excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Table", tableColumn.trim().toUpperCase())
+        }
+        if(!maskingColumn.isEmpty()){
+            excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Masking", maskingColumn.trim())
+        }
+        if(!excludeMaskingColumn.isEmpty()){
+            excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Masking", excludeMaskingColumn.trim(), DIFF)
+        }
         def excelBodyRowsMaskAction = SystemPropertiesInitation.readExcel(excelObjectProviderMaskAction)
-        excelObjectProviderMaskAction.printRow(excelBodyRowsMaskAction, ["System", "Table", "Column", "Action"])
+        excelObjectProviderMaskAction.printRow(excelBodyRowsMaskAction, ["System", "Table", "Column", "Masking", "Action"])
 
         Reporter.log("Lines read <$excelBodyRowsMaskAction.size>")
         Reporter.log("Action <Masking> ")
