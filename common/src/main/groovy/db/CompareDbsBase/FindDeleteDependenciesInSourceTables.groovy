@@ -23,6 +23,8 @@ the "delete statments" will be in the report
 public class FindDeleteDependenciesInSourceTables extends AnySqlCompareTest{
     private final static Logger log = Logger.getLogger("FDDS ")
     def recurse = false
+    def firstRelations = ""
+    def alterStrs = ""
     def actionTables = [:]
     def childTables = [:]
     def printRelationsTables = []
@@ -69,7 +71,7 @@ order by 7,6,4,2
     public void findDependenciesInSourceTables_test(String systemColumn, boolean recurse,   String startTableColumn, String deleteStatementColumn, ITestContext testContext) {
         super.setup()
         this.recurse = recurse
-
+        firstRelations = "DELETE $startTableColumn;"
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         reporterLogLn("Source: <$sourceDb>");
         reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb)))
@@ -88,13 +90,7 @@ order by 7,6,4,2
         actionTables[startTable] = startTable
         printRelations(startTable)
 
-        reporterLogLn("\n\n--###############");
-        reporterLogLn("--###############");
-        reporterLogLn("--Delete");
-        reporterLogLn("--Delete $startTable $deleteStatementColumn;");
-        reporterLogLn("--Delete");
-        reporterLogLn("--###############");
-        reporterLogLn("--###############\n");
+        reportStart("DELETE", "DELETE $startTable $deleteStatementColumn;")
         findDeleteRelations(startTable, deleteStatementColumn)
         deleteRelations["$startTable"] = "DELETE $startTable $deleteStatementColumn;"
 
@@ -102,9 +98,15 @@ order by 7,6,4,2
         deleteRelations.eachWithIndex { k, v, i->
             reporterLogLn("--${i + 1}:$deleteRelationsCount  ($startTable-->) $k\n$v")
         }
-        reporterLogLn("\n--###############");
-        reporterLogLn("--###############");
-        reporterLogLn("--###############");
+        reportStop()
+
+        reportStart("First relations", "DELETE $firstRelations;")
+        reportStart("Alter", "\n$alterStrs")
+        log.info("First relations\n### $startTableColumn\n$firstRelations")
+        log.info("Alter\n### \n$alterStrs")
+
+
+
     }
 
     private String printRelations(String parent) {
@@ -120,7 +122,7 @@ order by 7,6,4,2
 
         indentNo++
 
-        parentRelations.each { child->
+        source_R_Relations.findAll {it["PARENT_TABLE"]== "$parent"}.each { child->
             def childTable = child["CHILD_TABLE"].toString().toUpperCase()
             if (!startTable.contains(childTable) && childTable != parent)  {
                 def deleteRule = child["DELETE_RULE"]
@@ -131,8 +133,13 @@ order by 7,6,4,2
                     indentNoStr = "\n -- $indentNo*"
                 }
                 if(deleteRule != "CASCADE") {
+                    def alterStr = "alter table $childTable drop constraint $childConstraint;--    $parentConstraint"
+                    if(indentNo.equals(1)){
+                        firstRelations += "\n DELETE $childTable;"
+                        alterStrs += "$alterStr\n"
+                    }
                     reporterLogLn("$indentNoStr!" + "$counter".padLeft(4) + " $indentString $childTable    $deleteRule");
-                    reporterLogLn("alter table $childTable drop constraint $childConstraint;--    $parentConstraint");
+                    reporterLogLn(alterStr);
                     actionTables[childTable] = childTable
                 }else {
                     reporterLogLn("$indentNoStr " + "$counter".padLeft(4) + " $indentString $childTable    -- CASCADE IGNORE");
@@ -155,7 +162,7 @@ order by 7,6,4,2
                 return
             }
         }
-        parentRelations.each { actionTable->
+        source_R_Relations.findAll {it["PARENT_TABLE"]== "$parent"}.each { actionTable->
             def whereChildtDelete = ""
             def childTable = actionTable["CHILD_TABLE"].toString().toUpperCase()
             def childColumn = actionTable["CHILDCOL"]
@@ -171,5 +178,23 @@ order by 7,6,4,2
                 deleteRelations["$parentTable --> $childTable"] = "DELETE $childTable $whereChildtDelete;\n-- SELECT * FROM $childTable $whereChildtDelete;\n\n"
             }
         }
+    }
+
+    private reportStart(type, text){
+        reporterLogLn("\n\n")
+        reporterLogLn("--<<<<<<<<<<<<<<<");
+        reporterLogLn("--###############");
+        reporterLogLn("--$type             $type             $type");
+        reporterLogLn("--");
+        reporterLogLn("--$text;");
+        reporterLogLn("--###############");
+        reporterLogLn("--###############\n");
+
+    }
+    private reportStop(){
+        reporterLogLn("\n");
+        reporterLogLn("--###############");
+        reporterLogLn("-->>>>>>>>>>>>>>>");
+
     }
 }

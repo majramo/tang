@@ -8,9 +8,9 @@ import org.testng.annotations.Parameters
 class UpdateTextFieldsTargetDb_TestFactory {
 
 
-    @Parameters(["systemColumn", "actionColumn", "maskingColumn", "executeColumn"])
+    @Parameters(["systemColumn", "actionColumn", "maskingColumn", "executeColumn", "tableColumn"])
     @Factory
-    public Object[] createInstances(String systemColumn, String actionColumn, String maskingColumn, boolean executeColumn) {
+    public Object[] createInstances(String systemColumn, String actionColumn, String maskingColumn, boolean executeColumn, String tableColumn) {
 
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
 
@@ -18,6 +18,9 @@ class UpdateTextFieldsTargetDb_TestFactory {
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("Masking", maskingColumn)
+        if(!tableColumn.isEmpty()){
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve("Table", tableColumn.trim().toUpperCase())
+        }
         def excelBodyRows = SystemPropertiesInitation.readExcel(excelObjectProvider)
         excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "Column", "Action", "SearchExtraCondition"])
 
