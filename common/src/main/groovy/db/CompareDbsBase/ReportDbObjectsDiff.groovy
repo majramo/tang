@@ -73,7 +73,7 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             reporterLogLn("")
             reporterLogLn("Missing <$objectType> in <$queryFirst> <$diffCount>")
             reporterLogLn("")
-            def dbDifffDataToAdd = diffDbResult.collect{it[0]}.join(",\n")
+            def dbDifffDataToAdd = diffDbResult.collect{"'" + it[0] + "'"}.join(",\n")
 
 
             diffDbResult.eachWithIndex { it, i ->
