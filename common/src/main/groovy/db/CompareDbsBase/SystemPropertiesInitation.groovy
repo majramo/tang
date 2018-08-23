@@ -11,8 +11,8 @@ public final class SystemPropertiesInitation {
     public static final String ENABLED = "enabled"
 
     public static List getSystemData(String systemColumn) {
-        def targetDb = systemColumn.toLowerCase() + "_Target"
-        def sourceDb = systemColumn.toLowerCase() + "_Source"
+        def targetDb = systemColumn.toLowerCase() + "Target"
+        def sourceDb = systemColumn.toLowerCase() + "Source"
         def system = systemColumn[0].toUpperCase() + systemColumn[1..-1].toLowerCase()
 
         def systemInputFile = systemColumn.toLowerCase() + settings.systemInputFile
