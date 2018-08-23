@@ -20,7 +20,7 @@ the where statement used when deleteing
 the "delete statments" will be in the report
  */
 
-public class FindDeleteDependenciesInSourceTables extends AnySqlCompareTest{
+class FindDeleteDependenciesInSourceTables extends AnySqlCompareTest{
     private final static Logger log = Logger.getLogger("FDDS ")
     def recurse = false
     def firstRelations = ""
@@ -57,7 +57,7 @@ CHILD_CONSTRAINT,PARENT_CONSTRAINT,
         and a.constraint_type = 'R' 
 )
 order by 7,6,4,2
-""";
+"""
 
     def counter = 1
     def indentNo = 0
@@ -68,12 +68,12 @@ order by 7,6,4,2
 
     @Parameters(["systemColumn", "recurse", "startTableColumn", "deleteStatementColumn"] )
     @Test
-    public void findDependenciesInSourceTables_test(String systemColumn, boolean recurse,   String startTableColumn, String deleteStatementColumn, ITestContext testContext) {
+    void findDependenciesInSourceTables_test(String systemColumn, boolean recurse,   String startTableColumn, String deleteStatementColumn, ITestContext testContext) {
         super.setup()
         this.recurse = recurse
         firstRelations = "DELETE $startTableColumn;"
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
-        reporterLogLn("Source: <$sourceDb>");
+        reporterLogLn("Source: <$sourceDb>")
         reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb)))
         super.setSourceSqlHelper(testContext, sourceDb)
         source_R_Relations = sourceDbSqlDriver.sqlConRun("Get data ", dbRunTypeRows, SOURCE_TABLE_QUERY_ORACLE_FIND, 0, sourceDb)
@@ -84,8 +84,8 @@ order by 7,6,4,2
 
         indentString = ""
         indentNo = 0
-        reporterLogLn("");
-        reporterLogLn("# " + "$counter".padLeft(4) + ": Parent: <$startTable>");
+        reporterLogLn("")
+        reporterLogLn("# " + "$counter".padLeft(4) + ": Parent: <$startTable>")
 
         actionTables[startTable] = startTable
         printRelations(startTable)
@@ -127,23 +127,33 @@ order by 7,6,4,2
             if (!startTable.contains(childTable) && childTable != parent)  {
                 def deleteRule = child["DELETE_RULE"]
                 def childConstraint = child["CHILD_CONSTRAINT"]
+                def childCol = child["CHILDCOL"]
                 def parentConstraint = child["PARENT_CONSTRAINT"]
+                def parentCol = child["PARENTCOL"]
                 def indentNoStr = "--$indentNo "
                 if(indentNo.equals(1)){
                     indentNoStr = "\n -- $indentNo*"
                 }
                 if(deleteRule != "CASCADE") {
-                    def alterStr = "alter table $childTable drop constraint $childConstraint;--    $parentConstraint"
+                    reporterLogLn("$indentNoStr " + "$counter".padLeft(4) + " $indentString $childTable    -- $deleteRule ")
+                    def alterStr = "alter table $childTable drop constraint $childConstraint;--    $parentConstraint\n" +
+                            "--DELETE $childTable WHERE $childCol NOT IN (SELECT $parentCol FROM $parentTable);\n" +
+                            "SELECT COUNT(1) FROM $childTable WHERE $childCol NOT IN (SELECT $parentCol FROM $parentTable);\n" +
+                            "SELECT COUNT(1) FROM $parentTable WHERE $parentCol NOT IN (SELECT $childCol FROM $childTable);\n"
                     if(indentNo.equals(1)){
                         firstRelations += "\n DELETE $childTable;"
                         alterStrs += "$alterStr\n"
                     }
-                    reporterLogLn("$indentNoStr!" + "$counter".padLeft(4) + " $indentString $childTable    $deleteRule");
-                    reporterLogLn(alterStr);
+                    reporterLogLn("$indentNoStr!" + "$counter".padLeft(4) + " $indentString $childTable    $deleteRule")
+                    reporterLogLn(alterStr)
                     actionTables[childTable] = childTable
                 }else {
-                    reporterLogLn("$indentNoStr " + "$counter".padLeft(4) + " $indentString $childTable    -- CASCADE IGNORE");
-                    reporterLogLn("alter table $childTable drop constraint $childConstraint;--   $parentConstraint");
+                    reporterLogLn("$indentNoStr " + "$counter".padLeft(4) + " $indentString $childTable    -- CASCADE IGNORE")
+                    def alterStr = "alter table $childTable drop constraint $childConstraint;--    $parentConstraint\n" +
+                            "--DELETE $childTable WHERE $childCol NOT IN (SELECT $parentCol FROM $parentTable);\n" +
+                            "SELECT COUNT(1) FROM $childTable WHERE $childCol NOT IN (SELECT $parentCol FROM $parentTable);\n" +
+                            "SELECT COUNT(1) FROM $parentTable WHERE $parentCol NOT IN (SELECT $childCol FROM $childTable);\n"
+                    reporterLogLn(alterStr)
                 }
                 printRelations(childTable)
                 childTables["$parentTable: $childTable"] = childTable
@@ -182,19 +192,19 @@ order by 7,6,4,2
 
     private reportStart(type, text){
         reporterLogLn("\n\n")
-        reporterLogLn("--<<<<<<<<<<<<<<<");
-        reporterLogLn("--###############");
-        reporterLogLn("--$type             $type             $type");
-        reporterLogLn("--");
-        reporterLogLn("--$text;");
-        reporterLogLn("--###############");
-        reporterLogLn("--###############\n");
+        reporterLogLn("--<<<<<<<<<<<<<<<")
+        reporterLogLn("--###############")
+        reporterLogLn("--$type             $type             $type")
+        reporterLogLn("--")
+        reporterLogLn("--$text;")
+        reporterLogLn("--###############")
+        reporterLogLn("--###############\n")
 
     }
     private reportStop(){
-        reporterLogLn("\n");
-        reporterLogLn("--###############");
-        reporterLogLn("-->>>>>>>>>>>>>>>");
+        reporterLogLn("\n")
+        reporterLogLn("--###############")
+        reporterLogLn("-->>>>>>>>>>>>>>>")
 
     }
 }
