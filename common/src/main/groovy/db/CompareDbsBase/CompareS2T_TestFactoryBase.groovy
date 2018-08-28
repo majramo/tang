@@ -65,7 +65,7 @@ public class CompareS2T_TestFactoryBase {
         def excelBodyRows = SystemPropertiesInitation.readExcelEnabled(excelObjectProvider)
 
         excelBodyRows.unique().eachWithIndex { excelRow, index ->
-            def rowLine = index + 1
+            def rowLine = index + 2
             int row = 0
             try {
                 row = Integer.parseInt(excelRow[ROW].replaceAll(/\..*/, ''))
@@ -122,7 +122,8 @@ public class CompareS2T_TestFactoryBase {
     protected void addObjectToList(result, row, sourceDb, sourceSql, targetDb, targetSql, threshold, comments, rowLine, by, considerSystemTableColumnAnalyse = "", String tableFieldToExclude = "", String actionTypeColumn = "" ) {
         def dbCompareProperties
         if (sourceDb != "" && sourceSql != "") {
-            dbCompareProperties = new DbCompareProperties("$row : $rowLine", sourceDb, sourceSql, targetDb, targetSql, threshold, comments, by, considerSystemTableColumnAnalyse, tableFieldToExclude, actionTypeColumn)
+            dbCompareProperties = new DbCompareProperties("$row : ($rowLine)" +
+                    "", sourceDb, sourceSql, targetDb, targetSql, threshold, comments, by, considerSystemTableColumnAnalyse, tableFieldToExclude, actionTypeColumn)
             result.add(new CompareS2T_Test(dbCompareProperties))
         }
     }
