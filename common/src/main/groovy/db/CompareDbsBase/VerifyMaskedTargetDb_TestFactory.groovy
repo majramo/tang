@@ -12,7 +12,7 @@ class  VerifyMaskedTargetDb_TestFactory {
 
     @Parameters(["systemColumn", "actionColumn", "tableColumn", "maskingColumn", "excludeMaskingColumn"] )
     @Factory
-    public Object[] createVerifyTruncatedInstances(ITestContext testContext, String systemColumn, String actionColumn, String tableColumn, String maskingColumn, String  excludeMaskingColumn) {
+    public Object[] createVerifyMaskedInstances(ITestContext testContext, String systemColumn, String actionColumn, String tableColumn, String maskingColumn, String  excludeMaskingColumn) {
 
         def (ExcelObjectProvider excelObjectProviderMaskAction, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         def inputFile = excelObjectProviderMaskAction.inputFile
@@ -40,6 +40,7 @@ class  VerifyMaskedTargetDb_TestFactory {
             def column = excelRow["Column"]
             def searchCriteria = excelRow["SearchCriteria"]
             def searchExtraCondition = excelRow["SearchExtraCondition"]
+            def masking = excelRow["Masking"]
             if (searchCriteria == null || searchCriteria == "-" ){
                 searchCriteria = ""
             }
@@ -47,7 +48,7 @@ class  VerifyMaskedTargetDb_TestFactory {
                 searchExtraCondition = ""
             }
 
-            result.add(new VerifyMaskedTargetColumn_Test(testContext, targetDb, sourceDb, excelRow["System"], table, column, actionColumn, searchCriteria, searchExtraCondition))
+            result.add(new VerifyMaskedTargetColumn_Test(testContext, targetDb, sourceDb, excelRow["System"], table, column, actionColumn, masking, searchCriteria, searchExtraCondition))
 
         }
 

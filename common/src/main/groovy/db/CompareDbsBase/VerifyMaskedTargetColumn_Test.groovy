@@ -18,10 +18,11 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     def table
     def column
     def actionColumn
+    def masking
     def searchCriteria
     def searchExtraCondition
     def numberOfLinesInSqlCompare = 101
-    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn, searchCriteria = "", searchExtraCondition = "") {
+    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn, masking, searchCriteria = "", searchExtraCondition = "") {
         super.setup()
         this.targetDb = targetDb
         this.sourceDb = sourceDb
@@ -29,6 +30,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         this.table = table.toLowerCase()
         this.column = column.toLowerCase()
         this.actionColumn = actionColumn
+        this.masking = masking
         this.searchCriteria = searchCriteria
         this.searchExtraCondition = searchExtraCondition
         targetDbOwner = settings."$targetDb".owner
@@ -51,6 +53,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         reporterLogLn("Target Db: <$targetDb> ");
         reporterLogLn("Tmp Table: <$table> ");
         reporterLogLn("Column: <$column> ");
+        reporterLogLn("Masking: <$masking> ");
 
 
         def checkColumnType = "SELECT data_type FROM USER_TAB_COLS WHERE lower(table_name) = '$table' AND lower(column_name) = '$column'"
