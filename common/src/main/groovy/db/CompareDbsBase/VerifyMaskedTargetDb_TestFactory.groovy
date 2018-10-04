@@ -10,9 +10,9 @@ import static dtos.base.Constants.CompareType.DIFF
 
 class  VerifyMaskedTargetDb_TestFactory {
 
-    @Parameters(["systemColumn", "actionColumn", "tableColumn", "maskingColumn", "excludeMaskingColumn"] )
+    @Parameters(["systemColumn", "actionColumn", "tableColumn", "excludeTableColumn", "maskingColumn", "excludeMaskingColumn"] )
     @Factory
-    public Object[] createVerifyMaskedInstances(ITestContext testContext, String systemColumn, String actionColumn, String tableColumn, String maskingColumn, String  excludeMaskingColumn) {
+    public Object[] createVerifyMaskedInstances(ITestContext testContext, String systemColumn, String actionColumn, String tableColumn, String excludeTableColumn, String maskingColumn, String excludeMaskingColumn) {
 
         def (ExcelObjectProvider excelObjectProviderMaskAction, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         def inputFile = excelObjectProviderMaskAction.inputFile
@@ -21,6 +21,9 @@ class  VerifyMaskedTargetDb_TestFactory {
         excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
         if(!tableColumn.isEmpty()){
             excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Table", tableColumn.trim().toUpperCase())
+        }
+        if(!excludeTableColumn.isEmpty()){
+            excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Table", excludeTableColumn.trim().toUpperCase(), DIFF)
         }
         if(!maskingColumn.isEmpty()){
             excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Masking", maskingColumn.trim())
