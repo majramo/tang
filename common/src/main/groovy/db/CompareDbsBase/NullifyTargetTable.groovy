@@ -34,7 +34,7 @@ public class NullifyTargetTable extends AnySqlCompareTest{
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(targetDb)))
 
         row++
-        reporterLogLn("Row: <$row> TRUNCATE TABLE ");
+        reporterLogLn("Row: <$row> Nullify Column");
         reporterLogLn("Target Db: <$targetDb> ");
         reporterLogLn("Action:    <$action> ");
         reporterLogLn("Column:\n$column\n");
