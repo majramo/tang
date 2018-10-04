@@ -53,6 +53,8 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         reporterLogLn("Target Db: <$targetDb> ");
         reporterLogLn("Tmp Table: <$table> ");
         reporterLogLn("Column: <$column> ");
+        reporterLogLn("SearchCriteria: <$searchCriteria> ");
+        reporterLogLn("searchExtraCondition: <$searchExtraCondition> ");
         reporterLogLn("Masking: <$masking> ");
 
 
@@ -130,9 +132,9 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                 def count = targetDbResult.size()
                 if (count > maxRows ){
                     targetDbResult = targetDbResult[0..maxRows-1]
-                    reporterLogLn("Showing max rows: <$maxRows>")
+                    reporterLogLn("Showing max rows: <$maxRows (total: $count)>")
                 }else{
-                    reporterLogLn("Showing max rows: <$count>")
+                    reporterLogLn("Showing rows: <total $count>")
                 }
 
                 targetDbResult.each {
