@@ -34,7 +34,22 @@ class FindDeleteDependenciesInSourceTables extends AnySqlCompareTest{
 SELECT CHILD_TABLE, CHILDCOL, position, PARENT_TABLE, PARENTCOL, delete_rule, bt,  
 'SELECT ' || CHILDCOL || ' FROM ' || CHILD_TABLE || ' WHERE ' || CHILDCOL || ' IN ( ' || 'SELECT ' ||PARENTCOL || ' FROM ' ||PARENT_TABLE || ' WHERE %s )' WHERESTR ,
 CHILD_CONSTRAINT,PARENT_CONSTRAINT,
- 'ALTER TABLE  ' || CHILD_TABLE ||' DISABLE ALL TRIGGERS;'
+ 'ALTER TABLE  ' || CHILD_TABLE ||' DISABLE ALL TRIGGERS;',
+ '
+ALTER TABLE ' || Child_Table  || ' ENABLE CONSTRAINT ' || Child_Constraint   || ';  --Enable_Child_Constraint      
+ALTER TABLE ' || Parent_Table || ' ENABLE CONSTRAINT ' || Parent_Constraint  || ';  --Enable_Parent_Constraint   
+ALTER TABLE ' || Child_Table  || ' DROP CONSTRAINT '   || Child_Constraint   || ';   --Drop_Child_Constraint 
+ALTER TABLE ' || Parent_Table || ' DROP CONSTRAINT '   || Parent_Constraint  || ';  --Drop_Parent_Constraint  
+SELECT ' || Childcol  || ' FROM ' || Child_Table  || ' GROUP BY ' || Childcol  || ' HAVING COUNT(1) > 1;  -- Duplicates_Child  
+SELECT ' || Parentcol || ' FROM ' || Parent_Table || ' GROUP BY ' || Parentcol || ' HAVING COUNT(1) > 1;  -- Duplicates_Parent 
+SELECT ' || Childcol  || ' FROM ' || Child_Table  || ' WHERE NOT ' || Childcol  || ' IN ( ' || 'SELECT ' || Parentcol || ' FROM ' || Parent_Table || ' ); -- Child_Records_Missing_In_Parent
+SELECT ' || Parentcol || ' FROM ' || Parent_Table || ' WHERE NOT ' || Parentcol || ' IN ( ' || 'SELECT ' || Childcol  || ' FROM ' || Child_Table  || ' );  --Parent_Records_Missing_In_Child 
+SELECT ' || Childcol  || ' FROM ' || Child_Table || ' WHERE NOT ' || Childcol || ' IN ( ' || 'SELECT ' ||Parentcol || ' FROM ' || Parent_Table || '   ); -- Child_Records_Missing_In_Parent 
+ALTER TABLE ' || Child_Table  || ' DISABLE ALL TRIGGERS ;  --Disbale_Child_Triggers 
+ALTER TABLE ' || Parent_Table || ' DISABLE ALL TRIGGERS ;  -Disable_Parent_Triggers 
+ALTER TABLE ' || Child_Table  || ' ENABLE  ALL TRIGGERS ;  --Enabale_Child_Triggers 
+ALTER TABLE ' || Parent_Table || ' ENABLE  ALL TRIGGERS ;  --Enable_Parent_Triggers 
+'  TABLESHELP
  FROM
 (
  select 
@@ -130,6 +145,7 @@ order by 7,6,4,2
                 def childCol = child["CHILDCOL"]
                 def parentConstraint = child["PARENT_CONSTRAINT"]
                 def parentCol = child["PARENTCOL"]
+                def TablesHelp = child["TABLESHELP"]
                 def indentNoStr = "--$indentNo "
                 if(indentNo.equals(1)){
                     indentNoStr = "\n -- $indentNo*"
@@ -139,7 +155,8 @@ order by 7,6,4,2
                     def alterStr = "alter table $childTable drop constraint $childConstraint;--    $parentConstraint\n" +
                             "--DELETE $childTable WHERE $childCol NOT IN (SELECT $parentCol FROM $parentTable);\n" +
                             "SELECT COUNT(1) FROM $childTable WHERE $childCol NOT IN (SELECT $parentCol FROM $parentTable);\n" +
-                            "SELECT COUNT(1) FROM $parentTable WHERE $parentCol NOT IN (SELECT $childCol FROM $childTable);\n"
+                            "SELECT COUNT(1) FROM $parentTable WHERE $parentCol NOT IN (SELECT $childCol FROM $childTable);\n" +
+                            TablesHelp
                     if(indentNo.equals(1)){
                         firstRelations += "\n DELETE $childTable;"
                         alterStrs += "$alterStr\n"
@@ -152,7 +169,8 @@ order by 7,6,4,2
                     def alterStr = "alter table $childTable drop constraint $childConstraint;--    $parentConstraint\n" +
                             "--DELETE $childTable WHERE $childCol NOT IN (SELECT $parentCol FROM $parentTable);\n" +
                             "SELECT COUNT(1) FROM $childTable WHERE $childCol NOT IN (SELECT $parentCol FROM $parentTable);\n" +
-                            "SELECT COUNT(1) FROM $parentTable WHERE $parentCol NOT IN (SELECT $childCol FROM $childTable);\n"
+                            "SELECT COUNT(1) FROM $parentTable WHERE $parentCol NOT IN (SELECT $childCol FROM $childTable);\n" +
+                            TablesHelp
                     reporterLogLn(alterStr)
                 }
                 printRelations(childTable)
