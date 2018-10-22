@@ -16,9 +16,10 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
     private String searchExtraCondition;
     private String maskingColumn;
     private boolean execute;
+    private boolean onlyAaZzCharColumnn;
     private static String settingsEmailDomain = "test.addtest.se"
 
-    public UpdateTextFieldsTable(targetDb, system, table, action, column, searchExtraCondition, String maskingColumn, boolean execute = false) {
+    public UpdateTextFieldsTable(targetDb, system, table, action, column, searchExtraCondition, String maskingColumn, boolean execute = false, boolean onlyAaZzCharColumnn = false) {
         super.setup()
         this.targetDb = targetDb
         this.action = action
@@ -27,6 +28,7 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
         this.maskingColumn = maskingColumn
         this.searchExtraCondition = searchExtraCondition
         this.execute = execute
+        this.onlyAaZzCharColumnn = onlyAaZzCharColumnn
 
         String dbTargetOwner = settings."$targetDb".owner
     }
@@ -49,26 +51,34 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
             settingsEmailDomain = settings.emailDomain
         }
         switch (maskingColumn) {
-            case ~/DD_Fritext/:
+            case ~/AF_Fritext/:
                 targetSql += " 'Text ' || substr( (rownum + 12345678)  ,1,8) "
                 break
-            case ~/DD_Telefonnummer/:
+            case ~/AF_Telefonnummer/:
                 targetSql += " '010' || substr( (rownum + 12345678)  ,1,8) "
                 break
-            case ~/DD_Losenord/:
+            case ~/AF_Losenord/:
                 targetSql += '1234'
                 break
-            case ~/DD_Url/:
+            case ~/AF_Url/:
                 targetSql += " 'test.' || substr( (rownum + 12345678)  ,1,8) || '.@settingsEmailDomain' "
                 break
-            case ~/DD_Epost/:
-                targetSql += " 'test.' || substr( (rownum + 12345678)  ,1,8) || '@$settingsEmailDomain' "
+            case ~/AF_Epost/:
+                if(!onlyAaZzCharColumnn){
+                    targetSql += " 'test.' || substr( (rownum + 12345678)  ,1,8) || '@$settingsEmailDomain' "
+                }else{
+                    targetSql += " replace(replace(replace(replace(replace(replace($column, 'å', 'a'), 'ö', 'o'), 'ä', 'a') , 'Ä', 'A') , 'Å', 'A') , 'Ö', 'O')  "
+                }
                 break
         }
 
         targetSql += "\nwhere $column IS NOT NULL"
         if(!searchExtraCondition.isEmpty() && searchExtraCondition != "-"){
-            targetSql += "\nAND $searchExtraCondition"
+            if(maskingColumn.equals("AF_Epost") && onlyAaZzCharColumnn){
+                targetSql += "\n--Ignore for Epost $searchExtraCondition"
+            }else {
+                targetSql += "\nAND $searchExtraCondition"
+            }
         }
         targetSql += "-- Execute is <$execute>"
         reporterLogLn("")

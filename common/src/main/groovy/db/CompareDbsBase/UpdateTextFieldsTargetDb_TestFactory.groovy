@@ -3,14 +3,15 @@ package db.CompareDbsBase
 import excel.ExcelObjectProvider
 import org.testng.Reporter
 import org.testng.annotations.Factory
+import org.testng.annotations.Optional
 import org.testng.annotations.Parameters
 
 class UpdateTextFieldsTargetDb_TestFactory {
 
 
-    @Parameters(["systemColumn", "actionColumn", "maskingColumn", "executeColumn", "tableColumn"])
+    @Parameters(["systemColumn", "actionColumn", "maskingColumn", "executeColumn", "tableColumn", "onlyAaZzCharColumnn"])
     @Factory
-    public Object[] createInstances(String systemColumn, String actionColumn, String maskingColumn, boolean executeColumn, String tableColumn) {
+    public Object[] createInstances(String systemColumn, String actionColumn, String maskingColumn, boolean executeColumn, String tableColumn, @Optional("false")boolean onlyAaZzCharColumnn) {
 
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
 
@@ -30,9 +31,8 @@ class UpdateTextFieldsTargetDb_TestFactory {
             def table = excelRow["Table"]
             def action = excelRow["Action"]
             def column = excelRow["Column"]
-            def DD_Telefonnummer = excelRow["Column"]
             def searchExtraCondition = excelRow["SearchExtraCondition"]
-            result.add(new UpdateTextFieldsTable(targetDb, excelRow["System"], table, action, column, searchExtraCondition, maskingColumn, executeColumn))
+            result.add(new UpdateTextFieldsTable(targetDb, excelRow["System"], table, action, column, searchExtraCondition, maskingColumn, executeColumn, onlyAaZzCharColumnn))
         }
         return result;
     }
