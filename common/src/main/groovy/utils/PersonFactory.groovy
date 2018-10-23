@@ -30,28 +30,66 @@ public class PersonFactory implements Serializable {
     def firstNames = []
     def lastNames = []
 
-    public PersonFactory(){
-        //def addressFile = settings.addressFile
-        def addressFile = settings.addressCompleteFile
+    public PersonFactory(boolean staticAddresses = true){
         if(settings["emailDomain"].size() != 0 && settings["emailDomain"] != ""){
             settingsEmailDomain = settings.emailDomain
         }
-        try {
-            def addressesFromFile = []
-            def addressEntries = this.getClass().getResourceAsStream(addressFile).text
-            addressEntries.eachLine {
-                it = it.trim()
-                if (it != ""){
-                    addressesFromFile.add(it.split(","))
-                }
-            }
-            addresses = addressesFromFile
-        } catch (NullPointerException e) {
-            Reporter.log("Can't find setting file $addressFile")
-            Reporter.log("Using default values")
-            addresses = addressesDefault
+        //def addressFile = settings.addressFile
+        if(staticAddresses){
+            def addressFile = settings.addressCompleteFile
 
+            try {
+                def addressesFromFile = []
+                def addressEntries = this.getClass().getResourceAsStream(addressFile).text
+                addressEntries.eachLine {
+                    it = it.trim()
+                    if (it != ""){
+                        addressesFromFile.add(it.split(","))
+                    }
+                }
+                addresses = addressesFromFile
+            } catch (NullPointerException e) {
+                Reporter.log("Can't find setting file $addressFile")
+                Reporter.log("Using default values")
+                addresses = addressesDefault
+
+            }
+        }else{
+            def addressFile = settings.addressBaseList
+
+            try {
+                def addressesFromFile = []
+                def addressEntries = this.getClass().getResourceAsStream(addressFile).text
+                addressEntries.eachLine {addressline->
+                    addressline = addressline.trim()
+                    if (addressline != ""){
+                        def addresslineSplit = addressline.split(";")
+                        def address= addresslineSplit[0]
+                        def maxNo= addresslineSplit[1]
+                        def zip= addresslineSplit[2]
+                        def city= addresslineSplit[3]
+                        if( maxNo.isEmpty() || Integer.parseInt(maxNo) > 100){
+                            addressesFromFile.add(["$address $maxNo", zip, city])
+                        }else{
+                            int no = Integer.parseInt(maxNo)
+                            if (no < 31){
+                                no = 51
+                            }
+                            (1..no).each{nextNo->
+                                addressesFromFile.add(["$address $nextNo", zip, city])
+                            }
+                        }
+                    }
+                }
+                addresses = addressesFromFile
+            } catch (NullPointerException e) {
+                Reporter.log("Can't find setting file $addressFile")
+                Reporter.log("Using default values")
+                addresses = addressesDefault
+
+            }
         }
+
 
 
 //        if(settings["addressRange"].size() != 0 && settings["addressRange"] != ""){
