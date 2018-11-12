@@ -90,7 +90,7 @@ order by 7,6,4,2
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         reporterLogLn("Source: <$sourceDb>")
         reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb)))
-        super.setSourceSqlHelper(testContext, sourceDb)
+        super.setSourceSqlHelper(testContext, targetDb)
         source_R_Relations = sourceDbSqlDriver.sqlConRun("Get data ", dbRunTypeRows, SOURCE_TABLE_QUERY_ORACLE_FIND, 0, sourceDb)
 
         startTable = startTableColumn.trim().toUpperCase()
