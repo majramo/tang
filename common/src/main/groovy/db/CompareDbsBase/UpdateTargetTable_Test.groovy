@@ -11,8 +11,9 @@ public class UpdateTargetTable_Test extends AnySqlCompareTest{
     private String targetDb;
     private String action;
     private String targetSql;
+    private boolean skipTest = false
 
-    public UpdateTargetTable_Test(targetDb, system, table, action, targetSql) {
+    public UpdateTargetTable_Test(targetDb, system, table, action, String targetSql) {
         super.setup()
         this.action = action
         this.targetDb = targetDb
@@ -20,12 +21,18 @@ public class UpdateTargetTable_Test extends AnySqlCompareTest{
         String dbTargetOwner = settings."$targetDb".owner
         this.targetSql = "-- Update table <$table> in system <$system>\n"
         this.targetSql += targetSql
+        if(!targetSql.toUpperCase().startsWith("UPDATE ")){
+            skipTest = true
+        }
 
         println this.targetSql
     }
 
     @Test
     public void updateTargetTest(ITestContext testContext){
+        if(skipTest){
+            skipTest("targetSql doesn't contain <UPDATE >\n\n$targetSql")
+        }
         super.setTargetSqlHelper(testContext, targetDb)
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(targetDb)))
 
