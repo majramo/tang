@@ -4,6 +4,7 @@ import excel.ExcelObjectProvider
 import org.testng.ITestContext
 import org.testng.Reporter
 import org.testng.annotations.Factory
+import org.testng.annotations.Optional
 import org.testng.annotations.Parameters
 
 import static dtos.base.Constants.CompareType.DIFF
@@ -12,7 +13,7 @@ class VerifyNullifiedTargetDb_TestFactory {
 
     @Parameters(["systemColumn", "actionColumn", "tableColumn", "maskingColumn", "excludeMaskingColumn"] )
     @Factory
-    public Object[] createVerifyTNullifiedInstances(ITestContext testContext, String systemColumn, String actionColumn, String tableColumn, String maskingColumn, String  excludeMaskingColumn) {
+    public Object[] createVerifyTNullifiedInstances(ITestContext testContext, String systemColumn, String actionColumn, @Optional ("") String tableColumn, @Optional ("") String maskingColumn, @Optional ("") String  excludeMaskingColumn) {
 
         def (ExcelObjectProvider excelObjectProviderMaskAction, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         def inputFile = excelObjectProviderMaskAction.inputFile

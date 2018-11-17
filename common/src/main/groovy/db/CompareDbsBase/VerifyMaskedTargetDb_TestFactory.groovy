@@ -4,6 +4,7 @@ import excel.ExcelObjectProvider
 import org.testng.ITestContext
 import org.testng.Reporter
 import org.testng.annotations.Factory
+import org.testng.annotations.Optional
 import org.testng.annotations.Parameters
 import static dtos.base.Constants.CompareType.DIFF
 
@@ -12,7 +13,7 @@ class  VerifyMaskedTargetDb_TestFactory {
 
     @Parameters(["systemColumn", "actionColumn", "tableColumn", "excludeTableColumn", "maskingColumn", "excludeMaskingColumn"] )
     @Factory
-    public Object[] createVerifyMaskedInstances(ITestContext testContext, String systemColumn, String actionColumn, String tableColumn, String excludeTableColumn, String maskingColumn, String excludeMaskingColumn) {
+    public Object[] createVerifyMaskedInstances(ITestContext testContext, String systemColumn, String actionColumn, @Optional ("") String tableColumn, @Optional ("") String excludeTableColumn, @Optional ("") String maskingColumn, @Optional ("") String excludeMaskingColumn) {
 
         def (ExcelObjectProvider excelObjectProviderMaskAction, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         def inputFile = excelObjectProviderMaskAction.inputFile
