@@ -32,7 +32,7 @@ ORDER BY 1"""
 
     @Parameters(["systemColumn", "excelModifiedTablesOnly", "sourceDbColumn", "targetDbColumn"] )
     @Test
-    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("false")boolean excelModifiedTablesOnly, @Optional("") String sourceDbColumn, @Optional("") String targetDbColumn, ITestContext testContext){
+    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("true")boolean excelModifiedTablesOnly, @Optional("") String sourceDbColumn, @Optional("") String targetDbColumn, ITestContext testContext){
         super.setup()
         def inputFile = ""
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
