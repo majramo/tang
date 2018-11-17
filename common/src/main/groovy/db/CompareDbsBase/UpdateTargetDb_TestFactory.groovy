@@ -17,6 +17,7 @@ class UpdateTargetDb_TestFactory {
 
         excelObjectProvider.addColumnsToRetriveFromFile(["System", "Table", "Column", "Action"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
+        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", "Truncate", DIFF)
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("RunSql", "-", DIFF)
         def excelBodyRows = SystemPropertiesInitation.readExcel(excelObjectProvider)
         excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "Column", "Action", "RunSql"])
