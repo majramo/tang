@@ -82,11 +82,11 @@ order by 7,6,4,2
     def source_R_Relations
     def parentRelations
 
-    @Parameters(["systemColumn", "recurse", "startTableColumn", "deleteStatementColumn"] )
+    @Parameters(["systemColumn", "recurseColumn", "startTableColumn", "deleteStatementColumn"] )
     @Test
-    void findDependenciesInSourceTables_test(String systemColumn, boolean recurse,   String startTableColumn, String deleteStatementColumn, ITestContext testContext) {
+    void findDependenciesInSourceTables_test(String systemColumn, boolean recurseColumn,   String startTableColumn, String deleteStatementColumn, ITestContext testContext) {
         super.setup()
-        this.recurse = recurse
+        this.recurse = recurseColumn
         firstRelations = "DELETE $startTableColumn;"
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         reporterLogLn("Source: <$sourceDb>")
