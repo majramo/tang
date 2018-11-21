@@ -43,8 +43,9 @@ ALTER TABLE ' || Parent_Table || ' DROP CONSTRAINT '   || Parent_Constraint  || 
 SELECT ' || Childcol  || ' FROM ' || Child_Table  || ' GROUP BY ' || Childcol  || ' HAVING COUNT(1) > 1;  -- Duplicates_Child  
 SELECT ' || Parentcol || ' FROM ' || Parent_Table || ' GROUP BY ' || Parentcol || ' HAVING COUNT(1) > 1;  -- Duplicates_Parent 
 SELECT ' || Childcol  || ' FROM ' || Child_Table  || ' WHERE NOT ' || Childcol  || ' IN ( ' || 'SELECT ' || Parentcol || ' FROM ' || Parent_Table || ' ); -- Child_Records_Missing_In_Parent
+--DELETE ' || Child_Table  || ' WHERE NOT ' || Childcol  || ' IN ( ' || 'SELECT ' || Parentcol || ' FROM ' || Parent_Table || ' ); -- Child_Records_Missing_In_Parent
 SELECT ' || Parentcol || ' FROM ' || Parent_Table || ' WHERE NOT ' || Parentcol || ' IN ( ' || 'SELECT ' || Childcol  || ' FROM ' || Child_Table  || ' );  --Parent_Records_Missing_In_Child 
-SELECT ' || Childcol  || ' FROM ' || Child_Table || ' WHERE NOT ' || Childcol || ' IN ( ' || 'SELECT ' ||Parentcol || ' FROM ' || Parent_Table || '   ); -- Child_Records_Missing_In_Parent 
+--DELETE ' || Parent_Table || ' WHERE NOT ' || Parentcol || ' IN ( ' || 'SELECT ' || Childcol  || ' FROM ' || Child_Table  || ' );  --Parent_Records_Missing_In_Child 
 ALTER TABLE ' || Child_Table  || ' DISABLE ALL TRIGGERS ;  --Disbale_Child_Triggers 
 ALTER TABLE ' || Parent_Table || ' DISABLE ALL TRIGGERS ;  -Disable_Parent_Triggers 
 ALTER TABLE ' || Child_Table  || ' ENABLE  ALL TRIGGERS ;  --Enabale_Child_Triggers 
@@ -90,7 +91,7 @@ order by 7,6,4,2
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         reporterLogLn("Source: <$sourceDb>")
         reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb)))
-        super.setSourceSqlHelper(testContext, targetDb)
+        super.setSourceSqlHelper(testContext, sourceDb)
         source_R_Relations = sourceDbSqlDriver.sqlConRun("Get data ", dbRunTypeRows, SOURCE_TABLE_QUERY_ORACLE_FIND, 0, sourceDb)
 
         startTable = startTableColumn.trim().toUpperCase()
