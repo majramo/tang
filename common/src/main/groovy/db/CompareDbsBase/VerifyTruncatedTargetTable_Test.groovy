@@ -18,6 +18,8 @@ public class VerifyTruncatedTargetTable_Test extends AnySqlCompareTest{
     def TARGET_TABLE_QUERY_ORACLE = "SELECT DISTINCT table_name FROM all_tab_cols WHERE table_name = '%s' AND NOT table_name IN (select view_name from all_views) AND OWNER = '%s'"
     def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns WHERE table_name = '%s'"
     def table
+    def SKIP_EXCEPTOIN_TABLE_MISSING =  "ORA-00942"
+    def SKIP_EXCEPTOIN_DATAKASSETT =  "ORA-29913"
 
     public VerifyTruncatedTargetTable_Test(targetDb, system, table, action) {
         super.setup()
@@ -54,7 +56,16 @@ public class VerifyTruncatedTargetTable_Test extends AnySqlCompareTest{
             throw new SkipException("Table <$table> does not exist")
         }
 
-        dbResult = getDbResult(targetDbSqlDriver, targetSql, dbRunTypeFirstRow)
+        try {
+//            dbResult = getDbResult(targetDbSqlDriver, "SELECT COUNT(*) COUNT_ FROM NOTIFIERINGSLOGGs", dbRunTypeFirstRow)
+            dbResult = getDbResult(targetDbSqlDriver, targetSql, dbRunTypeFirstRow)
+        } catch (java.sql.SQLSyntaxErrorException | java.sql.SQLException e) {
+            if (e.toString().contains(SKIP_EXCEPTOIN_TABLE_MISSING) ||e.toString().contains(SKIP_EXCEPTOIN_DATAKASSETT)) {
+                Reporter.log("Error skipped: " + e.toString())
+                throw new SkipException("Skip error: " + e.toString())
+            }
+            throw e
+        }
         def count = dbResult["COUNT_"]
         reporterLogLn("Table count: <$count>")
         tangAssert.assertEquals(count, 0, "Table should have zero rows", "Table has  <$count> rows, expected was <0>");
