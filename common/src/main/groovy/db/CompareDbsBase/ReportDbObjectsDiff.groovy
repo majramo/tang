@@ -53,6 +53,9 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             def dataFromTarget = targetDbResult.collect{it[0]}.join(",")
             def targetCount = targetDbResult.size()
             reporterLogLn("Target <$objectType>: <$targetCount>");
+            if(targetCount.equals(0)){
+                skipTest("Nothing in Target to Compare: sourceCount is <$targetCount> ")
+            }
             sourceTableSql = sourceTableSql.replaceAll("__-DATA-__", dataFromTarget)
             reporterLogLn("\n### sourceTableSql: \n$sourceTableSql");
             def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
@@ -63,6 +66,9 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             def dataFromSource = sourceDbResult.collect{it[0]}.join(",")
             def sourceCount = dataFromSource.size()
             reporterLogLn("Source <$objectType>: <$sourceCount>");
+            if(sourceCount.equals(0)){
+                skipTest("Nothing in Source to Compare: sourceCount is <$sourceCount> ")
+            }
             targetTableSql = targetTableSql.replaceAll("__-DATA-__", dataFromSource)
             reporterLogLn("\n### targetTableSql: \n$targetTableSql");
             def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
