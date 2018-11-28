@@ -80,8 +80,18 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             reporterLogLn("Missing <$objectType> in <$queryFirst> <$diffCount>")
             reporterLogLn("")
             def dbDifffDataToAdd = diffDbResult.collect{"'" + it[0] + "'"}.join(",\n")
-
-
+            def dropQuery = ""
+            switch (objectType.toLowerCase()) {
+                case "constraint":
+                    dropQuery = "SELECT 'ALTER TABLE ' || table_name || ' DROP CONSTRAINT ' || CONSTRAINT_NAME " +
+                            "FROM all_constraints " +
+                            "WHERE CONSTRAINT_NAME IN( " + dbDifffDataToAdd +");"
+                    break
+                case "index":
+                    dropQuery = diffDbResult.collect{it[0].replaceAll(/"|'|,/, "").replaceAll(/^/, "DROP INDEX ").replaceAll(/$/,";") }.join("\n")
+                    break
+            }
+            reporterLogLn("dropQuery\n$dropQuery")
             diffDbResult.eachWithIndex { it, i ->
                 reporterLogLn("-- " + "${i + 1} ".padLeft(5)  + it[0])
             }
