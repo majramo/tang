@@ -30,7 +30,6 @@ public class VerifyNullifiedTargetColumn_Test extends AnySqlCompareTest{
         this.searchCriteria = searchCriteria
         this.searchExtraCondition = searchExtraCondition
         targetDbOwner = settings."$targetDb".owner
-        super.setTargetSqlHelper(testContext, targetDb)
         if(settings["numberOfLinesInSqlCompare"] != "" && settings["numberOfLinesInSqlCompare"].size() != 0 ){
             numberOfLinesInSqlCompare = settings["numberOfLinesInSqlCompare"]
         }
@@ -40,6 +39,7 @@ public class VerifyNullifiedTargetColumn_Test extends AnySqlCompareTest{
 
     @Test
     public void verifyNullifiedTargetTest(ITestContext testContext){
+        super.setTargetSqlHelper(testContext, targetDb)
         def tmpColumn = column
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(targetDb)))
         row++

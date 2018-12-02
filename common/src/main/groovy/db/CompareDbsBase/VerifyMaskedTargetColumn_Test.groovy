@@ -34,8 +34,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         this.searchCriteria = searchCriteria
         this.searchExtraCondition = searchExtraCondition
         targetDbOwner = settings."$targetDb".owner
-        super.setSourceSqlHelper(testContext, sourceDb)
-        super.setTargetSqlHelper(testContext, targetDb)
+
         if(settings["numberOfLinesInSqlCompare"] != "" && settings["numberOfLinesInSqlCompare"].size() != 0 ){
             numberOfLinesInSqlCompare = settings["numberOfLinesInSqlCompare"]
         }
@@ -45,6 +44,8 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
 
     @Test
     public void verifyMaskedTargetTest(ITestContext testContext){
+        super.setSourceSqlHelper(testContext, sourceDb)
+        super.setTargetSqlHelper(testContext, targetDb)
         def tmpColumn = column
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(sourceDb), getDbType(targetDb)))
         row++
@@ -143,6 +144,8 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                 }
             }
         }
+        sourceDbSqlDriver = null
+        targetDbSqlDriver = null
         tangAssert.assertTrue(!sameData, "Table/Column <$table/$column> should be masked", "Table/Column seems to be unmasked ");
 
     }
