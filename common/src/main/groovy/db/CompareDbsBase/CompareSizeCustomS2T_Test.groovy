@@ -70,7 +70,7 @@ ORDER BY 1"""
         def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, tablesQuery, 0, sourceDb)
         def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, tablesQuery, 0, targetDb)
 
-        def diffCount
+        float diffCount
         def totalDiffCountExpected
         boolean noExceptionAtRun
         def sourceDbResultTableToCheck = sourceDbResult.size()-1
