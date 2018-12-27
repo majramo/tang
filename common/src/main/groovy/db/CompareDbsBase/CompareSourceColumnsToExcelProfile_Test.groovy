@@ -24,9 +24,9 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
     ArrayList<String> headersDb = ["SYSTEMNAME", "TABLE_NAME", "COLUMN_NAME", "DATA_TYPE", "SENSITIVE", "MASKING", "ACTION", "MASKOVERRIDE", "MaskOverrideAddon"]
     DecimalFormat thousandSeparatorFormat = new DecimalFormat("###,###");
 
-    @Parameters(["systemColumn", "maskingColumn", "tableColumn"] )
+    @Parameters(["systemColumn"] )
     @Test
-    public void compareSourceColumnsEqualsToExcelTest(String systemColumn, @Optional("")boolean tableColumn, @Optional("") String maskingColumn, ITestContext testContext){
+    public void compareSourceColumnsEqualsToExcelTest(String systemColumn, ITestContext testContext){
         def fileName = "/configFiles/SystemTableColumnSql.sql"
         URL is = this.getClass().getResource(fileName);
 
