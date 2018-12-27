@@ -99,8 +99,8 @@ ORDER BY 1"""
         }
         (diffCount, totalDiffCountExpected, noExceptionAtRun)  = compareTableSizes(sourceDb, sourceDbSqlDriver, sourceDbResult, targetDb, targetDbSqlDriver, targetDbResult, system, inputFile)
 
-        tangAssert.assertTrue(noExceptionAtRun, "No exception", "Got exception")
-        tangAssert.assertEquals(diffCount, totalDiffCountExpected, "$MESSAGE: should have no diff", "$MESSAGE: diffCount $diffCount <> $totalDiffCountExpected ")
+        tangAssert.assertTrue(noExceptionAtRun, "No exception", "Got exception <$noExceptionAtRun>")
+        tangAssert.assertTrue(diffCount == totalDiffCountExpected, "$MESSAGE: should have no diff", "$MESSAGE: diffCount $diffCount <> $totalDiffCountExpected ")
 
     }
 
@@ -196,6 +196,7 @@ ORDER BY 1"""
                 loopException = true
                 noExceptionAtRun = false
                 str = aggregate(str, "Exception i source <$sourceDb> $e")
+                reporterLogLn(e)
             }
             sourceSizeOut = thousandSeparatorFormat.format(new BigDecimal(sourceSize))
 
