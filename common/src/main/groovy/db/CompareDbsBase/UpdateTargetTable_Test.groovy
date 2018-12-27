@@ -31,7 +31,7 @@ public class UpdateTargetTable_Test extends AnySqlCompareTest{
     @Test
     public void updateTargetTest(ITestContext testContext){
         if(skipTest){
-            skipTest("targetSql doesn't contain <UPDATE >\n\n$targetSql")
+            skipTest("targetSql doesn't start with <UPDATE >\n\n$targetSql")
         }
         super.setTargetSqlHelper(testContext, targetDb)
         reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(targetDb)))
