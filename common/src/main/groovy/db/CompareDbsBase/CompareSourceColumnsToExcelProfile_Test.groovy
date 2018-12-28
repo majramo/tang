@@ -36,6 +36,12 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
         }
         super.setup()
         def (ExcelObjectProvider excelObjectProviderMaskAction, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
+        def compareDataPath = settings.compareDataPath
+        if(compareDataPath.size() == 0 || compareDataPath == ""){
+            compareDataPath = "."
+        }
+        File excelFile = new File("$compareDataPath/${system}.DbCompareToExcel.xls")
+        File tmpFile   = new File("$compareDataPath/${system}.tmp.DbCompareToExcel.xls")
 
         def dbType = getDbType(sourceDb)
         def tablesQuery
@@ -53,8 +59,6 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
 
         def dbDataCompareOutput = compare(dbSystemProfile, excelSystemProfile)
 
-        File excelFile = new File("C:/tmp/AF_Compare/${system}.DbCompareToExcel.xls")
-        File tmpFile   = new File("C:/tmp/AF_Compare/${system}.tmp.DbCompareToExcel.xls")
         ExcelFileWriter excelFileWriter = new ExcelFileWriter(tmpFile.getPath(), "System")
         excelFileWriter.writeHeader(["Source", "Mode", "TableColumn"] + headersExcel);
         excelFileWriter.writeBody(dbDataCompareOutput);
