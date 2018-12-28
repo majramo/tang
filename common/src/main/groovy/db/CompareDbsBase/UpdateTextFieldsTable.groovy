@@ -16,7 +16,7 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
     private String searchExtraCondition;
     private String maskingColumn;
     private boolean execute;
-    private boolean onlyAaZzCharColumnn;
+    private boolean onlyAaZzCharColumn;
     private static String settingsEmailDomain = "test.addtest.se"
 
     public UpdateTextFieldsTable(targetDb, system, table, action, column, searchExtraCondition, String maskingColumn, boolean execute = false, boolean onlyAaZzCharColumnn = false) {
@@ -28,7 +28,7 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
         this.maskingColumn = maskingColumn
         this.searchExtraCondition = searchExtraCondition
         this.execute = execute
-        this.onlyAaZzCharColumnn = onlyAaZzCharColumnn
+        this.onlyAaZzCharColumn = onlyAaZzCharColumnn
 
         String dbTargetOwner = settings."$targetDb".owner
     }
@@ -45,26 +45,32 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
         reporterLogLn("Action:    <$action> ");
         reporterLogLn("Masking:   <$maskingColumn   $maskingColumn   $maskingColumn   $maskingColumn>");
         reporterLogLn("Column:    <$column>");
+        reporterLogLn("###");
+        reporterLogLn("execute:    <$execute>");
 
         def targetSql = "UPDATE $table \nSET $column = "
-        if(settings["emailDomain"].size() != 0 && settings["emailDomain"] != ""){
-            settingsEmailDomain = settings.emailDomain
-        }
+
+        def settingsEmailDomain  = getSettingsValueIfExistsElseDefault("emailDomain")
+        def ddText  = getSettingsValueIfExistsElseDefault("DD_TEXT")
+        def ddPhoneNumber  = getSettingsValueIfExistsElseDefault("DD_PHONE_NUMBER")
+        def ddPassword  = getSettingsValueIfExistsElseDefault("DD_PASSWORD")
+        def ddUrl  = getSettingsValueIfExistsElseDefault("DD_URL")
+        def ddEmailAddress  = getSettingsValueIfExistsElseDefault("DD_EMAIL_ADDRESS")
         switch (maskingColumn) {
-            case ~/AF_Fritext/:
+            case ~/$ddText/:
                 targetSql += " 'Text ' || substr( (rownum + 12345678)  ,1,8) "
                 break
-            case ~/AF_Telefonnummer/:
+            case ~/$ddPhoneNumber/:
                 targetSql += " '010' || substr( (rownum + 12345678)  ,1,8) "
                 break
-            case ~/AF_Losenord/:
+            case ~/$ddPassword/:
                 targetSql += '1234'
                 break
-            case ~/AF_Url/:
+            case ~/$ddUrl/:
                 targetSql += " 'test.' || substr( (rownum + 12345678)  ,1,8) || '.@settingsEmailDomain' "
                 break
-            case ~/AF_Epost/:
-                if(!onlyAaZzCharColumnn){
+            case ~/$ddEmailAddress/:
+                if(!onlyAaZzCharColumn){
                     targetSql += " 'test.' || substr( (rownum + 12345678)  ,1,8) || '@$settingsEmailDomain' "
                 }else{
                     targetSql += " replace(replace(replace(replace(replace(replace($column, 'å', 'a'), 'ö', 'o'), 'ä', 'a') , 'Ä', 'A') , 'Å', 'A') , 'Ö', 'O')  "
@@ -74,7 +80,7 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
 
         targetSql += "\nwhere $column IS NOT NULL"
         if(!searchExtraCondition.isEmpty() && searchExtraCondition != "-"){
-            if(maskingColumn.equals("AF_Epost") && onlyAaZzCharColumnn){
+            if(maskingColumn.equals(ddEmailAddress) && onlyAaZzCharColumn){
                 targetSql += "\n--Ignore for Epost $searchExtraCondition"
             }else {
                 targetSql += "\nAND $searchExtraCondition"
@@ -87,5 +93,4 @@ public class UpdateTextFieldsTable extends AnySqlCompareTest{
             execute(targetDbSqlDriver, targetSql)
         }
     }
-
 }
