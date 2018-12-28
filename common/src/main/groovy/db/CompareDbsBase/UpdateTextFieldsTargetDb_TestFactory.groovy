@@ -17,8 +17,12 @@ class UpdateTextFieldsTargetDb_TestFactory {
 
         excelObjectProvider.addColumnsToRetriveFromFile(["System", "Table", "Column", "Action", "SearchExtraCondition"])
         excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
-        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
-        excelObjectProvider.addColumnsCapabilitiesToRetrieve("Masking", maskingColumn)
+        if(!actionColumn.isEmpty()){
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", actionColumn.trim())
+        }
+        if(!maskingColumn.isEmpty()){
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve("Masking", maskingColumn.trim())
+        }
         if(!tableColumn.isEmpty()){
             excelObjectProvider.addColumnsCapabilitiesToRetrieve("Table", tableColumn.trim().toUpperCase())
         }
