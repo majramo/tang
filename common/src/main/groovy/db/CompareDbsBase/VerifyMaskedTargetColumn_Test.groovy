@@ -22,6 +22,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     def searchCriteria
     def searchExtraCondition
     def numberOfLinesInSqlCompare = 101
+
     public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn, masking, searchCriteria = "", searchExtraCondition = "") {
         super.setup()
         this.targetDb = targetDb
@@ -36,7 +37,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         targetDbOwner = settings."$targetDb".owner
 
         if(settings["numberOfLinesInSqlCompare"] != "" && settings["numberOfLinesInSqlCompare"].size() != 0 ){
-            numberOfLinesInSqlCompare = settings["numberOfLinesInSqlCompare"]
+            numberOfLinesInSqlCompare = Integer.parseInt(settings["numberOfLinesInSqlCompare"])
         }
 
         log.info("sourceTargetSql <$sourceTargetSql>")
@@ -68,7 +69,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns WHERE table_name = '%s'" //Todo: change this  sqlserver sql and check in
         if(checkColumnTypeResult[0] == "CLOB" ){
             reporterLogLn("Clob: <$column> ");
-            tmpColumn = "to_char( $column)"
+            tmpColumn = "DBMS_LOB.SUBSTR( $column, 50, 1)"
             reporterLogLn("checkColumnType:\n$checkColumnType\n")
             reporterLogLn("Column <$table> <$column> is xLOB type<$checkColumnTypeResult> ==> <$tmpColumn>")
         }
@@ -86,16 +87,37 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                 numberOfLinesInSqlCompareTemp = numberOfLinesInSqlCompare + 1000
             }
 
+            def fromId = 1
+            def toMaxId = numberOfLinesInSqlCompareTemp
+            //TODO change the sql and put value of Max in the sql
+            def maxQuery = "SELECT MAX($searchCriteria)MAX_ID FROM $table " +
+                    "where NOT $column IS NULL"
+            def sourceDbResult = getSourceDbRowsResult(maxQuery)
+            def toMaxIdRaw = sourceDbResult[0]["MAX_ID"]
+            try {
+                toMaxId =  new BigDecimal(toMaxIdRaw)
+            } catch (NumberFormatException  e) {
+                reporterLogLn("######")
+                reporterLogLn("Wrong type of Id, MUST be NUMERIC <$searchCriteria>")
+                reporterLogLn("Got <$toMaxIdRaw>")
+                reporterLogLn("######")
+                reporterLogLn(maxQuery)
+                throw e
+            }
+            if(numberOfLinesInSqlCompareTemp < toMaxId){
+                fromId = toMaxId - numberOfLinesInSqlCompareTemp
+            }
+
             sourceTargetSql = "-- Verify search criteria and masked column<$searchCriteria, $tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
                 sourceTargetSql += "SELECT $searchCriteria, $tmpColumn FROM $table\n" +
-                        " WHERE NOT $tmpColumn IS NULL\n" +
-                        " AND LENGTH(REPLACE($tmpColumn, ' ' , '')) > 0\n" +
-                        " AND $searchCriteria BETWEEN (SELECT MAX($searchCriteria)- $numberOfLinesInSqlCompare FROM $table where NOT $tmpColumn IS NULL) AND (SELECT MAX($searchCriteria) FROM $table where NOT $tmpColumn IS NULL)\n" +
-                    " AND ROWNUM < $numberOfLinesInSqlCompareTemp\n"
+                        " WHERE NOT $column IS NULL\n" +
+                       // " AND LENGTH(REPLACE($tmpColumn, ' ' , '')) > 0\n" +
+                        " AND $searchCriteria BETWEEN $fromId AND $toMaxId\n" +
+                    " AND ROWNUM < $numberOfLinesInSqlCompare\n"
         }else{
             sourceTargetSql = "-- Verify masked column<$tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
             sourceTargetSql += "SELECT $tmpColumn FROM $table\n" +
-                    " WHERE NOT $tmpColumn IS NULL\n" +
+                    " WHERE NOT $column IS NULL\n" +
                     " AND ROWNUM < $numberOfLinesInSqlCompare\n"
         }
         if( searchExtraCondition != ""){
@@ -107,12 +129,15 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
 //            sourceTargetSql = "-- Verify masked column<$column> in table <$table> in system <$system> \n"
 //            sourceTargetSql = String.format(TARGET_TABLE_QUERY_SQLSERVER, table)
         }
+        log.info("\n")
         log.info("sourceTargetSql:\n$sourceTargetSql\n")
         reporterLogLn("TargetSql:\n$sourceTargetSql\n")
         reporterLogLn("#########")
 
         def sourceDbResult = getSourceDbRowsResult(sourceTargetSql)
         def targetDbResult = getTargetDbRowsResult(sourceTargetSql)
+        reporterLogLn("Source data size: " + sourceDbResult.size())
+        reporterLogLn("Target data size: " + targetDbResult.size())
 
         boolean sameData = false
         if(sourceDbResult != null && targetDbResult != null ) {
@@ -122,7 +147,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                 sameData = false
             }else {
                 if (checkColumnTypeResult[0] == "CLOB") {
-                    sameData = (targetDbResult.collect {}.toString() == sourceDbResult.collect {}.toString())
+                    sameData = (targetDbResult.collect {it.toString()} == sourceDbResult.collect {it.toString()})
                 } else {
                    sameData = (targetDbResult == sourceDbResult)
                 }
