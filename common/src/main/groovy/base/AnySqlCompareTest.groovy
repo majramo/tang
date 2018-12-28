@@ -703,4 +703,13 @@ $fieldsStr
         return savedSourceSql
     }
 
+    def getSettingsValueIfExistsElseDefault(settingsRef, defaultValue = settingsRef ){
+
+        def settingsDomainValue = settings[settingsRef]
+        if(settingsDomainValue.size() != 0 && settingsDomainValue != ""){
+            return settingsDomainValue
+        }
+        //default value
+        return defaultValue
+    }
 }
