@@ -27,7 +27,7 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
     @Parameters(["systemColumn"] )
     @Test
     public void compareSourceColumnsEqualsToExcelTest(String systemColumn, ITestContext testContext){
-        def fileName = "/configFiles/SystemTableColumnSql.sql"
+        def fileName = "/configFiles/AfSystemsProfilerSql.txt"
         URL is = this.getClass().getResource(fileName);
 
         def SOURCE_TABLE_QUERY_ORACLE
