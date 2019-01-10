@@ -21,7 +21,7 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
     def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
     def MESSAGE = "Comparing tables"
     ArrayList<String> headersExcel = ["System", "Table", "Column", "Type", "Sensitive", "Masking", "Action", "MaskOverride", "MaskOverrideAddon", "MaskExtra", "TargetSizeMinimumDiff", "TargetSizeMaximumDiff", "RunSql", "SearchCriteria", "SearchExtraCondition", "Verify"]
-    ArrayList<String> headersDb = ["SYSTEMNAME", "TABLE_NAME", "COLUMN_NAME", "DATA_TYPE", "SENSITIVE", "MASKING", "ACTION", "MASKOVERRIDE", "MaskOverrideAddon"]
+    ArrayList<String> headersDb = ["SYSTEMNAME", "TABLE_NAME", "COLUMN_NAME", "DATA_TYPE", "SENSITIVE", "MASKING", "ACTION", "MASKOVERRIDE", "MaskOverrideAddon", "C1", "C2", "C3", "C4", "C5", "C6", "C7"]
     DecimalFormat thousandSeparatorFormat = new DecimalFormat("###,###");
 
     @Parameters(["systemColumn"] )
@@ -89,14 +89,13 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
         def sameRows = dbData.getSystemProfileKeys().intersect(excelData.getSystemProfileKeys())
         def dbNewRows = dbData.getSystemProfileKeys() - sameRows
         def excelRemovedRows =excelData.getSystemProfileKeys() - sameRows
-
         def dataCompareOutput = []
         println ("\n$headersExcel")
         excelData.getSystemProfileRowsContainingKeys(sameRows).each {
             dataCompareOutput.add(["--", "Same"] + it.value.getValues())
         }
         dbData.getSystemProfileRowsContainingKeys(dbNewRows).each {
-            dataCompareOutput.add(["DB", "New"]  + it.value.getValues())
+            dataCompareOutput.add(["DB", "New"]  + it.value.getValues() )
 
         }
         excelData.getSystemProfileRowsContainingKeys(excelRemovedRows).each {
@@ -108,9 +107,19 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
     }
 
     private createSystemProfileFromExcelDataBody(name, fileName){
-        def excelData = new ExcelFileReader(fileName).getBodyRows()
-        def excelDataBody = []
         SystemProfile systemProfile = new SystemProfile(name)
+        def excelData
+        try {
+            excelData = new ExcelFileReader(fileName).getBodyRows()
+        } catch (Exception e) {
+            reporterLogLn("########## Warning")
+            reporterLogLn("########## Warning")
+            reporterLogLn("Exception <$e>")
+            reporterLogLn("Could not find file <$fileName>")
+            reporterLogLn("Assuming empty file!")
+            return systemProfile
+        }
+        def excelDataBody = []
         excelData.each {
             def excelBodyMap= it.excelBodyMap
             def excelBodyRow = []
