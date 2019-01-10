@@ -60,7 +60,7 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
         def dbDataCompareOutput = compare(dbSystemProfile, excelSystemProfile)
 
         ExcelFileWriter excelFileWriter = new ExcelFileWriter(tmpFile.getPath(), "System")
-        excelFileWriter.writeHeader(["Source", "Mode", "TableColumn"] + headersExcel);
+        excelFileWriter.writeHeader(["Source", "Mode"] + headersExcel);
         excelFileWriter.writeBody(dbDataCompareOutput);
         excelFileWriter.flushAndClose()
 
