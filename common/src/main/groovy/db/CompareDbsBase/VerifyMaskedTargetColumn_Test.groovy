@@ -95,7 +95,9 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
             def sourceDbResult = getSourceDbRowsResult(maxQuery)
             def toMaxIdRaw = sourceDbResult[0]["MAX_ID"]
             try {
-                toMaxId =  new BigDecimal(toMaxIdRaw)
+                if (toMaxIdRaw != null){
+                    toMaxId = new BigDecimal(toMaxIdRaw)
+                }
             } catch (NumberFormatException  e) {
                 reporterLogLn("######")
                 reporterLogLn("Wrong type of Id, MUST be NUMERIC <$searchCriteria>")
