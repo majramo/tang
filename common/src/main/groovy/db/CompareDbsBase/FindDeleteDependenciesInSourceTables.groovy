@@ -111,6 +111,7 @@ order by 7,6,4,2
             startTablesToRun = startTableColumn.trim().split(" ").collect().unique()
         }
 
+        super.reporterLogLn("")
         super.reporterLogLn("#####################################################################")
         super.reporterLogLn("#####################################################################")
         super.reporterLogLn("###")
@@ -120,15 +121,23 @@ order by 7,6,4,2
         super.reporterLogLn("#####################################################################")
         super.reporterLogLn("")
         super.reporterLogLn("")
-
-        startTablesToRun.each { startTableToRun ->
+        startTablesToRun.eachWithIndex { startTableToRun, i ->
             source_R_Relations.findAll { it["PARENT_TABLE"] == startTableToRun }
-            super.reporterLogLn(startTableToRun)
-            source_R_Relations.findAll{it["PARENT_TABLE"] == startTableToRun && it["CHILD_TABLE"] != startTableToRun && it["DELETE_RULE"] == "NO ACTION"}.collect{it["CHILD_TABLE"]}.unique().each{childTable->
-                super.reporterLogLn("   noaction: " + childTable)
+            def childRelations = source_R_Relations.findAll{it["PARENT_TABLE"] == startTableToRun && it["CHILD_TABLE"] != startTableToRun}.collect{it["CHILD_TABLE"]}.unique()
+            if(childRelations.size()>0){
+                super.reporterLogLn("${i + 1}: $startTableToRun")
+            }else{
+                super.reporterLogLn("(${i + 1}: $startTableToRun)")
             }
-            source_R_Relations.findAll{it["PARENT_TABLE"] == startTableToRun  && it["CHILD_TABLE"] != startTableToRun && it["DELETE_RULE"] != "NO ACTION"}.collect{it["CHILD_TABLE"]}.unique().each{childTable->
-                super.reporterLogLn("   other: " + childTable)
+            def noActionRelations = source_R_Relations.findAll{it["PARENT_TABLE"] == startTableToRun && it["CHILD_TABLE"] != startTableToRun && it["DELETE_RULE"] == "NO ACTION"}
+            def noACtionChildTables = noActionRelations.collect{it["CHILD_TABLE"]}.unique()
+            def otherRelations    = source_R_Relations.findAll{it["PARENT_TABLE"] == startTableToRun && it["CHILD_TABLE"] != startTableToRun && it["DELETE_RULE"] != "NO ACTION"}
+            def otherRelationsChildTables = otherRelations.collect{it["CHILD_TABLE"]}.unique()
+            noACtionChildTables.each{childTable->
+                super.reporterLogLn("   ---> " + noActionRelations.findAll{it["PARENT_TABLE"] == startTableToRun  && it["CHILD_TABLE"] == childTable}["DELETE_RULE"][0] + ": $childTable")
+            }
+            otherRelationsChildTables.each{childTable->
+                super.reporterLogLn("     -- (" + otherRelations.findAll{it["PARENT_TABLE"] == startTableToRun  && it["CHILD_TABLE"] == childTable}["DELETE_RULE"][0] + ": $childTable)")
             }
         }
 
@@ -147,6 +156,7 @@ order by 7,6,4,2
     }
 
     protected void reportStartTable(String startTable) {
+        reporterLogLn("")
         reporterLogLn("########################################")
         reporterLogLn("########################################")
         reporterLogLn("########################################")
