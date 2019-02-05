@@ -143,7 +143,7 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
             headersDb.each {header->
                 def field = dbRow[header]
                 if(header  == 'SYSTEMNAME'){
-                    field = name
+                    field = name.capitalize()
                 }
                 excelBodyRow.add(field)
             }
