@@ -49,4 +49,7 @@ public class SystemProfileRow {
     public  getValues(){
         return [System, Table, Column, Type, Sensitive, Masking, Action, MaskOverride, MaskOverrideAddon, MaskExtra, TargetSizeMinimumDiff, TargetSizeMaximumDiff, RunSql, SearchCriteria, SearchExtraCondition, Verify]
     }
+    public  getDbValues(){
+        return [System:System, Table:Table, Column:Column, Type:Type]
+    }
 }

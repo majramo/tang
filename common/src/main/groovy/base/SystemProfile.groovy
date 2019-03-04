@@ -30,5 +30,8 @@ public class SystemProfile {
             println("$k < " + v.toString())
         }
     }
+    public  getDbValues(){
+        return systemProfileRows.collect {it-> it.value.getDbValues()}
+    }
 
 }
