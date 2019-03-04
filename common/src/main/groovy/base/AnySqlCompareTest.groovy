@@ -712,4 +712,27 @@ $fieldsStr
         //default value
         return defaultValue
     }
+
+    def joinList(list, delimiter = ",", length = 80){
+        def outLine = ""
+        def outLines = ""
+        def counter = list.size() - 1
+        list.eachWithIndex{ line, index->
+            if(counter == index) {
+                outLine += "$line"
+            }else{
+                outLine += "$line$delimiter"
+            }
+            if (outLine.length() >= length){
+                outLines += "$outLine\n"
+                outLine = ""
+            }else{
+                if (outLine.length() >= length) {
+                    outLines += "$outLine\n"
+                    outLine = ""
+                }
+            }
+        }
+        return "$outLines$outLine"
+    }
 }
