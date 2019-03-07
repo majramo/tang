@@ -23,6 +23,9 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
     ArrayList<String> headersExcel = ["System", "Table", "Column", "Type", "Sensitive", "Masking", "Action", "MaskOverride", "MaskOverrideAddon", "MaskExtra", "TargetSizeMinimumDiff", "TargetSizeMaximumDiff", "RunSql", "SearchCriteria", "SearchExtraCondition", "Verify"]
     ArrayList<String> headersDb = ["SYSTEMNAME", "TABLE_NAME", "COLUMN_NAME", "DATA_TYPE", "SENSITIVE", "MASKING", "ACTION", "MASKOVERRIDE", "MaskOverrideAddon", "C1", "C2", "C3", "C4", "C5", "C6", "C7"]
     DecimalFormat thousandSeparatorFormat = new DecimalFormat("###,###");
+    def newCount = 0
+    def removedCount = 0
+    def sameCount = 0
 
     @Parameters(["systemColumn"] )
     @Test
@@ -49,10 +52,10 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
          tablesQuery = SOURCE_TABLE_QUERY_ORACLE
 
         super.setSourceSqlHelper(testContext, sourceDb)
-        reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb)))
+        reporterLogPrint(reporterHelper.addIcons(getDbType(sourceDb)))
 
-        reporterLogLn("Source: <$sourceDb>");
-        reporterLogLn("Query: <$tablesQuery>");
+        reporterLogPrint("Source: <$sourceDb>");
+        reporterLogPrint("Query: <$tablesQuery>");
 
         SystemProfile excelSystemProfile = createSystemProfileFromExcelDataBody("Excel file", excelObjectProviderMaskAction.inputFile)
         SystemProfile dbSystemProfile = createSystemProfileFromDatabase(systemColumn, sourceDb, tablesQuery)
@@ -69,20 +72,23 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
             excelFile.delete()
         }
 
-        reporterLogLn("")
-        reporterLogLn("")
-        reporterLogLn("#################")
+        reporterLogPrint("")
+        reporterLogPrint("")
+        reporterLogPrint("#################")
         //excel file couldn't be removed!
         if(excelFile.exists()) {
             println "Check file " + tmpFile.absolutePath
-            reporterLogLn("File <$tmpFile> can't be renamed to >$excelFile>")
-            reporterLogLn("Check file " + tmpFile.absolutePath)
+            reporterLogPrint("File <$tmpFile> can't be renamed to >$excelFile>")
+            reporterLogPrint("Check file " + tmpFile.absolutePath)
             log.error("File <$tmpFile> can't be renamed to >$excelFile>")
         }else {
             tmpFile.renameTo(excelFile)
             println "Check file " + excelFile.absolutePath
-            reporterLogLn("Check file " + excelFile.absolutePath)
+            reporterLogPrint("Check file " + excelFile.absolutePath)
         }
+        reporterLogPrint("Same columns: " + sameCount)
+        reporterLogPrint("new columns: " + newCount)
+        reporterLogPrint("Removed columns: " + removedCount)
     }
 
     private compare(SystemProfile dbData, SystemProfile excelData){
@@ -91,8 +97,12 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
         def excelRemovedRows =excelData.getSystemProfileKeys() - sameRows
         def dataCompareOutput = []
         println ("\n$headersExcel")
+        sameCount = sameRows.size()
+        newCount = dbNewRows.size()
+        removedCount = excelRemovedRows.size()
         excelData.getSystemProfileRowsContainingKeys(sameRows).each {
             dataCompareOutput.add(["--", "Same"] + it.value.getValues())
+
         }
         dbData.getSystemProfileRowsContainingKeys(dbNewRows).each {
             dataCompareOutput.add(["DB", "New"]  + it.value.getValues() )
@@ -100,7 +110,6 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
         }
         excelData.getSystemProfileRowsContainingKeys(excelRemovedRows).each {
             dataCompareOutput.add(["Excel", "Removed"]  + it.value.getValues())
-
         }
 
         return dataCompareOutput.sort{it[2]}
@@ -112,11 +121,11 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
         try {
             excelData = new ExcelFileReader(fileName).getBodyRows()
         } catch (Exception e) {
-            reporterLogLn("########## Warning")
-            reporterLogLn("########## Warning")
-            reporterLogLn("Exception <$e>")
-            reporterLogLn("Could not find file <$fileName>")
-            reporterLogLn("Assuming empty file!")
+            reporterLogPrint("########## Warning")
+            reporterLogPrint("########## Warning")
+            reporterLogPrint("Exception <$e>")
+            reporterLogPrint("Could not find file <$fileName>")
+            reporterLogPrint("Assuming empty file!")
             return systemProfile
         }
         def excelDataBody = []
