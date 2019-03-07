@@ -2,6 +2,8 @@ package excel
 
 import dtos.SettingsHelper
 import exceptions.TangFileException
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import org.apache.log4j.Logger
 import org.apache.poi.hssf.usermodel.HSSFRow
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -95,6 +97,8 @@ public class ExcelFileObjectReader {
 
     private void setDataFromFile(HashMap excelCapabilities, int to = 0, int from = 0) {
         println("\n\n###\nReading file: $fileName")
+        Date startTime = new Date()
+        println(startTime)
         try {
             URL is = this.getClass().getResource(fileName);
             if (is == null) {
@@ -106,7 +110,10 @@ public class ExcelFileObjectReader {
             HSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> excelRowIterator = sheet.rowIterator();
             fileInputStream.close();
-            readLines(excelRowIterator, to, excelCapabilities, from)
+            def lines = readLines(excelRowIterator, to, excelCapabilities, from)
+            Date stopTime = new Date()
+            TimeDuration td = TimeCategory.minus( stopTime, startTime )
+            println("$stopTime duration<$td> Reading file: $fileName")
         } catch (FileNotFoundException e) {
             throw new TangFileException("Can't find file " + fileName, e)
         } catch (IOException e) {
@@ -116,6 +123,8 @@ public class ExcelFileObjectReader {
 
     private  ArrayList<Object[][]> getDataFromFile(HashMap excelCapabilities, int to = 0, int from = 0) {
         println("\n\n###\nReading file: $fileName")
+        Date startTime = new Date()
+        println(startTime)
         try {
             URL is = this.getClass().getResource(fileName);
             if (is == null) {
@@ -127,12 +136,17 @@ public class ExcelFileObjectReader {
             HSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> excelRowIterator = sheet.rowIterator();
             fileInputStream.close();
-            getLines(excelRowIterator, to, excelCapabilities, from)
+            def lines = getLines(excelRowIterator, to, excelCapabilities, from)
+            Date stopTime = new Date()
+            TimeDuration td = TimeCategory.minus( stopTime, startTime )
+            println("$stopTime duration<$td> Reading file: $fileName")
+            return lines
         } catch (FileNotFoundException e) {
             throw new TangFileException("Can't find file " + fileName, e)
         } catch (IOException e) {
             throw new TangFileException("Can't open file " + fileName, e)
         }
+
     }
 
 
