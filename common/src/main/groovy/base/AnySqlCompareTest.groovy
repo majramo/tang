@@ -453,6 +453,10 @@ public class AnySqlCompareTest {
 
     }
 
+    public void reporterLogPrint(message = "") {
+        println "$message"
+        Reporter.log("$message")
+    }
     public void reporterLogLn(message = "") {
         Reporter.log("$message")
 //        Reporter.log("$message")
