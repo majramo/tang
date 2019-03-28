@@ -46,11 +46,12 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
         reporterLogLn("DB copmpare type: <$objectType>");
         reporterLogLn("Query first: <$queryFirst>");
         def diffDbResult
-            //read database
+        def targetDbResult
+        //read database
         if(queryFirst.equals("target")){
             reporterLogLn("\n### targetTableSql: \n$targetTableSql");
-            def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
-            def dataFromTarget = targetDbResult.collect{it[0]}.join(",")
+            targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
+            def dataFromTarget = joinList(targetDbResult.collect{it[0]})
             def targetCount = targetDbResult.size()
             reporterLogLn("Target <$objectType>: <$targetCount>");
             if(targetCount.equals(0)){
@@ -63,7 +64,7 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
         }else{
             reporterLogLn("\n### sourceTableSql: \n$sourceTableSql");
             def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
-            def dataFromSource = sourceDbResult.collect{it[0]}.join(",")
+            def dataFromSource = joinList(sourceDbResult.collect{it[0]})
             def sourceCount = dataFromSource.size()
             reporterLogLn("Source <$objectType>: <$sourceCount>");
             if(sourceCount.equals(0)){
@@ -71,7 +72,7 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             }
             targetTableSql = targetTableSql.replaceAll("__-DATA-__", dataFromSource)
             reporterLogLn("\n### targetTableSql: \n$targetTableSql");
-            def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
+            targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
             diffDbResult = targetDbResult
         }
         def diffCount =  diffDbResult.size()
@@ -80,18 +81,26 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             reporterLogLn("Missing <$objectType> in <$queryFirst> <$diffCount>")
             reporterLogLn("")
             def dbDifffDataToAdd = diffDbResult.collect{"'" + it[0] + "'"}.join(",\n")
-            def dropQuery = ""
+            dbDifffDataToAdd = joinList(diffDbResult.collect{  "'" + it[0] + "'" }, ", ", 44)
+            def objectQuery = ""
             switch (objectType.toLowerCase()) {
                 case "constraint":
-                    dropQuery = "SELECT 'ALTER TABLE ' || table_name || ' DROP CONSTRAINT ' || CONSTRAINT_NAME " +
+                    objectQuery = "SELECT 'ALTER TABLE ' || table_name || ' ENABLE CONSTRAINT ' || CONSTRAINT_NAME; --enable" +
+                            "--ALTER TABLE ' || table_name || ' DROP CONSTRAINT ' || CONSTRAINT_NAME; --drop" +
                             "FROM all_constraints " +
                             "WHERE CONSTRAINT_NAME IN( " + dbDifffDataToAdd +");"
+                    targetDbResult
+                    objectQuery += "\n\n--ENABLE CONSTRAINT\n" +
+                            diffDbResult["ENABLE_"].join("\n")
+                    objectQuery += "\n\n--DROP CONSTRAINT\n" +
+                            diffDbResult["DROP_"].join("\n")
                     break
                 case "index":
-                    dropQuery = diffDbResult.collect{it[0].replaceAll(/"|'|,/, "").replaceAll(/^/, "DROP INDEX ").replaceAll(/$/,";") }.join("\n")
+                    objectQuery = diffDbResult.collect{it[0].replaceAll(/"|'|,/, "").replaceAll(/^/, "DROP INDEX ").replaceAll(/$/,";") }.join("\n")
+                    objectQuery += "\n\n--DROP INDEX\n" + diffDbResult.collect{"DROP INDEX " + it["INDEX_NAME"] + ";"}.join("\n")
                     break
             }
-            reporterLogLn("dropQuery\n$dropQuery")
+            reporterLogLn("objectQuery\n$objectQuery")
             diffDbResult.eachWithIndex { it, i ->
                 reporterLogLn("-- " + "${i + 1} ".padLeft(5)  + it[0])
             }
