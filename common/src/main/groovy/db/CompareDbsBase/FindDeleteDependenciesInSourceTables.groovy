@@ -108,7 +108,7 @@ order by 7,6,4,2
             def parentTablesToRun = source_R_Relations.collect{it["PARENT_TABLE"]}.intersect(dbActionTables)
             startTablesToRun = (childTablesToRun + parentTablesToRun).unique()
         }else{
-            startTablesToRun = startTableColumn.trim().split(" ").collect().unique()
+            startTablesToRun = startTableColumn.trim().split(" ").collect{it.toUpperCase()}.unique()
         }
 
         super.reporterLogLn("")
