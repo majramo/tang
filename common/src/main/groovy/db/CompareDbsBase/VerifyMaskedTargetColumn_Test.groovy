@@ -79,73 +79,13 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                 " WHERE NOT $tmpColumn IS NULL\n" +
                 " AND ROWNUM < 21\n"
 
-        if (searchCriteria != "") {
-            def numberOfLinesInSqlCompareTemp = numberOfLinesInSqlCompare
-            if(numberOfLinesInSqlCompare.class.equals(String)){
-                numberOfLinesInSqlCompareTemp  = Integer.parseInt(numberOfLinesInSqlCompare) + 1000
-            }else {
-                numberOfLinesInSqlCompareTemp = numberOfLinesInSqlCompare + 1000
-            }
-
-            def fromId = 1
-            def toMaxId = numberOfLinesInSqlCompareTemp
-            //TODO change the sql and put value of Max in the sql
-            def maxQuery = "SELECT MAX($searchCriteria)MAX_ID FROM $table " +
-                    "where NOT $column IS NULL"
-            def sourceDbResult = getSourceDbRowsResult(maxQuery)
-            def toMaxIdRaw = sourceDbResult[0]["MAX_ID"]
-            try {
-                if (toMaxIdRaw != null){
-                    toMaxId = new BigDecimal(toMaxIdRaw)
-                }
-            } catch (NumberFormatException  e) {
-                reporterLogLn("######")
-                reporterLogLn("Wrong type of Id, MUST be NUMERIC <$searchCriteria>")
-                reporterLogLn("Got <$toMaxIdRaw>")
-                reporterLogLn("######")
-                reporterLogLn(maxQuery)
-                throw e
-            }
-            if(numberOfLinesInSqlCompareTemp < toMaxId){
-                fromId = toMaxId - numberOfLinesInSqlCompareTemp
-            }
-
-            sourceTargetSql = "-- Verify search criteria and masked column<$searchCriteria, $tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
-                sourceTargetSql += "SELECT $searchCriteria, $tmpColumn FROM $table\n" +
-                        " WHERE NOT $column IS NULL\n" +
-                       // " AND LENGTH(REPLACE($tmpColumn, ' ' , '')) > 0\n" +
-                        " AND $searchCriteria BETWEEN $fromId AND $toMaxId\n" +
-                    " AND ROWNUM < $numberOfLinesInSqlCompare\n"
-        }else{
-            sourceTargetSql = "-- Verify masked column<$tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
-            sourceTargetSql += "SELECT $tmpColumn FROM $table\n" +
-                    " WHERE NOT $column IS NULL\n" +
-                    " AND ROWNUM < $numberOfLinesInSqlCompare\n"
-        }
-        if( searchExtraCondition != ""){
-            sourceTargetSql += "\nAND $searchExtraCondition\n"
-        }
-        sourceTargetSql += "ORDER BY 1\n"
-
-        if(getDbType(targetDb).equals("sqlserver")){//Todo: fix this code for sqlserver
-//            sourceTargetSql = "-- Verify masked column<$column> in table <$table> in system <$system> \n"
-//            sourceTargetSql = String.format(TARGET_TABLE_QUERY_SQLSERVER, table)
-        }
-        log.info("\n")
-        log.info("sourceTargetSql:\n$sourceTargetSql\n")
-        reporterLogLn("TargetSql:\n$sourceTargetSql\n")
-        reporterLogLn("#########")
-
-        def sourceDbResult = getSourceDbRowsResult(sourceTargetSql)
-        def targetDbResult = getTargetDbRowsResult(sourceTargetSql)
-        reporterLogLn("Source data size: " + sourceDbResult.size())
-        reporterLogLn("Target data size: " + targetDbResult.size())
+        def (sourceDbResult, targetDbResult) = getData(tmpColumn)
 
         boolean sameData = false
         if(sourceDbResult != null && targetDbResult != null ) {
             if(targetDbResult.size().equals(0)){
                 reporterLogLn("Target size is zero")
-
+                skipTest("Target size is zero")
                 sameData = false
             }else {
                 if (checkColumnTypeResult[0] == "CLOB") {
@@ -175,6 +115,72 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         targetDbSqlDriver = null
         tangAssert.assertTrue(!sameData, "Table/Column <$table/$column> should be masked", "Table/Column seems to be unmasked ");
 
+    }
+
+    protected List getData(tmpColumn) {
+
+        if (searchCriteria != "") {
+            def numberOfLinesInSqlCompareTemp = numberOfLinesInSqlCompare
+            if (numberOfLinesInSqlCompare.class.equals(String)) {
+                numberOfLinesInSqlCompareTemp = Integer.parseInt(numberOfLinesInSqlCompare) + 1000
+            } else {
+                 numberOfLinesInSqlCompareTemp = numberOfLinesInSqlCompare + 1000
+            }
+
+            def fromId = 1
+            def toMaxId = numberOfLinesInSqlCompareTemp
+            //TODO change the sql and put value of Max in the sql
+            def maxQuery = "SELECT MAX($searchCriteria)MAX_ID FROM $table " +
+                    "where NOT $column IS NULL"
+            def sourceDbResult = getSourceDbRowsResult(maxQuery)
+            def toMaxIdRaw = sourceDbResult[0]["MAX_ID"]
+            try {
+                if (toMaxIdRaw != null) {
+                    toMaxId = new BigDecimal(toMaxIdRaw)
+                }
+            } catch (NumberFormatException e) {
+                reporterLogLn("######")
+                reporterLogLn("Wrong type of Id, MUST be NUMERIC <$searchCriteria>")
+                reporterLogLn("Got <$toMaxIdRaw>")
+                reporterLogLn("######")
+                reporterLogLn(maxQuery)
+                throw e
+            }
+            if (numberOfLinesInSqlCompareTemp < toMaxId) {
+                fromId = toMaxId - numberOfLinesInSqlCompareTemp
+            }
+
+            sourceTargetSql = "-- Verify search criteria and masked column<$searchCriteria, $tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
+            sourceTargetSql += "SELECT $searchCriteria, $tmpColumn FROM $table\n" +
+                    " WHERE NOT $column IS NULL\n" +
+                    // " AND LENGTH(REPLACE($tmpColumn, ' ' , '')) > 0\n" +
+                    " AND $searchCriteria BETWEEN $fromId AND $toMaxId\n" +
+                    " AND ROWNUM < $numberOfLinesInSqlCompare\n"
+        } else {
+            sourceTargetSql = "-- Verify masked column<$tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
+            sourceTargetSql += "SELECT $tmpColumn FROM $table\n" +
+                    " WHERE NOT $column IS NULL\n" +
+                    " AND ROWNUM < $numberOfLinesInSqlCompare\n"
+        }
+        if (searchExtraCondition != "") {
+            sourceTargetSql += "\nAND $searchExtraCondition\n"
+        }
+        sourceTargetSql += "ORDER BY 1\n"
+
+        if (getDbType(targetDb).equals("sqlserver")) {//Todo: fix this code for sqlserver
+//            sourceTargetSql = "-- Verify masked column<$column> in table <$table> in system <$system> \n"
+//            sourceTargetSql = String.format(TARGET_TABLE_QUERY_SQLSERVER, table)
+        }
+        log.info("\n")
+        log.info("sourceTargetSql:\n$sourceTargetSql\n")
+        reporterLogLn("TargetSql:\n$sourceTargetSql\n")
+        reporterLogLn("#########")
+
+        def sourceDbResult = getSourceDbRowsResult(sourceTargetSql)
+        def targetDbResult = getTargetDbRowsResult(sourceTargetSql)
+        reporterLogLn("Source data size: " + sourceDbResult.size())
+        reporterLogLn("Target data size: " + targetDbResult.size())
+        return [sourceDbResult, targetDbResult]
     }
 
 }
