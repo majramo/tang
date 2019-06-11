@@ -14,6 +14,12 @@ class  VerifyMaskedTargetDb_TestFactory {
     @Parameters(["systemColumn", "actionColumn", "tableColumn", "excludeTableColumn", "maskingColumn", "excludeMaskingColumn"] )
     @Factory
     public Object[] createVerifyMaskedInstances(ITestContext testContext, String systemColumn, String actionColumn, @Optional ("") String tableColumn, @Optional ("") String excludeTableColumn, @Optional ("") String maskingColumn, @Optional ("") String excludeMaskingColumn) {
+        systemColumn = systemColumn.trim()
+        actionColumn = actionColumn.trim()
+        tableColumn = tableColumn.trim()
+        excludeTableColumn = excludeTableColumn.trim()
+        maskingColumn = maskingColumn.trim()
+        excludeMaskingColumn = excludeMaskingColumn.trim()
 
         def (ExcelObjectProvider excelObjectProviderMaskAction, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         def inputFile = excelObjectProviderMaskAction.inputFile
@@ -21,21 +27,25 @@ class  VerifyMaskedTargetDb_TestFactory {
         excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
         if(!tableColumn.isEmpty()){
-            excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Table", tableColumn.trim().toUpperCase())
+            excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Table", tableColumn.toUpperCase())
         }
         if(!excludeTableColumn.isEmpty()){
-            excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Table", excludeTableColumn.trim().toUpperCase(), DIFF)
+            excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Table", excludeTableColumn.toUpperCase(), DIFF)
         }
         if(!maskingColumn.isEmpty()){
-            excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Masking", maskingColumn.trim())
+            excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Masking", maskingColumn)
         }
         if(!excludeMaskingColumn.isEmpty()){
-            excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Masking", excludeMaskingColumn.trim(), DIFF)
+            excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Masking", excludeMaskingColumn, DIFF)
         }
+
+//        excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Column", "UTDELNINGSADRESS")
+
         def excelBodyRowsMaskAction = SystemPropertiesInitation.readExcel(excelObjectProviderMaskAction)
         excelObjectProviderMaskAction.printRow(excelBodyRowsMaskAction, ["System", "Table", "Column", "Masking", "Action"])
 
         Reporter.log("Lines read <$excelBodyRowsMaskAction.size>")
+        println("Lines read <$excelBodyRowsMaskAction.size>")
         Reporter.log("Action <Masking> ")
 
         def result = [];
