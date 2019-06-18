@@ -26,12 +26,12 @@ And Not Table_Name Like '---\$\$\$---'
 And Nullable = 'N'
 Order by 1"""
 
-    def TARGET_TABLE_QUERY_ORACLE = "SELECT DISTINCT  'ALTER TABLE ' || table_name || ' MODIFY (' || column_name||' NULL)____' ||  'ALTER TABLE ' || table_name || ' MODIFY (' || column_name||' NOT NULL ENABLE)' value \n" +
-            "FROM USER_TAB_COLS \n" +
-            "WHERE NOT table_name IN (select view_name from all_views) \n" +
-            "And Not Table_Name Like '---\$\$\$---' \n" +
-            "And NOT Nullable = 'N' \n"
-
+    def alter1 = "'ALTER TABLE ' || table_name || ' MODIFY (' || column_name||' NULL);' "
+    def alter2 = "'ALTER TABLE ' || table_name || ' MODIFY (' || column_name||' NOT NULL ENABLE);'"
+    def selectTarget = "'--SELECT ID || '','''  || ' FROM ' || table_name || ' WHERE ' || column_name ||' IS NULL;'"
+    def selectSource = "'--SELECT ID , ' || column_name  || ' FROM ' || table_name || ' WHERE ID IN ();'"
+    def updateTargte = "'--UPDATE ' || table_name || ' SET ' || column_name || ' = ' || '''' || '-' || '''' || ' WHERE ID IN ();'"
+    def TARGET_TABLE_QUERY_ORACLE
     def SOURCE_TABLE_QUERY_SQLSERVER = SOURCE_TABLE_QUERY_ORACLE
     def TARGET_TABLE_QUERY_SQLSERVER = TARGET_TABLE_QUERY_ORACLE
     def MESSAGE = "Comparing columns should have zero differences"
@@ -40,12 +40,22 @@ Order by 1"""
     def sourceSizeOut
     def targetSizeOut
     def diffCountOut
-
     @Parameters(["systemColumn", "excelModifiedTablesOnly"] )
     @Test
     public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("false")boolean excelModifiedTablesOnly, ITestContext testContext){
         super.setup()
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
+        TARGET_TABLE_QUERY_ORACLE = "SELECT DISTINCT \n" +
+        "$alter1 ||\n" +
+        "$alter2 ||\n" +
+        "$selectTarget ||\n" +
+        "$selectSource ||\n" +
+        "$updateTargte value\n" +
+        "FROM USER_TAB_COLS\n" +
+        "WHERE NOT table_name IN (select view_name from all_views) \n" +
+        "And Not Table_Name Like '---\$\$\$---' \n" +
+        "And NOT Nullable = 'N' "
+
 
         def sourceTableSql = SOURCE_TABLE_QUERY_ORACLE
         def targetTableSql = TARGET_TABLE_QUERY_ORACLE
@@ -101,12 +111,10 @@ Order by 1"""
             targetDbResult[0..numberOfTablesToCheckColumn - 1].eachWithIndex { entry, int i ->
                 def k = i + 1
                 def v = entry.value.replaceAll(/\{/, '').replaceAll(/\}/, '')
-                def v1 = v.replaceAll(".*____", '')
-                def v2 = v.replaceAll("____.*", '')
+                def v1 = v.replaceAll(";", ";\n")
                 reporterLogLn("")
                 reporterLogLn("-- $k:$targetDbResultDiff")
-                reporterLogLn("$v2;")
-                reporterLogLn("$v1;")
+                reporterLogLn("$v1")
             }
         }
 

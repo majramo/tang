@@ -15,6 +15,7 @@ public class ReportPdbData_Test extends AnySqlCompareTest{
     def PDB_QUERY = """SELECT REPLACE(NAME, 'PDB', '') pdb, NAME, OPEN_MODE, RESTRICTED, TOTAL_SIZE, RECOVERY_STATUS 
 From V\$containers
 ORDER BY 1"""
+    def CHANGE_DB_MODE_SET_ROOT = 'Alter Session Set Container=Cdb\$root'
 
     @Parameters(["pdbDbName"])
     @Test
@@ -22,6 +23,7 @@ ORDER BY 1"""
         super.setup()
 
         SqlHelper admDbSqlHelper = new SqlHelper(null, log, pdbDbName, settings.dbRun, settings)
+        admDbSqlHelper.execute(pdbDbName, CHANGE_DB_MODE_SET_ROOT)
 
         testContext.setAttribute("ADM_SOURCE_SQL_HELPER", admDbSqlHelper)
         reporterLogLn(reporterHelper.addIcons(getDbType(admDbSqlHelper)))

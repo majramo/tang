@@ -8,6 +8,7 @@ import org.testng.ITestContext
 import org.testng.annotations.Parameters
 import org.testng.annotations.Test
 
+import static dtos.base.Constants.CompareType.DIFF
 import static dtos.base.Constants.dbRunTypeRows
 
 /*
@@ -30,6 +31,7 @@ class FindDeleteDependenciesInSourceTables extends AnySqlCompareTest{
     def printRelationsTables = []
     def deleteRelationsTables = []
     def deleteRelations = [:]
+    def buffer = ""
     private String SOURCE_TABLE_QUERY_ORACLE_FIND = """
 SELECT CHILD_TABLE, CHILDCOL, position, PARENT_TABLE, PARENTCOL, delete_rule, bt,  
 'SELECT ' || CHILDCOL || ' FROM ' || CHILD_TABLE || ' WHERE ' || CHILDCOL || ' IN ( ' || 'SELECT ' ||PARENTCOL || ' FROM ' ||PARENT_TABLE || ' WHERE %s )' WHERESTR ,
@@ -84,43 +86,126 @@ order by 7,6,4,2
 
     @Parameters(["systemColumn", "recurseColumn", "startTableColumn", "deleteStatementColumn"] )
     @Test
-    void findDependenciesInSourceTables_test(String systemColumn, boolean recurseColumn,   String startTableColumn, String deleteStatementColumn, ITestContext testContext) {
+    void findDependenciesInSourceTables_test(String systemColumn, boolean recurseColumn, String startTableColumn, String deleteStatementColumn, ITestContext testContext) {
         super.setup()
         this.recurse = recurseColumn
-        firstRelations = "DELETE $startTableColumn;"
+
+        this.recurse = recurseColumn
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
-        reporterLogLn("Source: <$sourceDb>")
         reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb)))
         super.setSourceSqlHelper(testContext, sourceDb)
         source_R_Relations = sourceDbSqlDriver.sqlConRun("Get data ", dbRunTypeRows, SOURCE_TABLE_QUERY_ORACLE_FIND, 0, sourceDb)
+        def startTablesToRun
+        if (startTableColumn.trim().isEmpty()){
+            //Read all action tables from Excel
+            excelObjectProvider.addColumnsToRetriveFromFile(["System", "Table", "Column", "Action"])
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve("System", system)
+            excelObjectProvider.addColumnsCapabilitiesToRetrieve("Action", "-", DIFF)
+            def excelBodyRows = SystemPropertiesInitation.readExcel(excelObjectProvider)
+            excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "Column", "Action"])
+            def dbActionTables = excelBodyRows["Table"].unique()
+            def childTablesToRun = source_R_Relations.collect{it["CHILD_TABLE"]}.intersect(dbActionTables)
+            def parentTablesToRun = source_R_Relations.collect{it["PARENT_TABLE"]}.intersect(dbActionTables)
+            startTablesToRun = (childTablesToRun + parentTablesToRun).unique()
+        }else{
+            startTablesToRun = startTableColumn.trim().split(" ").collect{it.toUpperCase()}.unique()
+        }
 
-        startTable = startTableColumn.trim().toUpperCase()
-        parentRelations = source_R_Relations.findAll {it["PARENT_TABLE"]== "$startTable"}
-        reporterLogLn("Relations size <" + parentRelations.size() + ">")
+        super.reporterLogLn("")
+        super.reporterLogLn("#####################################################################")
+        super.reporterLogLn("#####################################################################")
+        super.reporterLogLn("###")
+        super.reporterLogLn("startTablesToRun: $startTablesToRun"  )
+        super.reporterLogLn("###")
+        super.reporterLogLn("#####################################################################")
+        super.reporterLogLn("#####################################################################")
+        super.reporterLogLn("")
+        super.reporterLogLn("")
+        startTablesToRun.eachWithIndex { startTableToRun, i ->
+            source_R_Relations.findAll { it["PARENT_TABLE"] == startTableToRun }
+            def childRelations = source_R_Relations.findAll{it["PARENT_TABLE"] == startTableToRun && it["CHILD_TABLE"] != startTableToRun}.collect{it["CHILD_TABLE"]}.unique()
+            if(childRelations.size()>0){
+                super.reporterLogLn("${i + 1}: $startTableToRun")
+            }else{
+                super.reporterLogLn("(${i + 1}: $startTableToRun)")
+            }
+            def noActionRelations = source_R_Relations.findAll{it["PARENT_TABLE"] == startTableToRun && it["CHILD_TABLE"] != startTableToRun && it["DELETE_RULE"] == "NO ACTION"}
+            def noACtionChildTables = noActionRelations.collect{it["CHILD_TABLE"]}.unique()
+            def otherRelations    = source_R_Relations.findAll{it["PARENT_TABLE"] == startTableToRun && it["CHILD_TABLE"] != startTableToRun && it["DELETE_RULE"] != "NO ACTION"}
+            def otherRelationsChildTables = otherRelations.collect{it["CHILD_TABLE"]}.unique()
+            noACtionChildTables.each{childTable->
+                super.reporterLogLn("   ---> " + noActionRelations.findAll{it["PARENT_TABLE"] == startTableToRun  && it["CHILD_TABLE"] == childTable}["DELETE_RULE"][0] + ": $childTable")
+            }
+            otherRelationsChildTables.each{childTable->
+                super.reporterLogLn("     -- (" + otherRelations.findAll{it["PARENT_TABLE"] == startTableToRun  && it["CHILD_TABLE"] == childTable}["DELETE_RULE"][0] + ": $childTable)")
+            }
+        }
+
+        super.reporterLogLn("")
+
+        startTablesToRun.each {startTableToRun ->
+            firstRelations = ""
+            alterStrs = ""
+            actionTables = [:]
+            childTables = [:]
+            printRelationsTables = []
+            deleteRelationsTables = []
+            deleteRelations = [:]
+            findDependenciesInSourceTables_tests(startTableToRun.trim().toUpperCase(), deleteStatementColumn, testContext)
+        }
+    }
+
+    protected void reportStartTable(String startTable) {
+        reporterLogLn("")
+        reporterLogLn("########################################")
+        reporterLogLn("########################################")
+        reporterLogLn("########################################")
+        reporterLogLn("###    Table $startTable")
+        reporterLogLn("###    Table $startTable")
+        reporterLogLn("###    Table $startTable")
+        reporterLogLn("########################################")
+        reporterLogLn("########################################")
+        reporterLogLn("########################################")
+        reporterLogLn("")
+    }
+
+    def reporterLogLn(String message){
+        buffer += "$message\n"
+    }
+    void findDependenciesInSourceTables_tests(String startTableToRun, String deleteStatementColumn, ITestContext testContext) {
+        startTable = startTableToRun
+        buffer = ""
+        reportStartTable(startTableToRun)
+        firstRelations = "DELETE $startTableToRun;"
+
+        parentRelations = source_R_Relations.findAll {it["PARENT_TABLE"]== "$startTableToRun"}
+        reporterLogLn("$startTableToRun: Relations size <" + parentRelations.size() + ">")
 
         indentString = ""
         indentNo = 0
         reporterLogLn("")
-        reporterLogLn("# " + "$counter".padLeft(4) + ": Parent: <$startTable>")
+        reporterLogLn("# " + "$counter".padLeft(4) + ": Parent: <$startTableToRun>")
 
-        actionTables[startTable] = startTable
-        printRelations(startTable)
+        actionTables[startTableToRun] = startTableToRun
+        printRelations(startTableToRun)
 
-        reportStart("DELETE", "DELETE $startTable $deleteStatementColumn;")
-        findDeleteRelations(startTable, deleteStatementColumn)
-        deleteRelations["$startTable"] = "DELETE $startTable $deleteStatementColumn;"
+        reportStart("DELETE", "DELETE $startTableToRun $deleteStatementColumn;")
+        findDeleteRelations(startTableToRun, deleteStatementColumn)
+        deleteRelations["$startTableToRun"] = "DELETE $startTableToRun $deleteStatementColumn;"
 
         def deleteRelationsCount = deleteRelations.size()
         deleteRelations.eachWithIndex { k, v, i->
-            reporterLogLn("--${i + 1}:$deleteRelationsCount  ($startTable-->) $k\n$v")
+            reporterLogLn("--${i + 1}:$deleteRelationsCount  ($startTableToRun-->) $k\n$v")
         }
         reportStop()
 
         reportStart("First relations", "DELETE $firstRelations;")
         reportStart("Alter", "\n$alterStrs")
-        log.info("First relations\n### $startTableColumn\n$firstRelations")
+        log.info("First relations\n### $startTableToRun\n$firstRelations")
         log.info("Alter\n### \n$alterStrs")
-
+        if(deleteRelations.size()> 1){
+            super.reporterLogLn(buffer)
+        }
 
 
     }
@@ -152,7 +237,7 @@ order by 7,6,4,2
                     indentNoStr = "\n -- $indentNo*"
                 }
                 if(deleteRule != "CASCADE") {
-                    reporterLogLn("$indentNoStr " + "$counter".padLeft(4) + " $indentString $childTable    -- $deleteRule ")
+                    reporterLogLn("$indentNoStr " + "$counter".padLeft(4) + " $indentString $childTable    -- $deleteRule")
                     def alterStr = "alter table $childTable drop constraint $childConstraint;--    $parentConstraint\n" +
                             "--DELETE $childTable WHERE $childCol NOT IN (SELECT $parentCol FROM $parentTable);\n" +
                             "SELECT COUNT(1) FROM $childTable WHERE $childCol NOT IN (SELECT $parentCol FROM $parentTable);\n" +
