@@ -257,7 +257,7 @@ ORDER BY 1"""
                             reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * is truncated" )
                         }
 
-                     }
+                    }
                 } else {
                     ok = aggregate(ok, "$str a. Table $table has <$targetSizeOut> rows as expected, is truncated\n\n")
                     proc = "$proc".padLeft(5)
@@ -389,4 +389,5 @@ ORDER BY 1"""
         reporterLogLn("Target: $dbNameTarget")
         reporterLogLn("")
     }
+
 }
