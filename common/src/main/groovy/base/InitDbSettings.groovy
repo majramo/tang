@@ -11,15 +11,29 @@ import org.apache.poi.ss.usermodel.Workbook
  */
 class InitDbSettings {
 
+
+    public static final String PUBLIC_DATABASES = "/configFiles/databases.xls"
+    public static final String PRIVATE_DATABASES = "/configFiles/databasesPrivate.xls"
+
     public static void setupDatabases() {
         SettingsHelper settingsHelper = SettingsHelper.getInstance()
         def settings = settingsHelper.settings
 
-        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider("/configFiles/databases.xls")
+        ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(PUBLIC_DATABASES)
         excelObjectProvider.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "pwd", "dbPassword", "dbTestDataBase"])
         ArrayList<Object[][]> databases = excelObjectProvider.getGdcRows()
 
-        databases.each {
+        URL is = this.getClass().getResource(PRIVATE_DATABASES);
+        if (is != null) {
+            ExcelObjectProvider excelObjectProviderPrivate = new ExcelObjectProvider(PRIVATE_DATABASES)
+            excelObjectProviderPrivate.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "pwd", "dbPassword", "dbTestDataBase"])
+            ArrayList<Object[][]> databasesPrivate = excelObjectProviderPrivate.getGdcRows()
+            databases += databasesPrivate
+        }
+
+        println "No  " + "DB name".padRight(25) + "User".padRight(20) + "Database".padRight(20) + "Url".padRight(30) + "Driver".padRight(40) + "Driver name".padRight(30)
+        println "-"*160
+        databases.eachWithIndex {it,i->
             def dbName = (it["dbName"]).toString().trim()
             if (dbName != "" && dbName != null) {
                 def dbSettings = [:]
@@ -38,6 +52,7 @@ class InitDbSettings {
                 dbSettings['dbPassword'] = dbPassword
                 dbSettings['dbTestDataBase'] = (it["dbTestDataBase"]).toString().trim()
                 settings."${dbName}" = dbSettings
+                println "${i + 1}".padLeft(3, "0") + " " + "$dbName".padRight(25) + dbSettings['dbUserName'].padRight(20) + dbSettings['dbTestDataBase'].padRight(20) + dbSettings['dbUrl'].padRight(30)+ dbSettings['dbDriver'].padRight(40) + dbSettings['dbDriverName'].padRight(30)
             }
         }
     }
