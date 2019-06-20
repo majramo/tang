@@ -16,16 +16,15 @@ import static dtos.base.Constants.dbRunTypeFirstRow
 import static dtos.base.Constants.dbRunTypeRows
 import static dtos.base.Constants.CompareType.DIFF
 
-public class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
+class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
     private final static Logger log = Logger.getLogger("CSC  ")
     private final static String AND_QUERY_EXTENSION = "AND_QUERY_EXTENSION"
-    def SOURCE_TABLE_QUERY_ORACLE = """SELECT DISTINCT table_name FROM user_tab_cols 
+    def SOURCE_GET_TABLE_NAMES_QUERY_ORACLE = """SELECT DISTINCT table_name FROM user_tab_cols 
 WHERE NOT table_name IN (select view_name from all_views) 
 -- add query extension here if it exists in settings
 $AND_QUERY_EXTENSION --
 ORDER BY 1"""
-    def SOURCE_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
-    def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
+    def SOURCE_GET_TABLE_NAMES_QUERY_SQLSERVER = "SELECT DISTINCT '[' + Table_name + ']' Table_name FROM Information_schema.columns ORDER BY 1"
     def MESSAGE = "Comparing tables"
 
     DecimalFormat thousandSeparatorFormat = new DecimalFormat("###,###");
@@ -51,13 +50,13 @@ ORDER BY 1"""
         if(dbType.equals("oracle")) {
             def queryExtension = settings.compareTablesQuery.oracle
             if (!queryExtension.isEmpty()) {
-                tablesQuery = SOURCE_TABLE_QUERY_ORACLE.replace(AND_QUERY_EXTENSION, queryExtension)
+                tablesQuery = SOURCE_GET_TABLE_NAMES_QUERY_ORACLE.replace(AND_QUERY_EXTENSION, queryExtension)
             } else {
-                tablesQuery = SOURCE_TABLE_QUERY_ORACLE.replace(AND_QUERY_EXTENSION, "")
+                tablesQuery = SOURCE_GET_TABLE_NAMES_QUERY_ORACLE.replace(AND_QUERY_EXTENSION, "")
             }
             tablesQuery = tablesQuery.replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
         }else {
-            tablesQuery = SOURCE_TABLE_QUERY_SQLSERVER
+            tablesQuery = SOURCE_GET_TABLE_NAMES_QUERY_SQLSERVER
         }
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
@@ -258,7 +257,7 @@ ORDER BY 1"""
                             reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * is truncated" )
                         }
 
-                     }
+                    }
                 } else {
                     ok = aggregate(ok, "$str a. Table $table has <$targetSizeOut> rows as expected, is truncated\n\n")
                     proc = "$proc".padLeft(5)
@@ -390,4 +389,5 @@ ORDER BY 1"""
         reporterLogLn("Target: $dbNameTarget")
         reporterLogLn("")
     }
+
 }
