@@ -26,7 +26,7 @@ public class SqlHelper {
     private File sqlFile
     private final static Logger logger = Logger.getLogger("SqH  ")
 
-    public SqlHelper(File sqlFile, log, dbName, dbRun, settings) {
+    public SqlHelper(File sqlFile, log, dbName, dbRun, settings, decrypterPassword = "") {
         this.dbRun = dbRun
         this.dbName = dbName
         this.sqlFile = sqlFile
@@ -49,10 +49,14 @@ public class SqlHelper {
             try {
                 JdbcConnection jDbcConnection = null
                 if (!jdbcConnections[dbName]) {
+                    def passwordToUse = settings."$dbName".dbPassword
+                    if(!decrypterPassword.isEmpty()) {
+                        passwordToUse = decrypterPassword
+                    }
                     settings."$dbName".with {
                         Reporter.log("### Connection <$dbName>: url<$dbUrl> usr<$dbUserName> db<$dbTestDataBase> driver <$dbDriverName>")
                         this.log.info("### Connection <$dbName>: url<$dbUrl> usr<$dbUserName> db<$dbTestDataBase> driver <$dbDriverName>")
-                        jDbcConnection = new JdbcConnection(dbUrl, dbDriverName, dbUserName, dbPassword, dbTestDataBase, dbDriver)
+                        jDbcConnection = new JdbcConnection(dbUrl, dbDriverName, dbUserName, passwordToUse, dbTestDataBase, dbDriver)
                         this.log.info "##Init jDbcConnection $jDbcConnection"
                     }
                     jdbcConnections[dbName] = jDbcConnection
