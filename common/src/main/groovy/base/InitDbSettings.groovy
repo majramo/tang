@@ -20,13 +20,13 @@ class InitDbSettings {
         def settings = settingsHelper.settings
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(PUBLIC_DATABASES)
-        excelObjectProvider.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "pwd", "dbPassword", "dbTestDataBase"])
+        excelObjectProvider.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "pwd", "dbPassword", "dbTestDataBase", "dbKeyStore"])
         ArrayList<Object[][]> databases = excelObjectProvider.getGdcRows()
 
         URL is = this.getClass().getResource(PRIVATE_DATABASES);
         if (is != null) {
             ExcelObjectProvider excelObjectProviderPrivate = new ExcelObjectProvider(PRIVATE_DATABASES)
-            excelObjectProviderPrivate.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "pwd", "dbPassword", "dbTestDataBase"])
+            excelObjectProviderPrivate.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "pwd", "dbPassword", "dbTestDataBase", "dbKeyStore"])
             ArrayList<Object[][]> databasesPrivate = excelObjectProviderPrivate.getGdcRows()
             databases += databasesPrivate
         }
@@ -42,6 +42,7 @@ class InitDbSettings {
                 dbSettings['dbDriverName'] = (it["dbDriverName"]).toString().trim()
                 dbSettings['dbDriver'] = (it["dbDriver"]).toString().trim()
                 dbSettings['dbUrl'] = (it["dbUrl"]).toString().trim()
+                dbSettings['dbKeyStore'] = (it["dbKeyStore"]).toString().trim()
                 dbSettings['dbUserName'] = (it["dbUserName"]).toString().trim()
                 def dbPassword = (it["dbPassword"]).toString().trim()
                 if (dbPassword.matches("B.*&G.*")){
