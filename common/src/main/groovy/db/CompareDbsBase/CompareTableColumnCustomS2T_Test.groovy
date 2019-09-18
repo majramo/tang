@@ -5,6 +5,7 @@ import dtos.base.SqlHelper
 import excel.ExcelObjectProvider
 import org.apache.log4j.Logger
 import org.testng.ITestContext
+import org.testng.SkipException
 import org.testng.annotations.Optional
 import org.testng.annotations.Parameters
 import org.testng.annotations.Test
@@ -42,27 +43,27 @@ Order by 1"""
     def diffCountOut
     @Parameters(["systemColumn", "excelModifiedTablesOnly"] )
     @Test
-    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("false")boolean excelModifiedTablesOnly, ITestContext testContext){
+    public void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("false")boolean excelModifiedTablesOnly, ITestContext testContext) {
         super.setup()
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         TARGET_TABLE_QUERY_ORACLE = "SELECT DISTINCT \n" +
-        "$alter1 ||\n" +
-        "$alter2 ||\n" +
-        "$selectTarget ||\n" +
-        "$selectSource ||\n" +
-        "$updateTargte value\n" +
-        "FROM USER_TAB_COLS\n" +
-        "WHERE NOT table_name IN (select view_name from all_views) \n" +
-        "And Not Table_Name Like '---\$\$\$---' \n" +
-        "And NOT Nullable = 'N' "
+                "$alter1 ||\n" +
+                "$alter2 ||\n" +
+                "$selectTarget ||\n" +
+                "$selectSource ||\n" +
+                "$updateTargte value\n" +
+                "FROM USER_TAB_COLS\n" +
+                "WHERE NOT table_name IN (select view_name from all_views) \n" +
+                "And Not Table_Name Like '---\$\$\$---' \n" +
+                "And NOT Nullable = 'N' "
 
 
         def sourceTableSql = SOURCE_TABLE_QUERY_ORACLE
         def targetTableSql = TARGET_TABLE_QUERY_ORACLE
-        if(getDbType(sourceDb).equals("sqlserver")){
+        if (getDbType(sourceDb).equals("sqlserver")) {
             sourceTableSql = SOURCE_TABLE_QUERY_SQLSERVER
         }
-        if(getDbType(targetDb).equals("sqlserver")){
+        if (getDbType(targetDb).equals("sqlserver")) {
             targetTableSql = TARGET_TABLE_QUERY_SQLSERVER
         }
         super.setSourceSqlHelper(testContext, sourceDb)
@@ -71,23 +72,40 @@ Order by 1"""
 
         reporterLogLn("Source: <$sourceDb>\n");
         reporterLogLn("Target: <$targetDb>\n");
-        reporterLogLn("Source query: <$sourceTableSql\n>");
+        reporterLogLn("Source query: <\n$sourceTableSql\n>");
 
         def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
         def sourceEntriesToCheck = sourceDbResult.size()
         def maximuQueryValuesInSelect = 1000
-        if ( maximuQueryValuesInSelect > sourceEntriesToCheck){
+        if (maximuQueryValuesInSelect > sourceEntriesToCheck) {
             maximuQueryValuesInSelect = sourceEntriesToCheck
         }
         def values = ""
-        sourceDbResult[0..maximuQueryValuesInSelect-1].each{
+        if (maximuQueryValuesInSelect > 1) {
+        sourceDbResult[0..maximuQueryValuesInSelect - 1].each {
             values += it.value + "\n"
+           }
+        }
+        def targetDbResult
+        if(values.size() == 0){
+            reporterLogLn("Target query: <\n$sourceTableSql\n>");
+            targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, sourceTableSql, 0, targetDb)
+            if(targetDbResult.size() == 0){
+                reporterLogLn("Source result: <${sourceDbResult.size()}>");
+                reporterLogLn("Target result: <${targetDbResult.size()}>");
+                reporterLogLn("Source and target have no results!")
+                tangAssert.assertTrue(sourceDbResult.size() == targetDbResult.size(), MESSAGE, MESSAGE)
+                return
+            }
+            reporterLogLn("Skipped: Nothing in Source to Compare <$values> Check target manually!")
+            reporterLogLn("Target query: <\n$targetTableSql\n>");
+            throw new SkipException("Test is skipped: Nothing in Source to Compare <$values> Check target manually!")
         }
         values = values[0..values.length()-3]
         targetTableSql += "And Table_Name || '_'  || Column_Name In (\n$values\n)"
 
         reporterLogLn("Target query: <$targetTableSql>");
-        def targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
+        targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
 
         def targetDbResultDiff = targetDbResult.size()
 
