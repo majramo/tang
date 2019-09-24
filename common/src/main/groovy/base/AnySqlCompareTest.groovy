@@ -9,6 +9,7 @@ import org.testng.Reporter
 import org.testng.SkipException
 import org.testng.annotations.*
 import reports.ReporterHelper
+import sun.nio.cs.UTF_8
 
 import java.sql.SQLSyntaxErrorException
 import java.text.DateFormat
@@ -458,7 +459,7 @@ public class AnySqlCompareTest {
         Reporter.log("$message")
     }
     public void reporterLogLn(message = "") {
-        Reporter.log("$message")
+        Reporter.log( new String("$message".getBytes("UTF-8")))
 //        Reporter.log("$message")
     }
 
