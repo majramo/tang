@@ -20,13 +20,13 @@ class InitDbSettings {
         def settings = settingsHelper.settings
 
         ExcelObjectProvider excelObjectProvider = new ExcelObjectProvider(PUBLIC_DATABASES)
-        excelObjectProvider.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "pwd", "dbPassword", "dbTestDataBase", "dbKeyStore"])
+        excelObjectProvider.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbIp", "dbUserName", "pwd", "dbPassword", "dbTestDataBase", "dbKeyStore"])
         ArrayList<Object[][]> databases = excelObjectProvider.getGdcRows()
 
         URL is = this.getClass().getResource(PRIVATE_DATABASES);
         if (is != null) {
             ExcelObjectProvider excelObjectProviderPrivate = new ExcelObjectProvider(PRIVATE_DATABASES)
-            excelObjectProviderPrivate.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbUserName", "pwd", "dbPassword", "dbTestDataBase", "dbKeyStore"])
+            excelObjectProviderPrivate.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbIp", "dbUserName", "pwd", "dbPassword", "dbTestDataBase", "dbKeyStore"])
             ArrayList<Object[][]> databasesPrivate = excelObjectProviderPrivate.getGdcRows()
             databases += databasesPrivate
         }
@@ -42,6 +42,7 @@ class InitDbSettings {
                 dbSettings['dbDriverName'] = (it["dbDriverName"]).toString().trim()
                 dbSettings['dbDriver'] = (it["dbDriver"]).toString().trim()
                 dbSettings['dbUrl'] = (it["dbUrl"]).toString().trim()
+                dbSettings['dbIp'] = (it["dbIp"]).toString().trim()
                 dbSettings['dbKeyStore'] = (it["dbKeyStore"]).toString().trim()
                 dbSettings['dbUserName'] = (it["dbUserName"]).toString().trim()
                 def dbPassword = (it["dbPassword"]).toString().trim()
@@ -53,7 +54,7 @@ class InitDbSettings {
                 dbSettings['dbPassword'] = dbPassword
                 dbSettings['dbTestDataBase'] = (it["dbTestDataBase"]).toString().trim()
                 settings."${dbName}" = dbSettings
-                println "${i + 1}".padLeft(3, "0") + " " + "$dbName".padRight(25) + dbSettings['dbUserName'].padRight(20) + dbSettings['dbTestDataBase'].padRight(20) + dbSettings['dbUrl'].padRight(30)+ dbSettings['dbDriver'].padRight(40) + dbSettings['dbDriverName'].padRight(30)
+                println "${i + 1}".padLeft(3, "0") + " " + "$dbName".padRight(25) + dbSettings['dbUserName'].padRight(20) + dbSettings['dbTestDataBase'].padRight(20) + dbSettings['dbUrl'].padRight(30)+ dbSettings['dbIp'].padRight(30)+ dbSettings['dbDriver'].padRight(40) + dbSettings['dbDriverName'].padRight(30)
             }
         }
     }
