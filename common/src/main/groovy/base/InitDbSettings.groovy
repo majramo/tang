@@ -46,11 +46,6 @@ class InitDbSettings {
                 dbSettings['dbKeyStore'] = (it["dbKeyStore"]).toString().trim()
                 dbSettings['dbUserName'] = (it["dbUserName"]).toString().trim()
                 def dbPassword = (it["dbPassword"]).toString().trim()
-                if (dbPassword.matches("B.*&G.*")){
-                    //If dbPassword is a formula  like above then we put owner and pwd togheter
-                    def pwd = (it["pwd"]).toString().trim().replaceAll(/\..*/, "")
-                    dbPassword =  dbSettings['owner'] + pwd
-                }
                 dbSettings['dbPassword'] = dbPassword
                 dbSettings['dbTestDataBase'] = (it["dbTestDataBase"]).toString().trim()
                 settings."${dbName}" = dbSettings
