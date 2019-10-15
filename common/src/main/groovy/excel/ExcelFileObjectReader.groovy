@@ -10,6 +10,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Row
 import org.testng.Reporter
+import org.testng.SkipException
 
 import static dtos.base.Constants.CompareType.DIFF
 import static dtos.base.Constants.CompareType.EQUAL
@@ -345,9 +346,15 @@ public class ExcelFileObjectReader {
                 excelRow.each { excelBodyColumn ->
                     String field = excelObjectData.excelHeaderMap[column]
                     try {
-                        myInstance."$field" = excelBodyColumn.toString()
+                        if(excelBodyColumn.cellType.name().equals("FORMULA")) {
+                            myInstance."$field" = excelBodyColumn.stringCellValue
+                        }else{
+                            myInstance."$field" = excelBodyColumn.toString()
+                        }
                     } catch (MissingPropertyException exception) {
-                      //  log.info("Can't map a header for value <$field> column<$column> $exception")
+                       //log.info("Can't map a header for value <$field> column<$column> $exception")
+                    } catch (Exception exception) {
+                       log.info("Can't map a header for value <$field> column<$column> $exception")
                     }
                     column++
                 }
@@ -367,7 +374,15 @@ public class ExcelFileObjectReader {
                     def a = [:]
                     if(excelCapabilities.size()) {
                         excelCapabilities.each { key, ExcelCellDataProperty value ->
-                            a[key] = myInstance."$key"
+                            try {
+                                a[key] = myInstance."$key"
+                            }catch (groovy.lang.MissingPropertyException exception) {
+                                println("###");
+                                println("Can't find column: <$key> in Excel file");
+                                org.testng.Reporter.log("Can't find column: <$key> in Excel file");
+                                throw new SkipException("Can't find column: <$key> in Excel file\n" + exception)
+
+                            }
                         }
                     }else{
                         myInstance.each {row->
