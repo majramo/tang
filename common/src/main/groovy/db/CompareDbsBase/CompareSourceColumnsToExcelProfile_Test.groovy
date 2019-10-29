@@ -21,7 +21,7 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
     def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
     def MESSAGE = "Comparing tables"
     ArrayList<String> headersExcel = ["System", "Table", "Column", "Type", "Sensitive", "Masking", "Action", "MaskOverride", "MaskOverrideAddon", "MaskExtra", "TargetSizeMinimumDiff", "TargetSizeMaximumDiff", "RunSql", "SearchCriteria", "SearchExtraCondition", "Verify"]
-    ArrayList<String> headersDb = ["SYSTEMNAME", "TABLE_NAME", "COLUMN_NAME", "DATA_TYPE", "SENSITIVE", "MASKING", "ACTION", "MASKOVERRIDE", "MaskOverrideAddon", "C1", "C2", "C3", "C4", "C5", "C6", "C7"]
+    ArrayList<String> headersDb = ["SYSTEMNAME", "TABLE_NAME", "COLUMN_NAME", "DATA_TYPE", "SENSITIVE", "MASKING", "ACTION", "MASKOVERRIDE", "MaskOverrideAddon", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "VERIFY"]
     DecimalFormat thousandSeparatorFormat = new DecimalFormat("###,###");
     def newCount = 0
     def removedCount = 0
@@ -150,7 +150,7 @@ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
         sourceDbResult.each { dbRow->
             def excelBodyRow = []
             headersDb.each {header->
-                def field = dbRow[header]
+                def field = dbRow[header.toUpperCase()]
                 if(header  == 'SYSTEMNAME'){
                     field = name.capitalize()
                 }
