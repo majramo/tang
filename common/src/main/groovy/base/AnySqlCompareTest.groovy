@@ -708,31 +708,41 @@ $fieldsStr
         return savedSourceSql
     }
 
-    def getSettingsValueIfExistsElseDefault(settingsRef, defaultValue = settingsRef ){
+    def getSettingsValueIfExistsElseDefault(settingsRef, defaultValue = "" ){
 
         def settingsDomainValue = settings[settingsRef]
-        if(settingsDomainValue.size() != 0 && settingsDomainValue != ""){
+        try {
+            if(settingsDomainValue.size()){
+                //default value
+            }
+        } catch (InvokerInvocationException) {
             return settingsDomainValue
         }
         //default value
         return defaultValue
     }
 
-    def joinList(list, delimiter = ",", length = 80){
+    def joinList(list, delimiter = ",", rowLength = 0){
         def outLine = ""
         def outLines = ""
         def counter = list.size() - 1
+        def settingsRowLength  = getSettingsValueIfExistsElseDefault("sqlRowLength", 100)
+        if(rowLength.equals(0)){
+            if(rowLength > 0){
+                rowLength = settingsRowLength
+            }
+        }
         list.eachWithIndex{ line, index->
             if(counter == index) {
                 outLine += "$line"
             }else{
                 outLine += "$line$delimiter"
             }
-            if (outLine.length() >= length){
+            if (outLine.length() >= rowLength){
                 outLines += "$outLine\n"
                 outLine = ""
             }else{
-                if (outLine.length() >= length) {
+                if (outLine.length() >= rowLength) {
                     outLines += "$outLine\n"
                     outLine = ""
                 }
