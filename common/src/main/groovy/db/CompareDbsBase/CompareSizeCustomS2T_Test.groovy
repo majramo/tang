@@ -9,6 +9,7 @@ import org.testng.annotations.Parameters
 import org.testng.annotations.Test
 import org.testng.annotations.Optional
 
+import java.sql.SQLSyntaxErrorException
 import java.text.DecimalFormat
 
 import static dtos.base.Constants.CompareType.LIKE
@@ -19,8 +20,10 @@ import static dtos.base.Constants.CompareType.DIFF
 class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
     private final static Logger log = Logger.getLogger("CSC  ")
     private final static String AND_QUERY_EXTENSION = "AND_QUERY_EXTENSION"
+    public static final String MISSING_TABLE = "no table"
     def SOURCE_GET_TABLE_NAMES_QUERY_ORACLE = """SELECT DISTINCT table_name FROM user_tab_cols 
 WHERE NOT table_name IN (select view_name from all_views) 
+--and (table_name like 'FTG_UTRED%' or table_name like 'ANTECKNING_T%')
 -- add query extension here if it exists in settings
 $AND_QUERY_EXTENSION --
 ORDER BY 1"""
@@ -204,11 +207,11 @@ ORDER BY 1"""
                 def dbTargetSizeResult = targetDbSqlDriver.sqlConRun("$targetDb", dbRunTypeFirstRow, sqlSourceTarget, 0, targetDb)
                 targetSize = dbTargetSizeResult["COUNT_"]
                 targetSizeOut = thousandSeparatorFormat.format(new BigDecimal(targetSize))
-            }catch (Exception e){
+            }catch (SQLSyntaxErrorException e){
                 loopException = true
                 noExceptionAtRun = false
                 str = aggregate(str, "Exception i target <$targetDb> $e")
-                targetSizeOut = 0
+                targetSizeOut = MISSING_TABLE
             }
             str = aggregate(str, "target size <$targetSizeOut>")
             String truncateTable = truncateTables[table]
@@ -232,9 +235,17 @@ ORDER BY 1"""
                 if (targetSize > 0 || loopException) {
                     if (targetSize == sourceSize && targetSize == 0) {
                         icon = "-  "
-                        ok = aggregate(ok, "$str a. Table $table has <$targetSizeOut> rows as expected, is truncated\n\n")
-                        proc = "$proc".padLeft(5)
-                        reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * is truncated" )
+                        if(targetSizeOut == MISSING_TABLE) {
+                            icon = "M  "
+                            nok = aggregate(nok, "$str a. Table $table is missing, should be truncated\n\n")
+                            proc = "".padLeft(5)
+                            reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * should be truncated" )
+                            numberOfTableDiff++
+                        }else{
+                            ok = aggregate(ok, "$str a. Table $table has <$targetSizeOut> rows as expected, is truncated\n\n")
+                            proc = "$proc".padLeft(5)
+                            reporterLogLn("$rowNumber $icon D $proc" + "$diffCountOut".padLeft(12) + " | S " + "$sourceSizeOut".padLeft(12) + " | T " + "$targetSizeOut".padLeft(12)+ " | " + row.padRight(45) + " * is truncated" )
+                        }
                     } else {
                         diffCount = targetSize
                         diffCountOut = thousandSeparatorFormat.format(new BigDecimal(diffCount))
@@ -301,8 +312,14 @@ ORDER BY 1"""
                                 }
                             }
                         }
+                        if(targetSizeOut == MISSING_TABLE) {
+                            icon = "M  "
+                            nok = aggregate(nok, "$str a. Table $table is missing, should be truncated\n\n")
+                            proc = "".padLeft(5)
+                        }else{
+                            nok = aggregate(nok, "$str Table $table has <$diffCountOut> diff, <$diffCountPercent %>, expected maximum diff in target was <$expectedMaximumDiff %>\n\n")
+                        }
                         numberOfTableDiff++
-                        nok = aggregate(nok, "$str Table $table has <$diffCountOut> diff, <$diffCountPercent %>, expected maximum diff in target was <$expectedMaximumDiff %>\n\n")
                     } else {
                         ok = aggregate(ok, "$str Table $table has <$diffCountOut> diff, <$diffCountPercent %>, expected maximum diff in target was <$expectedMaximumDiff %>\n\n")
 
@@ -328,7 +345,13 @@ ORDER BY 1"""
                             }
                         }
                         numberOfTableDiff++
-                        nok = aggregate(nok, "$str table $table has <$diffCountOut> diff, <$diffCountPercent>, expected maximum diff in target was <0.0 %>\n\n")
+                        if(targetSizeOut == MISSING_TABLE) {
+                            icon = "M  "
+                            nok = aggregate(nok, "$str a. Table $table is missing, should be truncated\n\n")
+                            proc = "".padLeft(5)
+                        }else {
+                            nok = aggregate(nok, "$str table $table has <$diffCountOut> diff, <$diffCountPercent>, expected maximum diff in target was <0.0 %>\n\n")
+                        }
                     } else {
                         expectedMaximumDiff_Ok = true
                     }
