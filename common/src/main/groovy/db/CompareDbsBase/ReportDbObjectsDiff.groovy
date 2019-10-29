@@ -49,7 +49,7 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
         def targetDbResult
         //read database
         if(queryFirst.equals("target")){
-            reporterLogLn("\n### targetTableSql: \n$targetTableSql");
+            reporterLogLn("\n### targetTableSql: $targetQuerySettings\n$targetTableSql");
             targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
             def dataFromTarget = joinList(targetDbResult.collect{it[0]})
             def targetCount = targetDbResult.size()
@@ -57,12 +57,12 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             if(targetCount.equals(0)){
                 skipTest("Nothing in Target to Compare: sourceCount is <$targetCount> ")
             }
-            sourceTableSql = sourceTableSql.replaceAll("__-DATA-__", dataFromTarget)
-            reporterLogLn("\n### sourceTableSql: \n$sourceTableSql");
+            sourceTableSql = sourceTableSql.replace("__-DATA-__", dataFromTarget)
+            reporterLogLn("\n### sourceTableSql: $sourceQuerySettings\n$sourceTableSql");
             def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
             diffDbResult = sourceDbResult
         }else{
-            reporterLogLn("\n### sourceTableSql: \n$sourceTableSql");
+            reporterLogLn("\n### sourceTableSql: $sourceQuerySettings\n$sourceTableSql");
             def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
             def dataFromSource = joinList(sourceDbResult.collect{it[0]})
             def sourceCount = dataFromSource.size()
@@ -70,8 +70,8 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             if(sourceCount.equals(0)){
                 skipTest("Nothing in Source to Compare: sourceCount is <$sourceCount> ")
             }
-            targetTableSql = targetTableSql.replaceAll("__-DATA-__", dataFromSource)
-            reporterLogLn("\n### targetTableSql: \n$targetTableSql");
+            targetTableSql = targetTableSql.replace("__-DATA-__", dataFromSource)
+            reporterLogLn("\n### targetTableSql: $targetQuerySettings\n$targetTableSql");
             targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
             diffDbResult = targetDbResult
         }
