@@ -83,9 +83,10 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
 
         boolean sameData = false
         if(sourceDbResult != null && targetDbResult != null ) {
-            if(targetDbResult.size().equals(0)){
-                reporterLogLn("Target size is zero")
-                skipTest("Target size is zero")
+            def targetDbResultSize = targetDbResult.size()
+            if(targetDbResultSize < 100){
+                reporterLogLn("Target size is too low <$targetDbResultSize> check manually!")
+                skipTest("Target size is too low <$targetDbResultSize> check manually!")
                 sameData = false
             }else {
                 if (checkColumnTypeResult[0] == "CLOB") {
@@ -157,14 +158,14 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                     " AND NOT $tmpColumn = ' '\n" +
                     " AND length($tmpColumn) > 0\n" +
                     " AND $searchCriteria BETWEEN $fromId AND $toMaxId\n" +
-                    " AND ROWNUM < $numberOfLinesInSqlCompare\n"
+                    " AND ROWNUM < 1001\n"
         } else {
             sourceTargetSql = "-- Verify masked column<$tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
             sourceTargetSql += "SELECT $tmpColumn FROM $table\n" +
                     " WHERE NOT $column IS NULL\n" +
                     " AND NOT $tmpColumn = ' '\n" +
                     " AND length($tmpColumn) > 0\n" +
-                    " AND ROWNUM < $numberOfLinesInSqlCompare\n"
+                    " AND ROWNUM < 1001\n"
         }
         if (searchExtraCondition != "") {
             sourceTargetSql += "\nAND $searchExtraCondition\n"
