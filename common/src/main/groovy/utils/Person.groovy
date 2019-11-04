@@ -32,7 +32,7 @@ public class Person implements Serializable {
     String pwd
     String email
     String url
-    static String ipBase = f.format(date.getTime());
+    static random = new Random()
     String ip
     String pin
     String delimiter
@@ -60,7 +60,7 @@ public class Person implements Serializable {
         pwd  = "${lastNameShort}abc"[0..2] + "_" + "${firstNameShort}abc"[0..2] + "_$no"
         email = firstNameLc + "."  + lastNameLc + ".$no@$emailDomain"
         url = "www." + "${firstNameShort}abc"[0..2]  + "."  + "${lastNameShort}abc"[0..2]  + ".$no.$emailDomain"
-        ip = "${ipBase}." + socialSecurityNumberLongDashLess[9..11] + "." + socialSecurityNumberLongDashLess[6..8] + "." + socialSecurityNumberLongDashLess[9..11]
+        ip = (0..3).collect { random.nextInt(255) }.join('.')
         pin = socialSecurityNumberLongDashLess[8..11]
      }
 
