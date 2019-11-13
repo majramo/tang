@@ -15,7 +15,7 @@ class InitDbSettings {
     public static final String PUBLIC_DATABASES = "/configFiles/databases.xls"
     public static final String PRIVATE_DATABASES = "/configFiles/databasesPrivate.xls"
 
-    public static void setupDatabases() {
+    public static void setupDatabases(boolean readPrivateFiles = false) {
         SettingsHelper settingsHelper = SettingsHelper.getInstance()
         def settings = settingsHelper.settings
 
@@ -23,14 +23,15 @@ class InitDbSettings {
         excelObjectProvider.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbIp", "dbUserName", "pwd", "dbPassword", "dbTestDataBase", "dbKeyStore"])
         ArrayList<Object[][]> databases = excelObjectProvider.getGdcRows()
 
-        URL is = this.getClass().getResource(PRIVATE_DATABASES);
-        if (is != null) {
-            ExcelObjectProvider excelObjectProviderPrivate = new ExcelObjectProvider(PRIVATE_DATABASES)
-            excelObjectProviderPrivate.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbIp", "dbUserName", "pwd", "dbPassword", "dbTestDataBase", "dbKeyStore"])
-            ArrayList<Object[][]> databasesPrivate = excelObjectProviderPrivate.getGdcRows()
-            databases += databasesPrivate
-        }
-
+        if(readPrivateFiles){
+            URL is = this.getClass().getResource(PRIVATE_DATABASES)
+            if (is != null) {
+                ExcelObjectProvider excelObjectProviderPrivate = new ExcelObjectProvider(PRIVATE_DATABASES)
+                excelObjectProviderPrivate.addColumnsToRetriveFromFile(["dbName", "owner", "dbDriverName", "dbDriver", "dbUrl", "dbIp", "dbUserName", "pwd", "dbPassword", "dbTestDataBase", "dbKeyStore"])
+                ArrayList<Object[][]> databasesPrivate = excelObjectProviderPrivate.getGdcRows()
+                databases += databasesPrivate
+            }
+        };
         println "No  " + "DB name".padRight(25) + "User".padRight(20) + "Database".padRight(20) + "Url".padRight(30) + "Driver".padRight(40) + "Driver name".padRight(30)
         println "-"*160
         databases.eachWithIndex {it,i->
