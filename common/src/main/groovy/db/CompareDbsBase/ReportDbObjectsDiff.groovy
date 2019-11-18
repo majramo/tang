@@ -52,27 +52,31 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             reporterLogLn("\n### targetTableSql: $targetQuerySettings\n$targetTableSql");
             targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
             def dataFromTarget = joinList(targetDbResult.collect{it[0]})
-            def targetCount = targetDbResult.size()
+            def targetCount = targetDbResult.size( )
             reporterLogLn("Target <$objectType>: <$targetCount>");
-            if(targetCount.equals(0)){
+            if(targetCount.equals(0)){ReportDbObjectsDiff
                 skipTest("Nothing in Target to Compare: sourceCount is <$targetCount> ")
             }
             sourceTableSql = sourceTableSql.replace("__-DATA-__", dataFromTarget)
-            reporterLogLn("\n### sourceTableSql: $sourceQuerySettings\n$sourceTableSql");
             def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
+            def sourceCount = sourceDbResult.size( )
+            reporterLogLn("Source <$objectType>: missing count<$sourceCount>");
+            reporterLogLn("\n### sourceTableSql: $sourceQuerySettings\n$sourceTableSql");
             diffDbResult = sourceDbResult
         }else{
             reporterLogLn("\n### sourceTableSql: $sourceQuerySettings\n$sourceTableSql");
             def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
             def dataFromSource = joinList(sourceDbResult.collect{it[0]})
-            def sourceCount = dataFromSource.size()
+            def sourceCount = sourceDbResult.size()
             reporterLogLn("Source <$objectType>: <$sourceCount>");
             if(sourceCount.equals(0)){
                 skipTest("Nothing in Source to Compare: sourceCount is <$sourceCount> ")
             }
             targetTableSql = targetTableSql.replace("__-DATA-__", dataFromSource)
-            reporterLogLn("\n### targetTableSql: $targetQuerySettings\n$targetTableSql");
             targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
+            def targetCount = targetDbResult.size( )
+            reporterLogLn("Target <$objectType>: missing count<$targetCount>");
+            reporterLogLn("\n### targetTableSql: $targetQuerySettings\n$targetTableSql");
             diffDbResult = targetDbResult
         }
         def diffCount =  diffDbResult.size()
