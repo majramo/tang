@@ -51,7 +51,7 @@ public class AnySqlCompareTest {
 
     @BeforeSuite(alwaysRun = true)
     public void beforeSuite(ITestContext testContext) {
-        setup()
+        setup(true)
     }
 
     @Parameters(["environment", "sourceDb"])
@@ -505,9 +505,9 @@ public class AnySqlCompareTest {
     }
 
 
-    public void setup() {
+    public void setup(boolean readPrivateFiles = false) {
         if (!settingChanged) {
-            new InitDbSettings().setupDatabases()
+            new InitDbSettings().setupDatabases(readPrivateFiles)
             settingChanged = true
         }
     }
