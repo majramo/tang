@@ -18,7 +18,7 @@ class ReportSourceTableSizes_Test extends AnySqlCompareTest{
 
     def SOURCE_GET_TABLE_NAMES_QUERY_ORACLE = "SELECT DISTINCT table_name FROM user_tab_cols WHERE NOT table_name IN (select view_name from all_views)  And NOT Table_Name Like 'EXT___---'  And NOT Table_Name Like 'TMPEXT___---' And Not Table_Name Like '---\\\$\\\$\\\$---' ORDER BY 1"
     def SOURCE_GET_TABLE_SIZE_QUERY = "SELECT COUNT(1) COUNT_  FROM %s "
-    def SOURCE_GET_TABLE_NAMES_QUERY_SQLSERVER = "SELECT DISTINCT '[' + Table_name + ']' Table_name FROM Information_schema.columns WHERE TABLE_SCHEMA = 'dbo'  ORDER BY 1"
+    def SOURCE_GET_TABLE_NAMES_QUERY_SQLSERVER = "SELECT DISTINCT '[' + Table_name + ']' Table_name FROM Information_schema.columns WHERE TABLE_SCHEMA = 'dbo' ORDER BY 1"
 
     @Parameters(["systemColumn", "excelModifiedTablesOnly"] )
     @Test

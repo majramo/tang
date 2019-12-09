@@ -27,7 +27,7 @@ WHERE NOT table_name IN (select view_name from all_views)
 -- add query extension here if it exists in settings
 $AND_QUERY_EXTENSION --
 ORDER BY 1"""
-    def SOURCE_GET_TABLE_NAMES_QUERY_SQLSERVER = "SELECT DISTINCT '[' + Table_name + ']' Table_name FROM Information_schema.columns ORDER BY 1"
+    def SOURCE_GET_TABLE_NAMES_QUERY_SQLSERVER = "SELECT DISTINCT '[' + Table_name + ']' Table_name FROM Information_schema.columns WHERE TABLE_SCHEMA = 'dbo' ORDER BY 1"
     def MESSAGE = "Comparing tables"
 
     DecimalFormat thousandSeparatorFormat = new DecimalFormat("###,###");
