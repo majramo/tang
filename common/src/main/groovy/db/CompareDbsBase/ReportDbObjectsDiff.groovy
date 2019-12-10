@@ -24,22 +24,30 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
         super.setup()
 
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
-        def TARGET_TABLE_QUERY_ORACLE =  settings."$targetQuerySettings"
-        def SOURCE_TABLE_QUERY_ORACLE =  settings."$sourceQuerySettings"
+        def sourceDbType = getDbType(sourceDb)
+        def targetDbType = getDbType(targetDb)
+        def targetObjectQuery =  settings."$targetQuerySettings"."$targetDbType"
+        def sourceObjectQuery =  settings."$sourceQuerySettings"."$sourceDbType"
+        if(sourceObjectQuery.size() == 0 || targetObjectQuery.size() == 0){
+            reporterLogLn("Can't run: sourceObjectQuery <$sourceQuerySettings.$sourceDbType> <$sourceObjectQuery> or targetObjectQuery <$targetQuerySettings.$targetDbType> <$targetObjectQuery> is empty!")
+            skipTest("Can't run: sourceObjectQuery <$sourceQuerySettings.$sourceDbType> or targetObjectQuery <$targetQuerySettings.$targetDbType> is empty!")
+        }
+        targetObjectQuery = targetObjectQuery.trim()
+        sourceObjectQuery = sourceObjectQuery.trim()
 
         String sourceDbOwner = settings."$sourceDb".owner
         String targetDbOwner = settings."$targetDb".owner
-//        def sourceTableSql = String.format(SOURCE_TABLE_QUERY_ORACLE, sourceDbOwner.toUpperCase())
-        def sourceTableSql = SOURCE_TABLE_QUERY_ORACLE.replaceAll("_OWNER_", sourceDbOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
-        def targetTableSql = TARGET_TABLE_QUERY_ORACLE.replaceAll("_OWNER_", sourceDbOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
+//        def sourceObjectSql = String.format(SOURCE_TABLE_QUERY, sourceDbOwner.toUpperCase())
+        def sourceObjectSql = sourceObjectQuery.replaceAll("_OWNER_", sourceDbOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
+        def targetObjectSql = targetObjectQuery.replaceAll("_OWNER_", targetDbOwner.toUpperCase()).replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
         if(!sqlCriteriaColumn.isEmpty()){
-            sourceTableSql += "AND $sqlCriteriaColumn"
-            targetTableSql += "AND $sqlCriteriaColumn"
+            sourceObjectSql += "AND $sqlCriteriaColumn"
+            targetObjectSql += "AND $sqlCriteriaColumn"
         }
         super.setSourceSqlHelper(testContext, sourceDb)
         super.setTargetSqlHelper(testContext, targetDb)
-        reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb)))
-        reporterLogLn(reporterHelper.addIcons(getDbType(targetDb)))
+        reporterLogLn(reporterHelper.addIcons(sourceDbType))
+        reporterLogLn(reporterHelper.addIcons(targetDbType))
 
         reporterLogLn("Source: <$sourceDb>");
         reporterLogLn("Target: <$targetDb>");
@@ -49,34 +57,34 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
         def targetDbResult
         //read database
         if(queryFirst.equals("target")){
-            reporterLogLn("\n### targetTableSql: $targetQuerySettings\n$targetTableSql");
-            targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
+            reporterLogLn("\n### targetObjectSql: $targetQuerySettings\n$targetObjectSql");
+            targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetObjectSql, 0, targetDb)
             def dataFromTarget = joinList(targetDbResult.collect{it[0]})
             def targetCount = targetDbResult.size( )
             reporterLogLn("Target <$objectType>: <$targetCount>");
             if(targetCount.equals(0)){ReportDbObjectsDiff
                 skipTest("Nothing in Target to Compare: sourceCount is <$targetCount> ")
             }
-            sourceTableSql = sourceTableSql.replace("__-DATA-__", dataFromTarget)
-            def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
+            sourceObjectSql = sourceObjectSql.replace("__-DATA-__", dataFromTarget)
+            reporterLogLn("\n### sourceObjectSql: $sourceQuerySettings\n$sourceObjectSql");
+            def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceObjectSql, 0, sourceDb)
             def sourceCount = sourceDbResult.size( )
             reporterLogLn("Source <$objectType>: missing count<$sourceCount>");
-            reporterLogLn("\n### sourceTableSql: $sourceQuerySettings\n$sourceTableSql");
             diffDbResult = sourceDbResult
         }else{
-            reporterLogLn("\n### sourceTableSql: $sourceQuerySettings\n$sourceTableSql");
-            def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceTableSql, 0, sourceDb)
+            reporterLogLn("\n### sourceObjectSql: $sourceQuerySettings\n$sourceObjectSql");
+            def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceObjectSql, 0, sourceDb)
             def dataFromSource = joinList(sourceDbResult.collect{it[0]})
             def sourceCount = sourceDbResult.size()
             reporterLogLn("Source <$objectType>: <$sourceCount>");
             if(sourceCount.equals(0)){
                 skipTest("Nothing in Source to Compare: sourceCount is <$sourceCount> ")
             }
-            targetTableSql = targetTableSql.replace("__-DATA-__", dataFromSource)
-            targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetTableSql, 0, targetDb)
+            targetObjectSql = targetObjectSql.replace("__-DATA-__", dataFromSource)
+            targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetObjectSql, 0, targetDb)
             def targetCount = targetDbResult.size( )
             reporterLogLn("Target <$objectType>: missing count<$targetCount>");
-            reporterLogLn("\n### targetTableSql: $targetQuerySettings\n$targetTableSql");
+            reporterLogLn("\n### targetObjectSql: $targetQuerySettings\n$targetObjectSql");
             diffDbResult = targetDbResult
         }
         def diffCount =  diffDbResult.size()
