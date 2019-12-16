@@ -57,8 +57,12 @@ public class Person implements Serializable {
         tel = '0' + zip[2] + socialSecurityNumberLongDashLess[2..9]
         mobile = '076' + socialSecurityNumberLongDashLess[3..8]
         user = "${firstNameShort}abc"[0..2] + "_" +  "${lastNameShort}abc"[0..2] + "_$no"
-        pwd  = "${lastNameShort}abc"[0..2] + "_" + "${firstNameShort}abc"[0..2] + "_$no"
-        email = firstNameLc + "."  + lastNameLc + ".$no@$emailDomain"
+        pwd  = "${lastNameShort}abc"[0..0].toUpperCase() +  "${lastNameShort}abc"[1..2] + "_" + "${firstNameShort}abc"[0..2] + "_$no"
+        def firstNameLastName = (firstNameLc + "."  + lastNameLc + ".$no").replaceAll(" ", "")
+        if(firstNameLastName.size() > 30){
+            firstNameLastName = firstNameLastName[0..29]
+        }
+        email = "$firstNameLastName@$emailDomain"
         url = "www." + "${firstNameShort}abc"[0..2]  + "."  + "${lastNameShort}abc"[0..2]  + ".$no.$emailDomain"
         ip = (0..3).collect { random.nextInt(255) }.join('.')
         pin = socialSecurityNumberLongDashLess[8..11]
