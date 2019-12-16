@@ -3,7 +3,7 @@ package corebase
 import org.openqa.selenium.Point
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
-import org.openqa.selenium.htmlunit.HtmlUnitDriver
+import org.openqa.selenium.htmlunit.*
 import org.testng.SkipException
 
 /**
@@ -232,7 +232,7 @@ class SeleniumDummyHelper implements ISeleniumHelper {
 
 
     WebDriver getDriver() {
-        return new HtmlUnitDriver()
+        return //new HtmlUnitDriver()
     }
 
 
