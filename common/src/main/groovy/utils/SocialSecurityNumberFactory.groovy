@@ -244,7 +244,7 @@ public class SocialSecurityNumberFactory implements Serializable {
     }
 
     def checkSum(String n1, String n2, String n3) {
-        if (count++ < maxNoOfSocialSecurityNumbers) {
+        if (socialSecurityNumbers.size() < maxNoOfSocialSecurityNumbers) {
             n1Num = getVal(n1)
             n2Num = Integer.parseInt(n2)
             n3Num = getVal(n3)
@@ -275,7 +275,9 @@ public class SocialSecurityNumberFactory implements Serializable {
     }
 
     private void addToList(String n1, String n2, String n3, int n4, String year2) {
-        socialSecurityNumbers["$year2$month$day$n1$n2$n3$n4"] = new SocialSecurityNumber(year, month, day, n1, n2, n3, n4)
+       if(!("$n1$n2$n3" == "000")){
+           socialSecurityNumbers["$year2$month$day$n1$n2$n3$n4"] = new SocialSecurityNumber(year, month, day, n1, n2, n3, n4)
+       }
     }
 
     boolean isGenferFemaleRequired(String n3) {
