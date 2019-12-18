@@ -303,6 +303,7 @@ public class SeleniumHelper implements ISeleniumHelper {
                     webDriverManager.clearPreferences()
                     webDriverManager.setup()
                     FirefoxOptions firefoxOptions = new FirefoxOptions()
+                   // firefoxOptions.setProfile(firefoxProfile)
                     driver= new FirefoxDriver(firefoxOptions);
 
                     break
