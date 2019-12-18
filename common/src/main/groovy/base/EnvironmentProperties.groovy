@@ -6,7 +6,13 @@ public class EnvironmentProperties {
 
     public EnvironmentProperties(fieldsToAddToEnv){
         fieldsToAddToEnv.each {String k,String v->
-            fields[k.trim()] = v.trim()
+            if(k != null){
+                if(v != null) {
+                    fields[k.trim()] = v.trim()
+                }else{
+                    fields[k.trim()] = v
+                }
+            }
         }
     }
 
