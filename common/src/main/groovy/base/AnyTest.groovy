@@ -35,6 +35,7 @@ public class /**/AnyTest {
     protected final static ReporterHelper reporterHelper = new ReporterHelper()
 
     protected ISeleniumHelper driver
+    protected ISeleniumHelper seleniumHelper
     private String testBrowser
     public TangAssert tangAssert
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
