@@ -102,13 +102,14 @@ public class /**/AnyTest {
             log.info(testContext.getOutputDirectory())
             if (settings.guiRun) {
                 driver = new SeleniumHelper().init(browser, testContext.getOutputDirectory())
+                seleniumHelper = driver
                 driver.setTestName("tang_")
                 Reporter.log(SeleniumHelper.getSimpleName())
 
             } else {
                 driver = new SeleniumDummyHelper().init("", "")
+                seleniumHelper = driver
                 Reporter.log(SeleniumDummyHelper.getSimpleName())
-
             }
             testContext.setAttribute(SELENIUM_HELPER, driver)
             testContext.setAttribute(WEB_DRIVER, driver)
