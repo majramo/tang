@@ -54,4 +54,7 @@ public class JdbcConnection {
     public boolean isConnectionOk() {
         return jDbcConnection != null
     }
+    public getJDbcConnection() {
+        return  jDbcConnection
+    }
 }
