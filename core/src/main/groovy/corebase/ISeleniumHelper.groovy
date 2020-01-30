@@ -98,6 +98,8 @@ public interface ISeleniumHelper {
 
     public WebDriver getDriver()
 
+    public WebDriver getWebDriver()
+
     public File takeScreenShot(String message)
 
     public void takeScreenShotAndSource(String message)

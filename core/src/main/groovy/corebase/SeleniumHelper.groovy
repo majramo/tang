@@ -40,6 +40,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     private String loadingString = ""
     private static final int IMPLICT_WAIT = 1
     private WebDriver driver
+    private WebDriver webDriver
     private long HUNDRED_MILLI_SECONDS = 100
     private long defaultImplicitlyWait = 10
     private long defaultPageLoadTimeoutSeconds = 80
@@ -208,6 +209,7 @@ public class SeleniumHelper implements ISeleniumHelper {
                 break
 
         }
+        webDriver = driver
         macDriver = driver.capabilities["platform"].toString().contains("MAC")
 
         if (!browser.toString().contains("CH_") && !browser.toString().contains("CHROME") && !browser.toString().contains("SAFARI")) {
@@ -1028,6 +1030,10 @@ return defaultPageLoadTimeoutMilliSeconds
 
 public WebDriver getDriver() {
 return driver
+}
+
+public WebDriver getWebDriver() {
+return webDriver
 }
 
 

@@ -235,6 +235,10 @@ class SeleniumDummyHelper implements ISeleniumHelper {
         return //new HtmlUnitDriver()
     }
 
+    WebDriver getWebDriver() {
+        return //new HtmlUnitDriver()
+    }
+
 
     File takeScreenShot(String message) {
     }
