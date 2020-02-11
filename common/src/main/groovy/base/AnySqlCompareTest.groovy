@@ -159,7 +159,7 @@ public class AnySqlCompareTest {
         }
 
 
-            //Save sourceResult in Repository database
+        //Save sourceResult in Repository database
         if(actionTypeColumn == "SAVE"){
             reporterLogLn("Saving system <$system> <$sourceSize> rows to db #Hour")
             saveResultToDb(testContext, system, comments, sourceResult, sourceSql, getCurrentDateHour())
@@ -500,6 +500,12 @@ public class AnySqlCompareTest {
             case ~/.*db2.*/:
                 icon = "db2"
                 break
+            case ~/.*maria.*/:
+                icon = "mariadb"
+                break
+            case ~/.*mongodb.*/:
+                icon = "mongodb"
+                break
         }
         return icon
     }
@@ -590,8 +596,8 @@ $fieldsStr
         (repositoryTable, fields) = getRepositoryDatabase(sourceSql)
 
         if(repositoryTable == ""){
-           reporterLogLn("Could not decide Database table")
-           return
+            reporterLogLn("Could not decide Database table")
+            return
         }
 
         reporterLogLn("Reading Targetsaved system<$system> from Table <$repositoryTable>")
@@ -602,7 +608,7 @@ $fieldsStr
                 "WHERE $SCHEMA_NAME = '$system' " +
                 "AND $SOURCE_SQL =  '$savedSourceSql'" +
                 "AND time = (SELECT max(time) FROM $repositoryTable WHERE SCHEMA_NAME = '$system' AND SOURCE_SQL =  '$savedSourceSql' )"
-                "ORDER BY $ROW_ID"
+        "ORDER BY $ROW_ID"
         def dbResult = getDbResult(repositroyDbSqlDriver, dbQuery, Constants.dbRunTypeRows)
 
         ArrayList dbResultModified = new ArrayList()
@@ -682,7 +688,7 @@ $fieldsStr
                 break
             case ~/.*USER_INDEXES.*/:
                 repositoryTable = DATABASE_INDEXES
-                 break
+                break
             default:
                 return
         }
