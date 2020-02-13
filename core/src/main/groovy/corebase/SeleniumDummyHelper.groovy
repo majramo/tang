@@ -95,6 +95,10 @@ class SeleniumDummyHelper implements ISeleniumHelper {
         return "0"
     }
 
+    List getXpathsText(String xpath) {
+        return ["0"]
+    }
+
 
     boolean isTextPresent(String xpath, String text) {
         return true

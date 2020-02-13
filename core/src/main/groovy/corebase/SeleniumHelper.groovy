@@ -777,6 +777,11 @@ public class SeleniumHelper implements ISeleniumHelper {
         driver.navigate().back()
     }
 
+    public List getXpathsText(final String element) {
+        final List<WebElement> webElements = findElementsByXpath(element)
+        return webElements.collect{it.getText()}
+    }
+
     public int getXpathCount(final String element) {
         final List<WebElement> webElements = findElementsByXpath(element)
         return webElements.size()
