@@ -40,6 +40,7 @@ public interface ISeleniumHelper {
     public String getText(final String xpath)
 
     public List getXpathsText(final String xpath)
+    public List getXpathsText(final String xpath, int sleepTimeSeconds)
 
     public boolean isTextPresent(final String xpath, final String text)
 
@@ -68,7 +69,6 @@ public interface ISeleniumHelper {
 
     public boolean select(final String xpath, final int index)
 
-
     public void goBack()
 
     public int getXpathCount(final String xpath)
@@ -78,7 +78,6 @@ public interface ISeleniumHelper {
     public String getAttribute(final String xpath, final String attributeName)
 
     public void printWindows()
-
 
     public boolean sendKeys(final String xpath, text)
 
@@ -152,7 +151,6 @@ public interface ISeleniumHelper {
 
     public void selectAllAndTypeAndEnterAndExpectError(String xpath, String data, Exception e)
 
-
     public String getAlertTextAndAccept()
 
     public boolean isAlertPresent()
@@ -179,6 +177,11 @@ public interface ISeleniumHelper {
     public ISeleniumHelper restartBrowser()
 
     public void sleep(long milliseconds )
+
     public List analyseLinksByXpath(String[] xpaths)
+
     boolean selectVisualOption(java.lang.String xpath, java.lang.String text);
+
+    List getSelectVisualOptions(java.lang.String xpath);
+
  }

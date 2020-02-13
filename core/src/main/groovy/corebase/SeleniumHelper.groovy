@@ -22,6 +22,7 @@ import org.openqa.selenium.remote.ScreenshotException
 import org.openqa.selenium.safari.SafariDriver
 import org.openqa.selenium.support.ui.ExpectedCondition
 import org.openqa.selenium.support.ui.ExpectedConditions
+import org.openqa.selenium.support.ui.Select
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.testng.Reporter
 import org.testng.SkipException
@@ -777,7 +778,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         driver.navigate().back()
     }
 
-    public List getXpathsText(final String element) {
+    public List getXpathsText(final String element, int sleepTimeSeconds = 0) {
         final List<WebElement> webElements = findElementsByXpath(element)
         return webElements.collect{it.getText()}
     }
@@ -1514,5 +1515,15 @@ switch (href){
         }
         we.click()
         return true
+    }
+
+    @Override
+    List getSelectVisualOptions(String xpathOrId) {
+        log.info getCurrentMethodName() + " xpathOrId(<$xpathOrId>"
+        final WebElement we = findElementByXpathOrId(xpathOrId)
+        if (we == null) {
+            return []
+        }
+        return new Select(we).getOptions();
     }
 }

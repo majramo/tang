@@ -203,8 +203,13 @@ public class /**/AnyTest {
         return getDbResult(testContext, settings.defaultDatabase, query, message)
     }
 
-    public reporterLogLn(message = "") {
-        Reporter.log("$message$CR")
+    public reporterLogLn(message, String htmlTag = "") {
+        if(htmlTag.isEmpty()) {
+            Reporter.log("$message$CR")
+        }else{
+            Reporter.log("<$htmlTag>$message</$htmlTag>$CR")
+        }
+        log.info(message)
     }
 
     public setIssueLink(String issueStr){

@@ -95,7 +95,7 @@ class SeleniumDummyHelper implements ISeleniumHelper {
         return "0"
     }
 
-    List getXpathsText(String xpath) {
+    List getXpathsText(String xpath, int sleepTimeSeconds = 0) {
         return ["0"]
     }
 
@@ -416,8 +416,12 @@ class SeleniumDummyHelper implements ISeleniumHelper {
     @Override
     List analyseLinksByXpath(String[] xpaths) {
     }
-    public boolean selectVisualOption(java.lang.String xpath, java.lang.String text) {
 
+    public boolean selectVisualOption(java.lang.String xpath, java.lang.String text) {
     }
 
+    @Override
+    List getSelectVisualOptions(String xpath) {
+        return ["A"]
+    }
 }
