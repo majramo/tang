@@ -7,6 +7,7 @@ import dtos.SettingsHelper
 import dtos.base.SqlHelper
 import org.apache.commons.lang3.StringUtils
 import org.apache.log4j.Logger
+import org.codehaus.groovy.runtime.StackTraceUtils
 import org.testng.ITestContext
 import org.testng.Reporter
 import org.testng.SkipException
@@ -18,6 +19,7 @@ import static corebase.GlobalConstants.FIREFOX
 import static corebase.GlobalConstants.HTMLUNIT
 import static corebase.GlobalConstants.INTERNET_EXPLORER
 import static corebase.GlobalConstants.OPERA
+import static corebase.GlobalConstants.REPORT_NG_ESCAPE_OUTPUT_PROPERTY
 import static corebase.GlobalConstants.SAFARI
 import static dtos.base.Constants.BROWSER
 import static dtos.base.Constants.BROWSER_ICON
@@ -53,6 +55,7 @@ public class /**/AnyTest {
     @BeforeTest(alwaysRun = true)
     public void beforeTest(ITestContext testContext, @Optional String environment, @Optional String browser) {
         log.info("BeforeTest " + testContext.getName())
+        System.setProperty(REPORT_NG_ESCAPE_OUTPUT_PROPERTY, "false")
         if (StringUtils.isBlank(browser)) {
             browser = settings.defaultBrowser
         }
@@ -204,12 +207,35 @@ public class /**/AnyTest {
     }
 
     public reporterLogLn(message, String htmlTag = "") {
-        if(htmlTag.isEmpty()) {
+        if(htmlTag.isEmpty()){
             Reporter.log("$message$CR")
         }else{
             Reporter.log("<$htmlTag>$message</$htmlTag>$CR")
         }
         log.info(message)
+    }
+
+    public reporterLogLnH1(message) {
+        reporterLogLnFormatted(message)
+    }
+
+    public reporterLogLnH2(message) {
+        reporterLogLnFormatted(message)
+    }
+
+    public reporterLogLnH3(message) {
+        reporterLogLnFormatted(message)
+    }
+
+    public reporterLogLnStrong(message) {
+        reporterLogLnFormatted(message)
+    }
+
+    private reporterLogLnFormatted(message) {
+        StackTraceElement[] stackTrace = StackTraceUtils.sanitize(new Throwable()).stackTrace
+        def callinMethodName = stackTrace[2].methodName
+        def htmlTag = callinMethodName.replaceAll("reporterLogLn", "")
+        reporterLogLn(message, htmlTag)
     }
 
     public setIssueLink(String issueStr){
