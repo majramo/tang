@@ -39,8 +39,8 @@ public interface ISeleniumHelper {
 
     public String getText(final String xpath)
 
-    public List getXpathsText(final String xpath)
-    public List getXpathsText(final String xpath, int sleepTimeSeconds)
+    public List<String> getXpathsText(final String xpath)
+    public List<String> getXpathsText(final String xpath, int sleepTimeSeconds)
 
     public boolean isTextPresent(final String xpath, final String text)
 

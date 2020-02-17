@@ -778,7 +778,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         driver.navigate().back()
     }
 
-    public List getXpathsText(final String element, int sleepTimeSeconds = 0) {
+    public List<String> getXpathsText(final String element, int sleepTimeSeconds = 0) {
         final List<WebElement> webElements = findElementsByXpath(element)
         return webElements.collect{it.getText()}
     }

@@ -95,7 +95,7 @@ class SeleniumDummyHelper implements ISeleniumHelper {
         return "0"
     }
 
-    List getXpathsText(String xpath, int sleepTimeSeconds = 0) {
+    List<String> getXpathsText(String xpath, int sleepTimeSeconds = 0) {
         return ["0"]
     }
 
