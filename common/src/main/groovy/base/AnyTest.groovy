@@ -206,6 +206,10 @@ public class /**/AnyTest {
         return getDbResult(testContext, settings.defaultDatabase, query, message)
     }
 
+    public reporterLogLn() {
+        Reporter.log(CR)
+    }
+
     public reporterLogLn(message, String htmlTag = "") {
         if(htmlTag.isEmpty()){
             Reporter.log("$message$CR")

@@ -24,6 +24,11 @@ public class AnyPage {
         System.setProperty(REPORT_NG_ESCAPE_OUTPUT_PROPERTY, "false")
     }
 
+
+    public reporterLogLn() {
+        Reporter.log(CR)
+    }
+
     public reporterLogLn(message, String htmlTag = "") {
         if(htmlTag.isEmpty()){
             Reporter.log("$message$CR")
