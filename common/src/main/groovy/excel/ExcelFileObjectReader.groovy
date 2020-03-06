@@ -124,6 +124,9 @@ public class ExcelFileObjectReader {
 
     private  ArrayList<Object[][]> getDataFromFile(HashMap excelCapabilities, int to = 0, int from = 0) {
         println("\n\n###\nReading file: $fileName")
+        excelCapabilities.each {property->
+            Reporter.log("Properties:$property>")
+        }
         Date startTime = new Date()
         println(startTime)
         try {
