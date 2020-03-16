@@ -386,8 +386,16 @@ class SeleniumDummyHelper implements ISeleniumHelper {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    boolean isClickable(String xpath, int changedImplicitlyWait) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 
     boolean isDisplayed(String xpath) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    boolean isClickable(String xpath) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

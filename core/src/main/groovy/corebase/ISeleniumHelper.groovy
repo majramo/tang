@@ -159,6 +159,11 @@ public interface ISeleniumHelper {
 
     public boolean isDisplayed(String xpath, int changedImplicitlyWait)
 
+
+    public boolean isClickable(String xpath)
+
+    public boolean isClickable(String xpath, int changedImplicitlyWait)
+
     public String getHtmlImgTag(final String filePath)
 
     public String getHtmlImgTag(final String filePath, String fileName)

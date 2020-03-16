@@ -1526,4 +1526,21 @@ switch (href){
         }
         return new Select(we).getOptions();
     }
+
+    public boolean isClickable(String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
+        return isClickable(element)
+        resetImplicitTime()
+    }
+
+    public boolean isClickable(String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        WebElement webElement = findElementByXpathOrId(element, true)
+        if (webElement != null) {
+            def webDriverWait = createWebDriverWait()
+            return webDriverWait.until(ExpectedConditions.elementToBeClickable(webElement));
+        }
+        return false
+    }
 }
