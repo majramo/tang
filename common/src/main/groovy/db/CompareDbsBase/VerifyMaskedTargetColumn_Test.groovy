@@ -17,18 +17,20 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     private String targetDbOwner;
     def table
     def column
+    def type
     def actionColumn
     def masking
     def searchCriteria
     def searchExtraCondition
     def numberOfLinesInSqlCompare = 101
 
-    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, actionColumn, masking, searchCriteria = "", searchExtraCondition = "") {
+    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, type, actionColumn, masking, searchCriteria = "", searchExtraCondition = "") {
         super.setup()
         this.targetDb = targetDb
         this.sourceDb = sourceDb
         this.system = system.toLowerCase()
         this.table = table.toLowerCase()
+        this.type = type.toLowerCase()
         this.column = column.toLowerCase()
         this.actionColumn = actionColumn
         this.masking = masking
@@ -152,10 +154,14 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
             }
 
             sourceTargetSql = "-- Verify search criteria and masked column<$searchCriteria, $tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
+            def notNumberColumnCompare = ""
+            if(!["number", "date", "time"].contains(type)){
+                notNumberColumnCompare = " AND NOT $tmpColumn = ' '\n"
+            }
             sourceTargetSql += "SELECT $searchCriteria, $tmpColumn FROM $table\n" +
                     " WHERE NOT $column IS NULL\n" +
                     // " AND LENGTH(REPLACE($tmpColumn, ' ' , '')) > 0\n" +
-                    " AND NOT $tmpColumn = ' '\n" +
+                    notNumberColumnCompare +
                     " AND length($tmpColumn) > 0\n" +
                     " AND $searchCriteria BETWEEN $fromId AND $toMaxId\n" +
                     " AND ROWNUM < 1001\n"

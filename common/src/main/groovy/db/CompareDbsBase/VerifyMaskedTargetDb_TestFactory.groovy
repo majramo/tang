@@ -23,7 +23,7 @@ class  VerifyMaskedTargetDb_TestFactory {
 
         def (ExcelObjectProvider excelObjectProviderMaskAction, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
         def inputFile = excelObjectProviderMaskAction.inputFile
-        excelObjectProviderMaskAction.addColumnsToRetriveFromFile(["System", "Table", "Column", "Masking", "Action", "SearchCriteria", "SearchExtraCondition"])
+        excelObjectProviderMaskAction.addColumnsToRetriveFromFile(["System", "Table", "Column", "Masking", "Action", "SearchCriteria", "SearchExtraCondition", "Type"])
         excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("System", system)
         excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Action", actionColumn)
         if(!tableColumn.isEmpty()){
@@ -42,7 +42,7 @@ class  VerifyMaskedTargetDb_TestFactory {
 //        excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Column", "UTDELNINGSADRESS")
 
         def excelBodyRowsMaskAction = SystemPropertiesInitation.readExcel(excelObjectProviderMaskAction)
-        excelObjectProviderMaskAction.printRow(excelBodyRowsMaskAction, ["System", "Table", "Column", "Masking", "Action"])
+        excelObjectProviderMaskAction.printRow(excelBodyRowsMaskAction, ["System", "Table", "Column", "Masking", "Action", "Type"])
 
         Reporter.log("Lines read <$excelBodyRowsMaskAction.size>")
         println("Lines read <$excelBodyRowsMaskAction.size>")
@@ -52,6 +52,7 @@ class  VerifyMaskedTargetDb_TestFactory {
         excelBodyRowsMaskAction.unique().eachWithIndex { excelRow, index ->
             def table = excelRow["Table"]
             def column = excelRow["Column"]
+            def type= excelRow["Type"]
             def searchCriteria = excelRow["SearchCriteria"]
             def searchExtraCondition = excelRow["SearchExtraCondition"]
             def masking = excelRow["Masking"]
@@ -62,7 +63,7 @@ class  VerifyMaskedTargetDb_TestFactory {
                 searchExtraCondition = ""
             }
 
-            result.add(new VerifyMaskedTargetColumn_Test(testContext, targetDb, sourceDb, excelRow["System"], table, column, actionColumn, masking, searchCriteria, searchExtraCondition))
+            result.add(new VerifyMaskedTargetColumn_Test(testContext, targetDb, sourceDb, excelRow["System"], table, column, type, actionColumn, masking, searchCriteria, searchExtraCondition))
 
         }
 
