@@ -235,7 +235,7 @@ class FindDbRelationsInSourceTables extends AnySqlCompareTest {
         prepareRelationshipsTable[parent] = true
         //relationships.findAll{it.PARENT == "FTG_ARBSTALLE"  }
         def counter = 1
-        relationships.findAll { it.PARENT == parent }.unique().each {
+        relationships.findAll { it.PARENT == parent && it.CHILD != parent }.unique().each {
             def parentWhere = it["WHERE"]
             def child = it.CHILD
             def parentId = it.PARENT_ID
