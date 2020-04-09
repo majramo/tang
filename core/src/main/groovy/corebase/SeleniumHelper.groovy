@@ -8,19 +8,18 @@ import org.codehaus.groovy.runtime.StackTraceUtils
 import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
-import org.openqa.selenium.firefox.FirefoxBinary
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
 import org.openqa.selenium.firefox.FirefoxProfile
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
-import org.openqa.selenium.ie.InternetExplorerOptions
 import org.openqa.selenium.interactions.Actions
+import org.openqa.selenium.opera.OperaOptions
+import org.openqa.selenium.remote.CapabilityType
 import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.remote.ScreenshotException
 import org.openqa.selenium.safari.SafariDriver
-import org.openqa.selenium.support.ui.ExpectedCondition
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.Select
 import org.openqa.selenium.support.ui.WebDriverWait
@@ -56,6 +55,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     protected settings = settingsHelper.settings
     public applicationConf = settingsHelper.applicationConf
     protected URL COMPANY_HUB_URL
+    protected URL SELENOID_HUB_URL
     protected URL SAUCELABS_HUB
     private static int driversCount = 0
     private static int screenX_Position = 0;
@@ -169,6 +169,7 @@ public class SeleniumHelper implements ISeleniumHelper {
         COMPANY_HUB_URL = new URL(applicationConf.COMPANY_HUB)
         SAUCELABS_HUB = new URL(applicationConf.SAUCELABS_HUB)
 
+
         if (webDrivers.isEmpty()) {
             settings.webDrivers.each() {
                 webDrivers[it[0]] = getCapability(it[0], it[1], it[2], it[3], it[4])
@@ -195,11 +196,27 @@ public class SeleniumHelper implements ISeleniumHelper {
                 break
         }
 
+
         switch (browser) {
+            case ~/^.*SELENOID_.*/:
+
+                def SELENOID_HUB_URL = getSelenoidHub(browser)
+                def options = getSelenoidBrowserOptions(capability)
+                try {
+                    driver = new RemoteWebDriver(SELENOID_HUB_URL, options);
+                    moveDriverWindow(true, browser, driver)
+                } catch (Exception e) {
+                    log.error("Can't start driver:$browser>")
+                    log.error("Exception:$e>")
+                    throw e
+                }
+                break
+
             case ~/^LOCAL.*/:
                 driver = getLocalDriver(capability, browser)
                 moveDriverWindow(true, browser, driver)
                 break
+
             case ~/^COMPANY_HUB_URL.*/:
                 driver = new RemoteWebDriver(COMPANY_HUB_URL, capability)
                 moveDriverWindow(true, browser, driver)
@@ -227,6 +244,44 @@ public class SeleniumHelper implements ISeleniumHelper {
         }
 
         return this
+    }
+
+    private Serializable getSelenoidHub(String browser) {
+        def SELENOID_HUB_URL = ""
+        if (browser.contains("SELENOID")) {
+            if (browser.contains("LOCAL_SELENOID")) {
+                SELENOID_HUB_URL = new URL(settings.LOCAL_SELENOID_HUB)
+            } else {
+                SELENOID_HUB_URL = new URL(settings.REMOTE_SELENOID_HUB)
+            }
+        }
+        SELENOID_HUB_URL
+    }
+
+    private getSelenoidBrowserOptions(DesiredCapabilities capability) {
+        def browserOptions
+
+        switch (capability.getBrowserName()) {
+            case ~/firefox/:
+                browserOptions = new FirefoxOptions()
+                break
+            case ~/chrome/:
+                browserOptions = new ChromeOptions()
+                browserOptions.setExperimentalOption("useAutomationExtension", false)
+                break
+            case ~/opera/:
+                browserOptions = new OperaOptions()
+                break
+        }
+        browserOptions.setCapability("enableVNC", true);
+        browserOptions.setCapability("enableVideo", false);
+        if (!capability.version.isEmpty()) {
+            browserOptions.setCapability(CapabilityType.BROWSER_VERSION, capability.version);
+        }
+        if (settings.hostsEntries != null && settings.hostsEntries != "[]") {
+            browserOptions.setCapability("hostsEntries", settings.hostsEntries);
+        }
+        return browserOptions
     }
 
     private static boolean addExtensionToFirefox(FirefoxProfile firefoxProfile, FireFoxAddon fireFoxAddOn) {
