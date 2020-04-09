@@ -104,6 +104,7 @@ public class /**/AnyTest {
         try {
             log.info(testContext.getOutputDirectory())
             if (settings.guiRun) {
+                new HostsEntries(browser, environment)
                 driver = new SeleniumHelper().init(browser, testContext.getOutputDirectory())
                 seleniumHelper = driver
                 driver.setTestName("tang_")
