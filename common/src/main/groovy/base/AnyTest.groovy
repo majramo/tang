@@ -23,6 +23,7 @@ import static corebase.GlobalConstants.REPORT_NG_ESCAPE_OUTPUT_PROPERTY
 import static corebase.GlobalConstants.SAFARI
 import static dtos.base.Constants.BROWSER
 import static dtos.base.Constants.BROWSER_ICON
+import static dtos.base.Constants.SELENOID
 import static dtos.base.Constants.DATABASE
 import static dtos.base.Constants.CR
 import static dtos.base.Constants.ENVIRONMENT
@@ -62,6 +63,10 @@ public class /**/AnyTest {
         testContext.setAttribute(BROWSER, browser)
         testContext.setAttribute(BROWSER_ICON, getBrowserIcon(browser))
         testContext.setAttribute(ENVIRONMENT, environment)
+        if(browser.toUpperCase().contains(SELENOID)){
+            testContext.setAttribute(SELENOID,  browser.toUpperCase().replaceAll("${SELENOID}.*", SELENOID))
+
+        }
         log.info(testContext.getName())
 
     }

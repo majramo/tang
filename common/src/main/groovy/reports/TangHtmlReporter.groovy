@@ -91,13 +91,14 @@ public class TangHtmlReporter extends HTMLReporter implements ITestListener, ICo
         String browser = testResult.getTestContext().getAttribute(BROWSER)
         String browserIcon = testResult.getTestContext().getAttribute(BROWSER_ICON)
         String databaseIcon = testResult.getTestContext().getAttribute(DATABASE_VENDOR_1)
+        String selenoidIcon = testResult.getTestContext().getAttribute(SELENOID)
 
         testResult.setAttribute(DESCRIPTION, testResult.getMethod().getDescription())
 
         testResult.setAttribute(ENVIRONMENT, environment)
         testResult.setAttribute(BROWSER, browser)
 
-        testResult.setAttribute(ICONS, reporterHelper.addIcons(browserIcon?.toLowerCase(), databaseIcon?.toLowerCase(), environment?.toLowerCase()))
+        testResult.setAttribute(ICONS, reporterHelper.addIcons(selenoidIcon?.toLowerCase(),browserIcon?.toLowerCase(), databaseIcon?.toLowerCase(), environment?.toLowerCase()))
     }
 
     @Override
