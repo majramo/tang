@@ -128,6 +128,10 @@ public class PersonFactory implements Serializable {
         return getData(getPeopleOnDate(maxNoOfPnrs, yearMonthDayNum, delimiter), format)
     }
 
+    private String getPersonToString(ArrayList<Object[]> people, String format = ""){
+        return getData(people, format)
+    }
+
     private String getData(ArrayList<Object[]> people, String format){
         switch (format.toUpperCase()) {
             case "JSON":
