@@ -68,12 +68,12 @@ public class Person implements Serializable {
         pin = socialSecurityNumberLongDashLess[8..11]
      }
 
-    public String toString(){
-        return [no, age, firstName, lastName, socialSecurityNumberLong, socialSecurityNumberLongDashLess, gender, address, zip, city, tel, mobile, user, pwd, email, url, ip, pin].join(delimiter)
+    public String toString(currentDelimiter = delimiter){
+        return [no, age, firstName, lastName, socialSecurityNumberLong, socialSecurityNumberLongDashLess, gender, address, zip, city, tel, mobile, user, pwd, email, url, ip, pin].join(currentDelimiter)
     }
 
-    public String getHeader(){
-        return ['no', 'age', 'firstName', 'lastName', 'socialSecurityNumberLong', 'socialSecurityNumberLongDashLess', 'gender', 'address', 'zip', 'city', 'tel', 'mobile', 'user', 'pwd', 'email', 'url', 'ip', 'pin'].join(delimiter)
+    public String getHeader(currentDelimiter = delimiter){
+        return ['no', 'age', 'firstName', 'lastName', 'socialSecurityNumberLong', 'socialSecurityNumberLongDashLess', 'gender', 'address', 'zip', 'city', 'tel', 'mobile', 'user', 'pwd', 'email', 'url', 'ip', 'pin'].join(currentDelimiter)
     }
 
     public getJsonMap(){
