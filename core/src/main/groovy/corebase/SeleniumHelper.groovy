@@ -403,7 +403,7 @@ public class SeleniumHelper implements ISeleniumHelper {
             Reporter.log("")
             throw new SkipException("Can't set up driver $browser")
         } catch (Exception e1) {
-            log.info System.getProperty(e1)
+            log.info(e1)
 
         }
         return driver
