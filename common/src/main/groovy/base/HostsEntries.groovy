@@ -14,7 +14,7 @@ public class HostsEntries {
         def settings = settingsHelper.settings
         settings.hosts = []
 
-        if(browser.contains("REMOTE_")) {
+        if(browser.contains("REMOTE_") || browser.contains("SELENOID_")) {
             def envHostsFile = environment.replaceAll("_env", "")
             URL url = this.class.getResource("/hosts/hosts-${envHostsFile}.txt");
             if (url != null) {
