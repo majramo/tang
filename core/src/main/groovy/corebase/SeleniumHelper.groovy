@@ -389,7 +389,6 @@ public class SeleniumHelper implements ISeleniumHelper {
                 case ~/htmlunit|htmlunitwithjs/:
                     driver = new HtmlUnitDriver()
                     break
-
             }
         } catch (GroovyRuntimeException e) {
             log.info System.getProperty("webdriver.chrome.driver")
@@ -403,7 +402,7 @@ public class SeleniumHelper implements ISeleniumHelper {
             Reporter.log("")
             throw new SkipException("Can't set up driver $browser")
         } catch (Exception e1) {
-            log.info System.getProperty(e1)
+            log.info(e1)
 
         }
         return driver
