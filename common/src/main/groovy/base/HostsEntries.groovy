@@ -6,6 +6,11 @@ import org.apache.log4j.Logger
 public class HostsEntries {
     private final static Logger log = Logger.getLogger("HoEn ")
 
+    /*
+    Get rid of everything after "#"
+    split lines and make entry key:values
+    add entries to settings
+     */
     public HostsEntries(browser, environment){
         def FIRST_SPACE = "___FIRST_SPACE___"
 
@@ -18,42 +23,45 @@ public class HostsEntries {
             def envHostsFile = environment.replaceAll("_env", "")
             URL url = this.class.getResource("/hosts/hosts-${envHostsFile}.txt");
             if (url != null) {
-                def splittedLines
                 try {
                     def allLines = new File(url.toURI()).readLines()
 
-                    //Get rid of empty lines and lines starting with #
-                    def validLines = allLines.collect{String row ->
-                        def rowCleaned = row.replaceAll(/\t/, " ").replaceAll("^[ ]*", "")
-                        if(!rowCleaned.startsWith("#") && !rowCleaned.isEmpty() && rowCleaned.isEmpty() != null){
-                            rowCleaned
+                    //Get rid of empty lines and data after # sign
+                    def validLines = []
+                    allLines.each{String row ->
+                        def rowCleaned = row.replaceAll("#.*", "")
+                        rowCleaned = rowCleaned.replaceAll(/\s+/, " ").replaceAll("^[ ]*", "")
+                        if(!rowCleaned.isEmpty() && rowCleaned != null){
+                            validLines.add(rowCleaned)
+                        }
+                    }
+
+                    def entries = []
+                    validLines.each{
+                        def splittedLine = it.split(" ")
+                        def ip = splittedLine[0]
+                        if(splittedLine.size()<2){
+                         log.error("Line must have a dns entry:$splittedLine>")
+                        }
+                        splittedLine[1..splittedLine.size()-1].each {
+                         entries.add(it + ":"  + ip)
                         }
                     }
 
                     org.testng.Reporter.log("<BR>")
                     org.testng.Reporter.log(">>>hostsEntries")
 
-                    //clean each row and keep only ket, value
-                    splittedLines = validLines.findAll{it != null}.unique().collect{it.replaceAll("\t", " ").
-                            replaceFirst(" ", FIRST_SPACE).
-                            replaceAll(/${FIRST_SPACE}[ ]*/, FIRST_SPACE).
-                            replaceFirst(" .*", "").
-                            split(FIRST_SPACE)}
 
-
-                    settings.hostsEntries  = splittedLines.collect{it[1] + ":" + it[0] }
+                    settings.hostsEntries  = entries
 
                     log.info("settings.hostsEntries:$settings.hostsEntries>")
                     org.testng.Reporter.log(settings.hostsEntries.toString())
                     org.testng.Reporter.log("hostsEntries>>>")
                     org.testng.Reporter.log("<BR>")
                     org.testng.Reporter.log("<BR>")
-                } catch (java.lang.ArrayIndexOutOfBoundsException e) {
-                    org.testng.Reporter.log("Can't split entries:$splittedLines>")
-                    log.error("Can't split entries:$splittedLines>")
-                    throw e
                 } catch (Exception e) {
-                    log.error("splittedLines:$splittedLines>")
+                    org.testng.Reporter.log("url:$url>")
+                    log.error("url:$url>")
                     org.testng.Reporter.log("Exception:$e>")
                     log.error("Exception:$e>")
                     throw e
