@@ -52,7 +52,7 @@ public class HostsEntries {
                     org.testng.Reporter.log(">>>hostsEntries")
 
 
-                    settings.hostsEntries  = entries
+                    settings.hostsEntries  = entries.unique()
 
                     log.info("settings.hostsEntries:$settings.hostsEntries>")
                     org.testng.Reporter.log(settings.hostsEntries.toString())
