@@ -1076,417 +1076,417 @@ public class SeleniumHelper implements ISeleniumHelper {
     }
 
 
-public boolean waitForPageReadyStateComplete() {
-    waitForJsCondition("return (document.readyState == 'complete')");
-}
+    public boolean waitForPageReadyStateComplete() {
+        waitForJsCondition("return (document.readyState == 'complete')");
+    }
 
-public int getDefaultImplicitWait() {
-return defaultImplicitlyWait
-}
+    public int getDefaultImplicitWait() {
+        return defaultImplicitlyWait
+    }
 
-public int getDefaultPageLoadTimeout() {
-return defaultPageLoadTimeoutMilliSeconds
-}
+    public int getDefaultPageLoadTimeout() {
+        return defaultPageLoadTimeoutMilliSeconds
+    }
 
-public WebDriver getDriver() {
-return driver
-}
+    public WebDriver getDriver() {
+        return driver
+    }
 
-public WebDriver getWebDriver() {
-return webDriver
-}
-
-
-void takeScreenShotAndSource(String message = "") {
-takeScreenShot(message)
-addPageSourceToReport();
-}
+    public WebDriver getWebDriver() {
+        return webDriver
+    }
 
 
-File takeScreenShot(String message = "") {
+    void takeScreenShotAndSource(String message = "") {
+        takeScreenShot(message)
+        addPageSourceToReport();
+    }
 
-if (StringUtils.isNotBlank(message)) {
-Reporter.log(message)
-}
-def destinationDirectory = System.getProperty(IMAGE_DIRECTORY_PROPERTY)
 
-String fileName = getFileName(testName, ".png")
-File tempScreenShotFile = null
-try {
-File destinationFile = createDestinationFile(destinationDirectory, fileName)
-tempScreenShotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE)
-tempScreenShotFile.renameTo(destinationFile)
-log.info(getHtmlImgTag(destinationFile.getAbsolutePath(), fileName))
+    File takeScreenShot(String message = "") {
+
+        if (StringUtils.isNotBlank(message)) {
+            Reporter.log(message)
+        }
+        def destinationDirectory = System.getProperty(IMAGE_DIRECTORY_PROPERTY)
+
+        String fileName = getFileName(testName, ".png")
+        File tempScreenShotFile = null
+        try {
+            File destinationFile = createDestinationFile(destinationDirectory, fileName)
+            tempScreenShotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE)
+            tempScreenShotFile.renameTo(destinationFile)
+            log.info(getHtmlImgTag(destinationFile.getAbsolutePath(), fileName))
 //                Reporter.log(getHtmlImgTag(destinationFile.getAbsolutePath(), fileName) ) //Absolute path
-Reporter.log(getHtmlImgTag(IMAGE_DIRECTORY.replace("/", "../") + "/" + fileName, fileName))  //Relative path
-return destinationFile
-} catch (IOException e) {
-Reporter.log("Can't move screenShot. Exists here: " + tempScreenShotFile)
-Reporter.log(getHtmlImgTag(tempScreenShotFile.getAbsoluteFile().getAbsolutePath(), tempScreenShotFile))
-log.error("Moving screenshot file failed. " + e)
-} catch (ClassCastException e) {
-log.error("WebDriver does not support screenShots: " + e)
-}
-}
+            Reporter.log(getHtmlImgTag(IMAGE_DIRECTORY.replace("/", "../") + "/" + fileName, fileName))  //Relative path
+            return destinationFile
+        } catch (IOException e) {
+            Reporter.log("Can't move screenShot. Exists here: " + tempScreenShotFile)
+            Reporter.log(getHtmlImgTag(tempScreenShotFile.getAbsoluteFile().getAbsolutePath(), tempScreenShotFile))
+            log.error("Moving screenshot file failed. " + e)
+        } catch (ClassCastException e) {
+            log.error("WebDriver does not support screenShots: " + e)
+        }
+    }
 
-private String getFileName(String prefix, String fileExtension) {
-DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS")
-return prefix + dateFormat.format(new Date()) + "_" + counter++ + fileExtension
-}
+    private String getFileName(String prefix, String fileExtension) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS")
+        return prefix + dateFormat.format(new Date()) + "_" + counter++ + fileExtension
+    }
 
-private void addPageSourceToReport() {
-try {
-def destinationDirectory = System.getProperty(SOURCE_DIRECTORY_PROPERTY)
-String fileName = getFileName(TANG, ".html")
-File destinationFile = createDestinationFile(destinationDirectory, fileName)
+    private void addPageSourceToReport() {
+        try {
+            def destinationDirectory = System.getProperty(SOURCE_DIRECTORY_PROPERTY)
+            String fileName = getFileName(TANG, ".html")
+            File destinationFile = createDestinationFile(destinationDirectory, fileName)
 
-AtomicReference<FileWriter> fileWrite = new AtomicReference<FileWriter>()
-fileWrite.set(new FileWriter(destinationFile.getAbsoluteFile()))
-BufferedWriter bufferedWriter = new BufferedWriter(fileWrite.get())
-bufferedWriter.write(driver.getPageSource())
-bufferedWriter.close()
-log.debug("Page source generated: " + destinationFile.getName())
+            AtomicReference<FileWriter> fileWrite = new AtomicReference<FileWriter>()
+            fileWrite.set(new FileWriter(destinationFile.getAbsoluteFile()))
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWrite.get())
+            bufferedWriter.write(driver.getPageSource())
+            bufferedWriter.close()
+            log.debug("Page source generated: " + destinationFile.getName())
 //            Reporter.log(getHtmlSourceTag(destinationFile.getAbsolutePath(), fileName) )                 //Absolut path
-Reporter.log(getHtmlImgTag(SOURCE_DIRECTORY.replace("/", "../") + "/" + fileName, fileName))
+            Reporter.log(getHtmlImgTag(SOURCE_DIRECTORY.replace("/", "../") + "/" + fileName, fileName))
 //Relative path
 
-} catch (GroovyRuntimeException e) {
-log.error("Error generating page source: " + e)
-}
-}
+        } catch (GroovyRuntimeException e) {
+            log.error("Error generating page source: " + e)
+        }
+    }
 
-private File createDestinationFile(String dir, String fileName) {
-File destinationDir = new File(dir)
-if (!destinationDir.isDirectory()) {
-destinationDir.mkdir()
-}
-return new File(destinationDir, fileName)
-}
+    private File createDestinationFile(String dir, String fileName) {
+        File destinationDir = new File(dir)
+        if (!destinationDir.isDirectory()) {
+            destinationDir.mkdir()
+        }
+        return new File(destinationDir, fileName)
+    }
 
-private void createDir(String dir) {
-File destinationDir = new File(dir)
-if (!destinationDir.isDirectory()) {
-destinationDir.mkdir()
-threadSleep(10)
-}
-}
+    private void createDir(String dir) {
+        File destinationDir = new File(dir)
+        if (!destinationDir.isDirectory()) {
+            destinationDir.mkdir()
+            threadSleep(10)
+        }
+    }
 
 
-public String getHtmlImgTag(final String filePath, String fileName = "") {
-def str = '<br/>screenshot: ' +
-   "<a href=\"" + filePath + "\" target=\"_blank\">" +
-   fileName + "<br>" +
-   "<img src=\"" + filePath + "\" border=\"2\" width=\"528\" height=\"480\" hspace=\"10\" /></a><br/><br/>"
-return str
-}
+    public String getHtmlImgTag(final String filePath, String fileName = "") {
+        def str = '<br/>screenshot: ' +
+                "<a href=\"" + filePath + "\" target=\"_blank\">" +
+                fileName + "<br>" +
+                "<img src=\"" + filePath + "\" border=\"2\" width=\"528\" height=\"480\" hspace=\"10\" /></a><br/><br/>"
+        return str
+    }
 
-private static String getHtmlSourceTag(final String filePath, fileName = "") {
-def fileIcon = this.class.getResource("/icons/html.jpg")
-def str = '<br/>page source: ' +
-   "<a href=\"" + filePath + "\" target=\"_blank\">" +
-   fileName + "<br>" +
-   "<img src=\"" + fileIcon + "\"   border=\"2\" width=\"60\" height=\"60\" hspace=\"10\" /></a><br/>"
-return str
-}
+    private static String getHtmlSourceTag(final String filePath, fileName = "") {
+        def fileIcon = this.class.getResource("/icons/html.jpg")
+        def str = '<br/>page source: ' +
+                "<a href=\"" + filePath + "\" target=\"_blank\">" +
+                fileName + "<br>" +
+                "<img src=\"" + fileIcon + "\"   border=\"2\" width=\"60\" height=\"60\" hspace=\"10\" /></a><br/>"
+        return str
+    }
 
-public void quit() {
-driver.quit()
-}
+    public void quit() {
+        driver.quit()
+    }
 
-public String getCurrentUrl() {
-return driver.getCurrentUrl()
-}
+    public String getCurrentUrl() {
+        return driver.getCurrentUrl()
+    }
 
-public void maximizeWindow() {
-driver.manage().window().maximize()
-}
+    public void maximizeWindow() {
+        driver.manage().window().maximize()
+    }
 
-public void switchToNextWindow() {
+    public void switchToNextWindow() {
 //Store the current window handle
-def methodName = getCurrentMethodName()
-log.info("$methodName saved windowHandler size<" + windowHandler.size() + ">")
-windowHandler.each {
-log.info("$methodName saved windowHandler<$it>")
-}
-log.info("$methodName actual getWindowHandles size<" + driver.getWindowHandles().size() + ">")
+        def methodName = getCurrentMethodName()
+        log.info("$methodName saved windowHandler size<" + windowHandler.size() + ">")
+        windowHandler.each {
+            log.info("$methodName saved windowHandler<$it>")
+        }
+        log.info("$methodName actual getWindowHandles size<" + driver.getWindowHandles().size() + ">")
 
-while (driver.getWindowHandles().size() <= windowHandler.size()) {
-log.info("$methodName Waiting getWindowHandles<" + driver.getWindowHandles().size() + "> windowHandler<" + windowHandler.size() + ">")
-sleep(1002)
-}
-def currentWindow = driver.getWindowHandle()
-log.info("actual $currentWindow")
+        while (driver.getWindowHandles().size() <= windowHandler.size()) {
+            log.info("$methodName Waiting getWindowHandles<" + driver.getWindowHandles().size() + "> windowHandler<" + windowHandler.size() + ">")
+            sleep(1002)
+        }
+        def currentWindow = driver.getWindowHandle()
+        log.info("actual $currentWindow")
 
-windowHandler.push(currentWindow)
-windowHandler.each {
-log.info("After push windowHandler $it")
-}
-def nextWindow = driver.getWindowHandles()[driver.getWindowHandles().size() - 1]
-log.info("nextWindow $nextWindow")
+        windowHandler.push(currentWindow)
+        windowHandler.each {
+            log.info("After push windowHandler $it")
+        }
+        def nextWindow = driver.getWindowHandles()[driver.getWindowHandles().size() - 1]
+        log.info("nextWindow $nextWindow")
 
-driver.switchTo().window(nextWindow);
+        driver.switchTo().window(nextWindow);
 //Perform the click operation that opens new window
-log.info("After   W " + driver.getWindowHandles().size() + " H: " + windowHandler.size())
+        log.info("After   W " + driver.getWindowHandles().size() + " H: " + windowHandler.size())
 
 //Switch to new window opened
-resetImplicitTime()
-waitForPageReadyStateComplete()
-}
+        resetImplicitTime()
+        waitForPageReadyStateComplete()
+    }
 
-public void switchToPreviousWindow() {
-def methodName = getCurrentMethodName()
-log.info("$methodName saved windowHandler size<" + windowHandler.size() + ">")
-windowHandler.each {
-log.info("$methodName saved windowHandler<$it>")
-}
-def previuosWindow = windowHandler.pop()
-log.info("previuosWindow $previuosWindow")
-driver.switchTo().window(previuosWindow)
-windowHandler.each {
-log.info("After pop windowHandler $it")
-}
-log.info("After  pop windowHandler size: " + windowHandler.size())
-resetImplicitTime()
-waitForPageReadyStateComplete()
-}
+    public void switchToPreviousWindow() {
+        def methodName = getCurrentMethodName()
+        log.info("$methodName saved windowHandler size<" + windowHandler.size() + ">")
+        windowHandler.each {
+            log.info("$methodName saved windowHandler<$it>")
+        }
+        def previuosWindow = windowHandler.pop()
+        log.info("previuosWindow $previuosWindow")
+        driver.switchTo().window(previuosWindow)
+        windowHandler.each {
+            log.info("After pop windowHandler $it")
+        }
+        log.info("After  pop windowHandler size: " + windowHandler.size())
+        resetImplicitTime()
+        waitForPageReadyStateComplete()
+    }
 
-private void setDriverPath(String driverPath, String webDriverProperty) {
-try {
-log.info("setDriverPath <$driverPath> <$webDriverProperty>")
-URL driver = ClassLoader.getSystemResource(driverPath);
-File driverFile = new File(driver.toURI());
-if (!driverFile.canRead()) {
-   throw new IllegalArgumentException("Can not read: " + driverPath);
-}
-System.setProperty(webDriverProperty, driverFile.getAbsoluteFile().toString())
-} catch (GroovyRuntimeException e) {
-log.error(e)
-}
-}
+    private void setDriverPath(String driverPath, String webDriverProperty) {
+        try {
+            log.info("setDriverPath <$driverPath> <$webDriverProperty>")
+            URL driver = ClassLoader.getSystemResource(driverPath);
+            File driverFile = new File(driver.toURI());
+            if (!driverFile.canRead()) {
+                throw new IllegalArgumentException("Can not read: " + driverPath);
+            }
+            System.setProperty(webDriverProperty, driverFile.getAbsoluteFile().toString())
+        } catch (GroovyRuntimeException e) {
+            log.error(e)
+        }
+    }
 
-private void moveDriverWindow(boolean arrangeWindows, browser, WebDriver driver) {
-if (arrangeWindows && !isBrowserHtmlUnit(browser)) {
-driver.manage().window().setPosition(getPoint());
-threadSleep(10)
-}
-}
+    private void moveDriverWindow(boolean arrangeWindows, browser, WebDriver driver) {
+        if (arrangeWindows && !isBrowserHtmlUnit(browser)) {
+            driver.manage().window().setPosition(getPoint());
+            threadSleep(10)
+        }
+    }
 
-private static boolean isBrowserHtmlUnit(String browser) {
-return (StringUtils.isNotEmpty(browser) && browser.contains(HTMLUNIT))
-}
+    private static boolean isBrowserHtmlUnit(String browser) {
+        return (StringUtils.isNotEmpty(browser) && browser.contains(HTMLUNIT))
+    }
 
-public Point getPoint() {
-driversCount++;
-return new Point(getScreenX_Position(), getScreenY_Position());
+    public Point getPoint() {
+        driversCount++;
+        return new Point(getScreenX_Position(), getScreenY_Position());
 
-}
+    }
 
-public void setWindowPosition(int screenX_Position = 0, int screenY_Position = 0) {
-driver.manage().window().setPosition(new Point(screenX_Position, screenY_Position))
-}
+    public void setWindowPosition(int screenX_Position = 0, int screenY_Position = 0) {
+        driver.manage().window().setPosition(new Point(screenX_Position, screenY_Position))
+    }
 
-public int getScreenX_Position() {
-int currentScreenX = screenX_Position;
-if ((driversCount % SCREEN_ROW_WINDOWS_COUNT) == 0) {
-screenX_Position = 0;
-} else {
-screenX_Position += X_POSITION_MOVE_SIZE / SCREEN_ROW_WINDOWS_COUNT;
-}
-return currentScreenX;
-}
+    public int getScreenX_Position() {
+        int currentScreenX = screenX_Position;
+        if ((driversCount % SCREEN_ROW_WINDOWS_COUNT) == 0) {
+            screenX_Position = 0;
+        } else {
+            screenX_Position += X_POSITION_MOVE_SIZE / SCREEN_ROW_WINDOWS_COUNT;
+        }
+        return currentScreenX;
+    }
 
-public int getScreenY_Position() {
-if (driversCount > SCREEN_ROWS_COUNT * SCREEN_ROW_WINDOWS_COUNT) {
-driversCount = 1;
-screenY_Row = 0;
-}
-int currentScreenY_Row = screenY_Row;
-int yMod = driversCount % SCREEN_ROW_WINDOWS_COUNT;
-if (yMod == 0) {
-screenY_Row++;
-}
+    public int getScreenY_Position() {
+        if (driversCount > SCREEN_ROWS_COUNT * SCREEN_ROW_WINDOWS_COUNT) {
+            driversCount = 1;
+            screenY_Row = 0;
+        }
+        int currentScreenY_Row = screenY_Row;
+        int yMod = driversCount % SCREEN_ROW_WINDOWS_COUNT;
+        if (yMod == 0) {
+            screenY_Row++;
+        }
 
-return currentScreenY_Row * Y_POSITION_MOVE_SIZE / SCREEN_ROWS_COUNT;
-}
+        return currentScreenY_Row * Y_POSITION_MOVE_SIZE / SCREEN_ROWS_COUNT;
+    }
 
-String getTitle() {
-return driver.getTitle()
-}
-
-
-String requireTitle(String title = "") {
-int wait = defaultImplicitlyWait * 1000
-while (wait > 0) {
-String pageTitle = getTitle()
-if (pageTitle.contains(title)) {
-   return pageTitle
-}
-wait -= HUNDRED_MILLI_SECONDS
-sleep(HUNDRED_MILLI_SECONDS)
-}
-throw new ScreenshotException("Required title ($title) was not found")
-}
-
-public void switchToFrame(String frameElement) {
-log.info getCurrentMethodName() + " frameElement<$frameElement>"
-driver.switchTo().defaultContent()
-
-WebElement frame = requireVisibleXpath(frameElement)
-driver.switchTo().frame(frame);
-}
-
-public void switchToSubFrame(String frameElement) {
-log.info getCurrentMethodName() + " frameElement<$frameElement>"
-WebElement frame = findElementByXpathOrId(frameElement, true)
-driver.switchTo().frame(frame);
-}
-
-public void switchToDefault() {
-driver.switchTo().defaultContent()
-}
-
-public void requireXpath(String element) {
-findElementByXpathOrId(element, false)
-}
+    String getTitle() {
+        return driver.getTitle()
+    }
 
 
-public WebElement requireXpath(String element, int changedImplicitlyWait) {
-log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
-changeImplicitTimeToSeconds(changedImplicitlyWait)
-WebElement webElement = requireXpath(element)
-resetImplicitTime()
-return webElement
-}
+    String requireTitle(String title = "") {
+        int wait = defaultImplicitlyWait * 1000
+        while (wait > 0) {
+            String pageTitle = getTitle()
+            if (pageTitle.contains(title)) {
+                return pageTitle
+            }
+            wait -= HUNDRED_MILLI_SECONDS
+            sleep(HUNDRED_MILLI_SECONDS)
+        }
+        throw new ScreenshotException("Required title ($title) was not found")
+    }
 
-public WebElement requireVisibleXpath(String element) {
-log.info getCurrentMethodName() + " element<$element>"
-WebElement webElement = findElementByXpathOrId(element, false)
-for (int second = 0; ; second++) {
-if (second >= 60) {
-   throw new ScreenshotException("Required Xpath is not visible")
-}
-try {
-   if (!webElement.isDisplayed()) {
-       threadSleep(999)
-       webElement = findElementByXpathOrId(element, false)
-   } else {
-       break
-   }
-} catch (Exception e) {
-}
-}
-return webElement
-}
+    public void switchToFrame(String frameElement) {
+        log.info getCurrentMethodName() + " frameElement<$frameElement>"
+        driver.switchTo().defaultContent()
 
-public WebElement requireVisibleXpath(String element, int changedImplicitlyWait) {
-log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
-changeImplicitTimeToSeconds(changedImplicitlyWait)
-WebElement webElement = requireVisibleXpath(element)
-resetImplicitTime()
-return webElement
-}
+        WebElement frame = requireVisibleXpath(frameElement)
+        driver.switchTo().frame(frame);
+    }
 
-public boolean isDisplayed(String element, int changedImplicitlyWait) {
-log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
-changeImplicitTimeToSeconds(changedImplicitlyWait)
-return isDisplayed(element)
-resetImplicitTime()
-}
+    public void switchToSubFrame(String frameElement) {
+        log.info getCurrentMethodName() + " frameElement<$frameElement>"
+        WebElement frame = findElementByXpathOrId(frameElement, true)
+        driver.switchTo().frame(frame);
+    }
+
+    public void switchToDefault() {
+        driver.switchTo().defaultContent()
+    }
+
+    public void requireXpath(String element) {
+        findElementByXpathOrId(element, false)
+    }
 
 
-public boolean isDisplayed(String element) {
-log.info getCurrentMethodName() + " element<$element>"
-WebElement webElement = findElementByXpathOrId(element, true)
-if (webElement != null) {
-return webElement.isDisplayed()
-}
-return false
-}
+    public WebElement requireXpath(String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
+        WebElement webElement = requireXpath(element)
+        resetImplicitTime()
+        return webElement
+    }
 
-void hover(String element) {
-log.info getCurrentMethodName() + " element<$element>"
-Actions actions = new Actions(driver);
-WebElement menuHoverLink = findElementByXpathOrId(element, true);
-new Actions(driver).moveToElement(menuHoverLink).perform();
-actions.moveToElement(menuHoverLink);
-}
+    public WebElement requireVisibleXpath(String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        WebElement webElement = findElementByXpathOrId(element, false)
+        for (int second = 0; ; second++) {
+            if (second >= 60) {
+                throw new ScreenshotException("Required Xpath is not visible")
+            }
+            try {
+                if (!webElement.isDisplayed()) {
+                    threadSleep(999)
+                    webElement = findElementByXpathOrId(element, false)
+                } else {
+                    break
+                }
+            } catch (Exception e) {
+            }
+        }
+        return webElement
+    }
 
-void scrollIntoView(String element) {
-log.info getCurrentMethodName() + " element<$element>"
-hover(element)
-}
+    public WebElement requireVisibleXpath(String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
+        WebElement webElement = requireVisibleXpath(element)
+        resetImplicitTime()
+        return webElement
+    }
 
-void close() {
-driver.close()
-}
+    public boolean isDisplayed(String element, int changedImplicitlyWait) {
+        log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
+        changeImplicitTimeToSeconds(changedImplicitlyWait)
+        return isDisplayed(element)
+        resetImplicitTime()
+    }
 
-public boolean isAlertPresent() {
-try {
-WebDriverWait wait = new WebDriverWait(driver, 2);
-wait.until(ExpectedConditions.alertIsPresent());
-Alert alert = driver.switchTo().alert();
-} catch (Exception e) {
+
+    public boolean isDisplayed(String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        WebElement webElement = findElementByXpathOrId(element, true)
+        if (webElement != null) {
+            return webElement.isDisplayed()
+        }
+        return false
+    }
+
+    void hover(String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        Actions actions = new Actions(driver);
+        WebElement menuHoverLink = findElementByXpathOrId(element, true);
+        new Actions(driver).moveToElement(menuHoverLink).perform();
+        actions.moveToElement(menuHoverLink);
+    }
+
+    void scrollIntoView(String element) {
+        log.info getCurrentMethodName() + " element<$element>"
+        hover(element)
+    }
+
+    void close() {
+        driver.close()
+    }
+
+    public boolean isAlertPresent() {
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, 2);
+            wait.until(ExpectedConditions.alertIsPresent());
+            Alert alert = driver.switchTo().alert();
+        } catch (Exception e) {
 //exception handling
-}
-}
+        }
+    }
 
-public String getAlertText() {
-try {
-WebDriverWait wait = new WebDriverWait(driver, 2);
-wait.until(ExpectedConditions.alertIsPresent());
-Alert alert = driver.switchTo().alert();
-String alertText = alert.getText()
-return alertText
-} catch (Exception e) {
+    public String getAlertText() {
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, 2);
+            wait.until(ExpectedConditions.alertIsPresent());
+            Alert alert = driver.switchTo().alert();
+            String alertText = alert.getText()
+            return alertText
+        } catch (Exception e) {
 //exception handling
-}
-}
+        }
+    }
 
-public String getAlertTextAndAccept() {
-try {
-WebDriverWait wait = new WebDriverWait(driver, 2);
-wait.until(ExpectedConditions.alertIsPresent());
-Alert alert = driver.switchTo().alert();
-String alertText = alert.getText()
-alert.accept()
-return alertText
-} catch (Exception e) {
+    public String getAlertTextAndAccept() {
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, 2);
+            wait.until(ExpectedConditions.alertIsPresent());
+            Alert alert = driver.switchTo().alert();
+            String alertText = alert.getText()
+            alert.accept()
+            return alertText
+        } catch (Exception e) {
 //exception handling
-}
-}
+        }
+    }
 
-private getCurrentMethodName() {
-def marker = new Throwable()
-return StackTraceUtils.sanitize(marker).stackTrace[1].methodName
-}
+    private getCurrentMethodName() {
+        def marker = new Throwable()
+        return StackTraceUtils.sanitize(marker).stackTrace[1].methodName
+    }
 
-public List findAllLinksByXpath(String[] xpaths) {
-List<WebElement> webElements = new ArrayList();
-xpaths.each { xpath ->
-webElements.addAll(findElementsByXpath(xpath))
-}
+    public List findAllLinksByXpath(String[] xpaths) {
+        List<WebElement> webElements = new ArrayList();
+        xpaths.each { xpath ->
+            webElements.addAll(findElementsByXpath(xpath))
+        }
 
-return webElements;
-}
+        return webElements;
+    }
 
-public List analyseLinksByXpath(String[] xpaths) {
-reporterLogLn(CR)
-reporterLogLn("Searching links: $xpaths")
+    public List analyseLinksByXpath(String[] xpaths) {
+        reporterLogLn(CR)
+        reporterLogLn("Searching links: $xpaths")
 
-List<WebElement> foundWebElements = findAllLinksByXpath(xpaths)
-reporterLogLn("Searching links count: ${foundWebElements.size()}")
+        List<WebElement> foundWebElements = findAllLinksByXpath(xpaths)
+        reporterLogLn("Searching links count: ${foundWebElements.size()}")
 
-List webElementsWithoutHref = new ArrayList(); ;
-List webElementsWithJavascriptHref = new ArrayList(); ;
-List webElementsWithMailToHref = new ArrayList(); ;
-List webElementsWithHref = new ArrayList(); ;
-foundWebElements.each { WebElement webElement ->
-def href = webElement.getAttribute("href")
-switch (href){
-   case [null, ""]:
-       webElementsWithoutHref.add(webElement.getTagName() + " " + webElement.getText())
-       break
-   case ~/mailto:.*/:
+        List webElementsWithoutHref = new ArrayList(); ;
+        List webElementsWithJavascriptHref = new ArrayList(); ;
+        List webElementsWithMailToHref = new ArrayList(); ;
+        List webElementsWithHref = new ArrayList(); ;
+        foundWebElements.each { WebElement webElement ->
+            def href = webElement.getAttribute("href")
+            switch (href) {
+                case [null, ""]:
+                    webElementsWithoutHref.add(webElement.getTagName() + " " + webElement.getText())
+                    break
+                case ~/mailto:.*/:
                     webElementsWithMailToHref.add(href)
                     break
                 case ~/javascript:.*/:
@@ -1514,9 +1514,9 @@ switch (href){
                     connection.connect();
                     def response = connection.getResponseMessage();
                     connection.disconnect();
-                    if(response.toString().contains("Not Found")){
+                    if (response.toString().contains("Not Found")) {
                         webElementsWithHrefNotOk["${count++} $href"] = "error: ${response.toString()}";
-                    }else{
+                    } else {
                         webElementsWithHrefOk["${count++} $href"] = response.toString();
                     }
                 } catch (Exception exp2) {
@@ -1544,7 +1544,8 @@ switch (href){
             Reporter.log(it.key);
             Reporter.log("> Response<");
             Reporter.log(it.value);
-            reporterLogLn(">")        }
+            reporterLogLn(">")
+        }
     }
 
     private void printLinkShortInfo(List list, String header, String line) {
