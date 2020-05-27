@@ -12,16 +12,15 @@ public class SocialSecurityNumberTest {
 
     @Test
     void testSocialSecurityNumber1() {
-        Reporter.log new SocialSecurityNumber("5910202695").toString()
-        Reporter.log new SocialSecurityNumber("195910202695").toString()
-        Reporter.log new SocialSecurityNumber("200005247887").toString()
-        Reporter.log new SocialSecurityNumber("0005247887").toString()
+        Reporter.log new SocialSecurityNumber("1212121212").toString()
+        Reporter.log new SocialSecurityNumber("191212121212").toString()
+        Reporter.log new SocialSecurityNumber("201212121212").toString()
 
     }
 
     @Test
     void testSocialSecurityNumber2() {
-        socialSecurityNumberFactory.getPersonNummer("1959102026", 3).each {
+        socialSecurityNumberFactory.getPersonNummer("191212121212", 3).each {
             it.each {
                 print "$it.key "
                 it.each {
@@ -35,7 +34,7 @@ public class SocialSecurityNumberTest {
 
     @Test
     public void testSocialSecurityNumber3() {
-        Reporter.log new SocialSecurityNumber("9405056707").toString()
+        Reporter.log new SocialSecurityNumber("191212121212").toString()
     }
 
 }
