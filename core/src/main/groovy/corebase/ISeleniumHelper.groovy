@@ -189,4 +189,6 @@ public interface ISeleniumHelper {
 
     List getSelectVisualOptions(java.lang.String xpath);
 
+    WebElement scrollIntoViewJS(String xpath, int sleepTime) ;
+
  }

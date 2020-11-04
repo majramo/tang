@@ -1582,6 +1582,12 @@ public class SeleniumHelper implements ISeleniumHelper {
         return new Select(we).getOptions();
     }
 
+    WebElement scrollIntoViewJS(String xpath, int sleepTime = defaultImplicitlyWait) {
+        WebElement we = requireVisibleXpath(xpath, sleepTime)
+        sleep(1000)
+        return we
+    }
+
     public boolean isClickable(String element, int changedImplicitlyWait) {
         log.info getCurrentMethodName() + " element<$element> changedImplicitlyWait<$changedImplicitlyWait>"
         changeImplicitTimeToSeconds(changedImplicitlyWait)
@@ -1598,4 +1604,6 @@ public class SeleniumHelper implements ISeleniumHelper {
         }
         return false
     }
+
+
 }
