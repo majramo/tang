@@ -12,6 +12,8 @@ public class Constants {
     public static final String BROWSER_ICON = "BROWSER_ICON";
     public static final String ENVIRONMENT = "ENVIRONMENT";
     public static final String SELENOID = "SELENOID";
+    public static final String API = "API";
+    public static final String RESTASSURED = "restassured";
 
     public enum CompareType {
         EQUAL, EMPTY, NOT_EMPTY, DIFF, LIKE, FORGIVING, TRIM,
