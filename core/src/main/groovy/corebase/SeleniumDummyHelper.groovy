@@ -432,4 +432,8 @@ class SeleniumDummyHelper implements ISeleniumHelper {
     List getSelectVisualOptions(String xpath) {
         return ["A"]
     }
+
+    public WebElement scrollIntoViewJS(String xpath, int sleepTime) {
+    }
+
 }
