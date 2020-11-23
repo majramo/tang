@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.tang.parent</groupId>
         <artifactId>tang</artifactId>
-        <version>0.0.999-SNAPSHOT</version>
+        <version>0.1.01-SNAPSHOT</version>
     </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
