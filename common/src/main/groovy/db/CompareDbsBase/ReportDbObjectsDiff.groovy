@@ -99,7 +99,7 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
                 case "constraint":
                     objectQuery = "SELECT 'ALTER TABLE ' || table_name || ' ENABLE CONSTRAINT ' || CONSTRAINT_NAME; --enable" +
                             "--ALTER TABLE ' || table_name || ' DROP CONSTRAINT ' || CONSTRAINT_NAME; --drop" +
-                            "FROM all_constraints " +
+                            "FROM user_constraints " +
                             "WHERE CONSTRAINT_NAME IN( " + dbDifffDataToAdd +");"
                     targetDbResult
                     objectQuery += "\n\n--ENABLE CONSTRAINT\n" +
