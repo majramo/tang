@@ -60,6 +60,10 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             reporterLogLn("\n### targetObjectSql: $targetQuerySettings\n$targetObjectSql");
             targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetObjectSql, 0, targetDb)
             def dataFromTarget = joinList(targetDbResult.collect{it[0]})
+            if(targetDbResult.size() > 1000){
+                reporterLogLn("targetDbResult has ${targetDbResult.size()} results. The list in Where is truncated to 1000 rows")
+                dataFromTarget = joinList(targetDbResult[0..999].collect{it[0]})
+            }
             def targetCount = targetDbResult.size( )
             reporterLogLn("Target <$objectType>: <$targetCount>");
             if(targetCount.equals(0)){ReportDbObjectsDiff
@@ -75,6 +79,10 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             reporterLogLn("\n### sourceObjectSql: $sourceQuerySettings\n$sourceObjectSql");
             def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceObjectSql, 0, sourceDb)
             def dataFromSource = joinList(sourceDbResult.collect{it[0]})
+            if(sourceDbResult.size() > 1000){
+                reporterLogLn("sourceDbResult has ${sourceDbResult.size()} results. The list in Where is truncated to 1000 rows")
+                dataFromSource = joinList(sourceDbResult[0..999].collect{it[0]})
+            }
             def sourceCount = sourceDbResult.size()
             reporterLogLn("Source <$objectType>: <$sourceCount>");
             if(sourceCount.equals(0)){
