@@ -756,4 +756,22 @@ $fieldsStr
         }
         return "$outLines$outLine"
     }
+    def splittString(tableColumnsColumn) {
+        tableColumnsColumn = tableColumnsColumn.trim().replaceAll("  ", " ").replaceAll("  ", " ").replaceAll("  ", " ").replaceAll("  ", " ")
+        if (!tableColumnsColumn.isEmpty()){
+            def table = tableColumnsColumn.split(" ")[0].trim().toUpperCase()
+            def id = tableColumnsColumn.split(" ")[1].trim().toUpperCase()
+            def columns = tableColumnsColumn.split(" ")[2..-1]
+            columns.eachWithIndex { String column_fromRow, int i ->
+                def column = column_fromRow
+                def fromRow = "1"
+                if (column_fromRow.contains(":")) {
+                    column = column_fromRow.split(":")[0]
+                    fromRow = column_fromRow.split(":")[1]
+                }
+                maskings["${table}_$i"] = [table, id, column.trim().toUpperCase(), fromRow]
+            }
+        }
+    }
+
 }
