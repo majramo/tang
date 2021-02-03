@@ -87,9 +87,14 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         if(sourceDbResult != null && targetDbResult != null ) {
             def targetDbResultSize = targetDbResult.size()
             if(targetDbResultSize < 100){
-                reporterLogLn("Target size is too low <$targetDbResultSize> check manually!")
-                skipTest("Target size is too low <$targetDbResultSize> check manually!")
-                sameData = false
+                def sourceDbResultSize = sourceDbResult.size()
+                if(sourceDbResultSize == 0 && targetDbResultSize == 0) {
+                    reporterLogLn("Source and Target size are zero")
+                }else {
+                    reporterLogLn("Target size is too low <$targetDbResultSize> check manually!")
+                    skipTest("Target size is too low <$targetDbResultSize> check manually!")
+                    sameData = false
+                }
             }else {
                 if (checkColumnTypeResult[0] == "CLOB") {
                     sameData = (targetDbResult.collect {it.toString()} == sourceDbResult.collect {it.toString()})
@@ -134,7 +139,8 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
             def toMaxId = numberOfLinesInSqlCompareTemp
             //TODO change the sql and put value of Max in the sql
             def maxQuery = "SELECT MAX($searchCriteria)MAX_ID FROM $table " +
-                    "where NOT $column IS NULL"
+                    "where NOT $column IS NULL\n"+
+                    "AND NOT $column || '' in( 'START', 'SLUT' , 'REDANGJORD', 'GENOMFORDA', 'FINNSINTE', 'FEL', 'ANTAL')"
             def sourceDbResult = getSourceDbRowsResult(maxQuery)
             def toMaxIdRaw = sourceDbResult[0]["MAX_ID"]
             try {
@@ -156,7 +162,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
             sourceTargetSql = "-- Verify search criteria and masked column<$searchCriteria, $tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
             def notNumberColumnCompare = ""
             if(!["number", "date", "time"].contains(type)){
-                notNumberColumnCompare = " AND NOT $tmpColumn = ' '\n"
+                notNumberColumnCompare = " AND NOT $tmpColumn || ''  = ' '\n"
             }
             sourceTargetSql += "SELECT $searchCriteria, $tmpColumn FROM $table\n" +
                     " WHERE NOT $column IS NULL\n" +
@@ -166,12 +172,32 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                     " AND $searchCriteria BETWEEN $fromId AND $toMaxId\n" +
                     " AND ROWNUM < 1001\n"
         } else {
+            def subSelectQuery = "SELECT '''' || rowid || '''' rowid_  FROM $table " +
+                    "where NOT $column IS NULL\n"+
+                    "AND NOT $column || '' in( 'START', 'SLUT' , 'REDANGJORD', 'GENOMFORDA', 'FINNSINTE', 'FEL', 'ANTAL')\n" +
+                    "AND ROWNUM < 1001"
+            def subSelectResult = getSourceDbRowsResult(subSelectQuery)
+            def rowidCriteria = "--No Rowids exist in criteria\n"
+            if (subSelectResult.size()) {
+                def rowids =  joinList(subSelectResult.collect{it.ROWID_}, ", ", 120)
+                rowidCriteria += "--Rowids to add in criteria\nAND ROWID IN ($rowids)\n"
+
+            }else{
+                reporterLogLn("######")
+                reporterLogLn("Can't get rowids")
+                reporterLogLn("Got <$subSelectResult>")
+                reporterLogLn("######")
+            }
+
+
+
             sourceTargetSql = "-- Verify masked column<$tmpColumn> in table <$table> in target<$targetDb> against source<$sourceDb>\n"
             sourceTargetSql += "SELECT $tmpColumn FROM $table\n" +
                     " WHERE NOT $column IS NULL\n" +
-                    " AND NOT $tmpColumn = ' '\n" +
+                    " AND NOT $tmpColumn || ''  = ' '\n" +
                     " AND length($tmpColumn) > 0\n" +
-                    " AND ROWNUM < 1001\n"
+                    " AND ROWNUM < 1001\n" +
+                    rowidCriteria
         }
         if (searchExtraCondition != "") {
             sourceTargetSql += "\nAND $searchExtraCondition\n"
