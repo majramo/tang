@@ -91,9 +91,18 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                 if(sourceDbResultSize == 0 && targetDbResultSize == 0) {
                     reporterLogLn("Source and Target size are zero")
                 }else {
-                    reporterLogLn("Target size is too low <$targetDbResultSize> check manually!")
-                    skipTest("Target size is too low <$targetDbResultSize> check manually!")
-                    sameData = false
+                    if (sourceDbResultSize != targetDbResultSize) {
+                        reporterLogLn("Source and Target size are different, check manually")
+                        reporterLogLn("Source size is low <$sourceDbResultSize> check manually!")
+                        reporterLogLn("Target size is low <$targetDbResultSize> check manually!")
+                        skipTest("Source and Target size are different S<$sourceDbResultSize> != T<$targetDbResultSize> check manually!")
+                        sameData = false
+                    } else {
+                        reporterLogLn("Source size is low <$sourceDbResultSize>!")
+                        reporterLogLn("Target size is low <$targetDbResultSize>!")
+                        reporterLogLn("Source and Target are low S<$sourceDbResultSize> != T<$targetDbResultSize>")
+                    }
+
                 }
             }else {
                 if (checkColumnTypeResult[0] == "CLOB") {
@@ -200,7 +209,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                     rowidCriteria
         }
         if (searchExtraCondition != "") {
-            sourceTargetSql += "\nAND $searchExtraCondition\n"
+            sourceTargetSql += "AND $searchExtraCondition\n"
         }
         sourceTargetSql += "ORDER BY 1\n"
 
