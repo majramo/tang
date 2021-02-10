@@ -149,6 +149,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
             //TODO change the sql and put value of Max in the sql
             def maxQuery = "SELECT MAX($searchCriteria)MAX_ID FROM $table " +
                     "where NOT $column IS NULL\n"+
+                    "AND NOT UPPER('' ||$column) = 'NULL'\n"+
                     "AND NOT $column || '' in( 'START', 'SLUT' , 'REDANGJORD', 'GENOMFORDA', 'FINNSINTE', 'FEL', 'ANTAL')"
             def sourceDbResult = getSourceDbRowsResult(maxQuery)
             def toMaxIdRaw = sourceDbResult[0]["MAX_ID"]
