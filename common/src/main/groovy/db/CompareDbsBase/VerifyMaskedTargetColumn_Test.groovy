@@ -81,7 +81,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                 " WHERE NOT $tmpColumn IS NULL\n" +
                 " AND ROWNUM < 21\n"
 
-        def (sourceDbResult, targetDbResult) = getData(tmpColumn)
+        def (sourceDbResult, targetDbResult) = getData(tmpColumn, checkColumnTypeResult[0])
 
         boolean sameData = false
         if(sourceDbResult != null && targetDbResult != null ) {
@@ -134,7 +134,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
 
     }
 
-    protected List getData(tmpColumn) {
+    protected List getData(tmpColumn, dataType = "") {
 
         if (searchCriteria != "") {
             def numberOfLinesInSqlCompareTemp = numberOfLinesInSqlCompare
@@ -149,8 +149,12 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
             //TODO change the sql and put value of Max in the sql
             def maxQuery = "SELECT MAX($searchCriteria)MAX_ID FROM $table " +
                     "where NOT $column IS NULL\n"+
-                    "AND NOT UPPER('' ||$column) = 'NULL'\n"+
-                    "AND NOT $column || '' in( 'START', 'SLUT' , 'REDANGJORD', 'GENOMFORDA', 'FINNSINTE', 'FEL', 'ANTAL')"
+                    "AND NOT UPPER('' ||$column) = 'NULL'\n"
+            if(dataType == "CLOB" || dataType == "BLOB" ){
+                maxQuery = "SELECT MAX($searchCriteria)MAX_ID FROM $table " +
+                        "where NOT $column IS NULL\n"
+            }
+
             def sourceDbResult = getSourceDbRowsResult(maxQuery)
             def toMaxIdRaw = sourceDbResult[0]["MAX_ID"]
             try {
