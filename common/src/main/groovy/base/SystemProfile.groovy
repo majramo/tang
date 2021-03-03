@@ -25,9 +25,13 @@ public class SystemProfile {
 
 
     public print(){
-        println(name)
+        if(settings.debug == true){
+            println(name)
+        }
         systemProfileRows.each {k,v->
-            println("$k < " + v.toString())
+            if(settings.debug == true){
+                println("$k < " + v.toString())
+            }
         }
     }
     public  getDbValues(){

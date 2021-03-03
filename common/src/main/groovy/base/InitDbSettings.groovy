@@ -32,8 +32,10 @@ class InitDbSettings {
                 databases += databasesPrivate
             }
         };
-        println "No  " + "DB name".padRight(25) + "User".padRight(20) + "Database".padRight(20) + "Url".padRight(30) + "Driver".padRight(40) + "Driver name".padRight(30)
-        println "-"*160
+        if(settings.debug == "true"){
+            println "No  " + "DB name".padRight(25) + "User".padRight(20) + "Database".padRight(20) + "Url".padRight(30) + "Driver".padRight(40) + "Driver name".padRight(30)
+            println "-"*160
+        }
         databases.eachWithIndex {it,i->
             def dbName = (it["dbName"]).toString().trim()
             if (dbName != "" && dbName != null) {
@@ -50,7 +52,9 @@ class InitDbSettings {
                 dbSettings['dbPassword'] = dbPassword
                 dbSettings['dbTestDataBase'] = (it["dbTestDataBase"]).toString().trim()
                 settings."${dbName}" = dbSettings
-                println "${i + 1}".padLeft(3, "0") + " " + "$dbName".padRight(25) + dbSettings['dbUserName'].padRight(20) + dbSettings['dbTestDataBase'].padRight(20) + dbSettings['dbUrl'].padRight(30)+ dbSettings['dbIp'].padRight(30)+ dbSettings['dbDriver'].padRight(40) + dbSettings['dbDriverName'].padRight(30)
+                if(settings.debug == true){
+                    println "${i + 1}".padLeft(3, "0") + " " + "$dbName".padRight(25) + dbSettings['dbUserName'].padRight(20) + dbSettings['dbTestDataBase'].padRight(20) + dbSettings['dbUrl'].padRight(30)+ dbSettings['dbIp'].padRight(30)+ dbSettings['dbDriver'].padRight(40) + dbSettings['dbDriverName'].padRight(30)
+                }
             }
         }
     }
