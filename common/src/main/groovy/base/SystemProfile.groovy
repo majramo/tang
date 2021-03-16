@@ -1,8 +1,11 @@
 package base
 
+import dtos.SettingsHelper
+
 public class SystemProfile {
     def systemProfileRows = [:]
     def name
+    SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
 
     public SystemProfile(name){
