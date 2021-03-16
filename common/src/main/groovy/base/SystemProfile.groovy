@@ -3,6 +3,7 @@ package base
 public class SystemProfile {
     def systemProfileRows = [:]
     def name
+    def settings = settingsHelper.settings
 
     public SystemProfile(name){
         this.name = name
