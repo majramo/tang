@@ -127,6 +127,8 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                     index++
                 }
             }
+        }else{
+            tangAssert.assertTrue(false, "Table/Column <$table/$column> should be masked", "Table/Column can't be checked ");
         }
         sourceDbSqlDriver = null
         targetDbSqlDriver = null
@@ -160,6 +162,10 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
             try {
                 if (toMaxIdRaw != null) {
                     toMaxId = new BigDecimal(toMaxIdRaw)
+                }else{
+                    reporterLogLn("Can't get Max_ID <$searchCriteria>. It is NULL!")
+                    reporterLogLn("maxQuery <$maxQuery>")
+                    return [null, null]
                 }
             } catch (NumberFormatException e) {
                 reporterLogLn("######")
