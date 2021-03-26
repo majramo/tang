@@ -207,7 +207,7 @@ ORDER BY 1"""
                 def dbTargetSizeResult = targetDbSqlDriver.sqlConRun("$targetDb", dbRunTypeFirstRow, sqlSourceTarget, 0, targetDb)
                 targetSize = dbTargetSizeResult["COUNT_"]
                 targetSizeOut = thousandSeparatorFormat.format(new BigDecimal(targetSize))
-            }catch (SQLSyntaxErrorException e){
+            }catch (Exception e){
                 loopException = true
                 noExceptionAtRun = false
                 str = aggregate(str, "Exception i target <$targetDb> $e")
