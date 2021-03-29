@@ -47,10 +47,10 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
 
     @Test
     public void verifyMaskedTargetTest(ITestContext testContext){
-        super.setSourceSqlHelper(testContext, sourceDb)
-        super.setTargetSqlHelper(testContext, targetDb)
+//        super.setSourceSqlHelper(testContext, sourceDb)
+//        super.setTargetSqlHelper(testContext, targetDb)
         def tmpColumn = column
-        reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(sourceDb), getDbType(targetDb)))
+//        reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(sourceDb), getDbType(targetDb)))
         row++
         reporterLogLn("Row: <$row> Verify <$actionColumn> TABLE/COLUMN ");
         reporterLogLn("Source Db: <$sourceDb> ");
@@ -60,6 +60,9 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         reporterLogLn("SearchCriteria: <$searchCriteria> ");
         reporterLogLn("searchExtraCondition: <$searchExtraCondition> ");
         reporterLogLn("Masking: <$masking> ");
+        super.setSourceSqlHelper(testContext, sourceDb)
+        super.setTargetSqlHelper(testContext, targetDb)
+        reporterLogLn(reporterHelper.addIcons(getDbType(), getDbType(sourceDb), getDbType(targetDb)))
 
 
         def checkColumnType = "SELECT data_type FROM USER_TAB_COLS WHERE lower(table_name) = '$table' AND lower(column_name) = '$column'"
