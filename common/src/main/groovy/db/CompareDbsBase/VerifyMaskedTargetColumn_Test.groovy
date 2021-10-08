@@ -166,7 +166,9 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                 if (toMaxIdRaw != null) {
                     toMaxId = new BigDecimal(toMaxIdRaw)
                 }else{
-                    reporterLogLn("Can't get Max_ID <$searchCriteria>. It is NULL!")
+                    reporterLogLn("###### Can't get Max_ID <$searchCriteria>. It is NULL!")
+                    reporterLogLn("###### Can't get Max_ID <$searchCriteria>. It is NULL!")
+                    reporterLogLn("###### Can't get Max_ID <$searchCriteria>. It is NULL!")
                     reporterLogLn("maxQuery <$maxQuery>")
                     return [null, null]
                 }
