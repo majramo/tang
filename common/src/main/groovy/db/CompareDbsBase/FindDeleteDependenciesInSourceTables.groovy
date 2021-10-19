@@ -49,7 +49,7 @@ SELECT ' || Childcol  || ' FROM ' || Child_Table  || ' WHERE NOT ' || Childcol  
 SELECT ' || Parentcol || ' FROM ' || Parent_Table || ' WHERE NOT ' || Parentcol || ' IN ( ' || 'SELECT ' || Childcol  || ' FROM ' || Child_Table  || ' );  --Parent_Records_Missing_In_Child 
 --DELETE ' || Parent_Table || ' WHERE NOT ' || Parentcol || ' IN ( ' || 'SELECT ' || Childcol  || ' FROM ' || Child_Table  || ' );  --Parent_Records_Missing_In_Child 
 ALTER TABLE ' || Child_Table  || ' DISABLE ALL TRIGGERS ;  --Disbale_Child_Triggers 
-ALTER TABLE ' || Parent_Table || ' DISABLE ALL TRIGGERS ;  -Disable_Parent_Triggers 
+ALTER TABLE ' || Parent_Table || ' DISABLE ALL TRIGGERS ;  --Disable_Parent_Triggers 
 ALTER TABLE ' || Child_Table  || ' ENABLE  ALL TRIGGERS ;  --Enabale_Child_Triggers 
 ALTER TABLE ' || Parent_Table || ' ENABLE  ALL TRIGGERS ;  --Enable_Parent_Triggers 
 '  TABLESHELP
