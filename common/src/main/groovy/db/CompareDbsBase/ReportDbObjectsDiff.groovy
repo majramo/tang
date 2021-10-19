@@ -1,7 +1,6 @@
 package db.CompareDbsBase
 
 import base.AnySqlCompareTest
-import dtos.base.SqlHelper
 import excel.ExcelObjectProvider
 import org.apache.log4j.Logger
 import org.testng.ITestContext
@@ -9,12 +8,27 @@ import org.testng.annotations.Optional
 import org.testng.annotations.Parameters
 import org.testng.annotations.Test
 
-import static dtos.base.Constants.CompareType.DIFF
 import static dtos.base.Constants.dbRunTypeRows
 
 public class ReportDbObjectsDiff extends AnySqlCompareTest{
     private final static Logger log = Logger.getLogger("CSC  ")
-
+    def DROP_REF_CONSTRATINTS_ORACLE = "SELECT  ('ALTER TABLE ' || table_name || ' DROP CONSTRAINT ' || CONSTRAINT_NAME || ' cascade ;--DropRefConstraint') DROP_ " +
+            "FROM user_constraints \n" +
+            "where CONSTRAINT_NAME "
+   def DROP_PRIMARY_KEY_ORACLE = "WITH all_primary_keys AS (\n" +
+           "  SELECT constraint_name AS pk_name,\n" +
+           "         table_name\n" +
+           "    FROM user_constraints\n" +
+           "   WHERE  constraint_type = 'P'\n" +
+           "   --and table_name ='ARENDE'\n" +
+           ")\n" +
+           "  SELECT ('ALTER TABLE ' || ac.table_name || ' DROP PRIMARY KEY cascade ;--Drop parent primary key and create again') DROP_  \n" +
+           "\n" +
+           "    FROM all_constraints ac\n" +
+           "         LEFT JOIN all_primary_keys apk\n" +
+           "                ON ac.r_constraint_name = apk.pk_name\n" +
+           "   WHERE   ac.constraint_type = 'R'\n" +
+           "and ac.constraint_name \n"
 
 
 
@@ -59,10 +73,10 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
         if(queryFirst.equals("target")){
             reporterLogLn("\n### targetObjectSql: $targetQuerySettings\n$targetObjectSql");
             targetDbResult = targetDbSqlDriver.sqlConRun("Get data from $targetDb", dbRunTypeRows, targetObjectSql, 0, targetDb)
-            def dataFromTarget = joinList(targetDbResult.collect{it[0]})
+            def dataFromTarget = joinList(targetDbResult.collect{it[0]}, ", ", 120)
             if(targetDbResult.size() > 1000){
                 reporterLogLn("targetDbResult has ${targetDbResult.size()} results. The list in Where is truncated to 1000 rows")
-                dataFromTarget = joinList(targetDbResult[0..999].collect{it[0]})
+                dataFromTarget = joinList(targetDbResult[0..999].collect{it[0]}, ", ", 120)
             }
             def targetCount = targetDbResult.size( )
             reporterLogLn("Target <$objectType>: <$targetCount>");
@@ -78,10 +92,10 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
         }else{
             reporterLogLn("\n### sourceObjectSql: $sourceQuerySettings\n$sourceObjectSql");
             def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get data from $sourceDb", dbRunTypeRows, sourceObjectSql, 0, sourceDb)
-            def dataFromSource = joinList(sourceDbResult.collect{it[0]})
+            def dataFromSource = joinList(sourceDbResult.collect{it[0]}, ", ", 120)
             if(sourceDbResult.size() > 1000){
                 reporterLogLn("sourceDbResult has ${sourceDbResult.size()} results. The list in Where is truncated to 1000 rows")
-                dataFromSource = joinList(sourceDbResult[0..999].collect{it[0]})
+                dataFromSource = joinList(sourceDbResult[0..999].collect{it[0]}, ", ", 120)
             }
             def sourceCount = sourceDbResult.size()
             reporterLogLn("Source <$objectType>: <$sourceCount>");
@@ -100,8 +114,8 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             reporterLogLn("")
             reporterLogLn("Missing <$objectType> in <$queryFirst> <$diffCount>")
             reporterLogLn("")
-            def dbDifffDataToAdd = diffDbResult.collect{"'" + it[0] + "'"}.join(",\n")
-            dbDifffDataToAdd = joinList(diffDbResult.collect{  "'" + it[0] + "'" }, ", ", 44)
+            def dbDifffDataToAdd = joinList(diffDbResult.collect{"'" + it[0] + "'"},(",\n"),120)
+            dbDifffDataToAdd = joinList(diffDbResult.collect{  "'" + it[0] + "'" }, ", ", 120)
             def objectQuery = ""
             switch (objectType.toLowerCase()) {
                 case "constraint":
@@ -125,6 +139,18 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
                 reporterLogLn("-- " + "${i + 1} ".padLeft(5)  + it[0])
             }
             reporterLogLn("\n--Query <$objectType>:\nIN( $dbDifffDataToAdd );\n\n")
+            String refQuery = "$DROP_REF_CONSTRATINTS_ORACLE\nIN( $dbDifffDataToAdd )\n\n"
+            reporterLogLn("\n--Query\n $refQuery;")
+            targetDbResult = targetDbSqlDriver.sqlConRun("Get drropp FK ref from $targetDb", dbRunTypeRows, refQuery, 0, targetDb)
+            targetDbResult.each{
+                reporterLogLn(it["DROP_"])
+            }
+            String refPrimaryKeyQuery = "$DROP_PRIMARY_KEY_ORACLE\nIN( $dbDifffDataToAdd )\n\n"
+            reporterLogLn("\n--Query\n $refPrimaryKeyQuery;")
+            targetDbResult = targetDbSqlDriver.sqlConRun("Get drropp FK ref from $targetDb", dbRunTypeRows, refPrimaryKeyQuery, 0, targetDb)
+            targetDbResult.each{
+                reporterLogLn(it["DROP_"])
+            }
         }else{
             reporterLogLn("\n<$objectType> Source = Target")
 
