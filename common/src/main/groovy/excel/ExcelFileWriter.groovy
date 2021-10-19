@@ -43,9 +43,9 @@ public class ExcelFileWriter {
             bodyLine.eachWithIndex { columnValue, int columnIndex ->
                 HSSFCell cell = bodyRow.createCell((Short)columnIndex );
                 cell.setCellValue(columnValue)
-                print "$columnValue, "
+                //print "$columnValue, "
             }
-            println ""
+//            println ""
         }
         hSSFSheet.setAutoFilter(new CellRangeAddress(0, bodyLines.size(), 0, headerColumns.size()))
     }
