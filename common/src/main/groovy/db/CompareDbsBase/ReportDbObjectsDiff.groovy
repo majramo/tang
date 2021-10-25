@@ -12,7 +12,8 @@ import static dtos.base.Constants.dbRunTypeRows
 
 public class ReportDbObjectsDiff extends AnySqlCompareTest{
     private final static Logger log = Logger.getLogger("CSC  ")
-    def DROP_REF_CONSTRATINTS_ORACLE = "SELECT  ('ALTER TABLE ' || table_name || ' DROP CONSTRAINT ' || CONSTRAINT_NAME || ' cascade ;--DropRefConstraint') DROP_ " +
+    def DROP_REF_CONSTRATINTS_ORACLE = "SELECT  ('ALTER TABLE ' || table_name || ' DROP CONSTRAINT ' || CONSTRAINT_NAME || ' cascade ;--DropRefConstraint') DROP_CASCADE, \n" +
+            "('ALTER TABLE ' || table_name || ' DROP CONSTRAINT ' || CONSTRAINT_NAME || ' ;--DropRefConstraint') DROP_ \n" +
             "FROM user_constraints \n" +
             "where CONSTRAINT_NAME "
    def DROP_PRIMARY_KEY_ORACLE = "WITH all_primary_keys AS (\n" +
@@ -22,7 +23,8 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
            "   WHERE  constraint_type = 'P'\n" +
            "   --and table_name ='ARENDE'\n" +
            ")\n" +
-           "  SELECT ('ALTER TABLE ' || ac.table_name || ' DROP PRIMARY KEY cascade ;--Drop parent primary key and create again') DROP_  \n" +
+           "    SELECT distinct ('ALTER TABLE ' || ac.table_name || ' DROP PRIMARY KEY cascade ;--Drop parent primary key cascade' || ac.table_name || '.*primary and create again') DROP_CASCADE , \n" +
+           "    ('ALTER TABLE ' || ac.table_name || ' DROP PRIMARY KEY ;--Drop parent primary key ' || ac.table_name || '.*primary and create again') DROP_  \n" +
            "\n" +
            "    FROM all_constraints ac\n" +
            "         LEFT JOIN all_primary_keys apk\n" +
@@ -110,19 +112,20 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
             diffDbResult = targetDbResult
         }
         def diffCount =  diffDbResult.size()
-        if( diffCount >0) {
+        if (diffCount > 0) {
+
             reporterLogLn("")
             reporterLogLn("Missing <$objectType> in <$queryFirst> <$diffCount>")
             reporterLogLn("")
-            def dbDifffDataToAdd = joinList(diffDbResult.collect{"'" + it[0] + "'"},(",\n"),120)
-            dbDifffDataToAdd = joinList(diffDbResult.collect{  "'" + it[0] + "'" }, ", ", 120)
+            def dbDifffDataToAdd = joinList(diffDbResult.collect { "'" + it[0] + "'" }, (",\n"), 120)
+            dbDifffDataToAdd = joinList(diffDbResult.collect { "'" + it[0] + "'" }, ", ", 120)
             def objectQuery = ""
             switch (objectType.toLowerCase()) {
                 case "constraint":
                     objectQuery = "SELECT 'ALTER TABLE ' || table_name || ' ENABLE CONSTRAINT ' || CONSTRAINT_NAME; --enable" +
                             "--ALTER TABLE ' || table_name || ' DROP CONSTRAINT ' || CONSTRAINT_NAME; --drop" +
                             "FROM user_constraints " +
-                            "WHERE CONSTRAINT_NAME IN( " + dbDifffDataToAdd +");"
+                            "WHERE CONSTRAINT_NAME IN( " + dbDifffDataToAdd + ");"
                     targetDbResult
                     objectQuery += "\n\n--ENABLE CONSTRAINT\n" +
                             diffDbResult["ENABLE_"].join("\n")
@@ -130,28 +133,33 @@ public class ReportDbObjectsDiff extends AnySqlCompareTest{
                             diffDbResult["DROP_"].join("\n")
                     break
                 case "index":
-                    objectQuery = diffDbResult.collect{it[0].replaceAll(/"|'|,/, "").replaceAll(/^/, "DROP INDEX ").replaceAll(/$/,";") }.join("\n")
-                    objectQuery += "\n\n--DROP INDEX\n" + diffDbResult.collect{"DROP INDEX " + it["INDEX_NAME"] + ";"}.join("\n")
+                    objectQuery = diffDbResult.collect { it[0].replaceAll(/"|'|,/, "").replaceAll(/^/, "DROP INDEX ").replaceAll(/$/, ";") }.join("\n")
+                    objectQuery += "\n\n--DROP INDEX\n" + diffDbResult.collect { "DROP INDEX " + it["INDEX_NAME"] + ";" }.join("\n")
                     break
             }
             reporterLogLn("objectQuery\n$objectQuery")
             diffDbResult.eachWithIndex { it, i ->
-                reporterLogLn("-- " + "${i + 1} ".padLeft(5)  + it[0])
+                reporterLogLn("-- " + "${i + 1} ".padLeft(5) + it[0])
             }
-            reporterLogLn("\n--Query <$objectType>:\nIN( $dbDifffDataToAdd );\n\n")
-            String refQuery = "$DROP_REF_CONSTRATINTS_ORACLE\nIN( $dbDifffDataToAdd )\n\n"
-            reporterLogLn("\n--Query\n $refQuery;")
-            targetDbResult = targetDbSqlDriver.sqlConRun("Get drropp FK ref from $targetDb", dbRunTypeRows, refQuery, 0, targetDb)
-            targetDbResult.each{
-                reporterLogLn(it["DROP_"])
+            dbDifffDataToAdd = dbDifffDataToAdd.replaceAll(/\'\'/, /'/)
+            if (objectType.toLowerCase().matches(".*constraint.*")) {
+                reporterLogLn("\n--Query <$objectType>:\nIN( $dbDifffDataToAdd );\n\n")
+                String refQuery = "$DROP_REF_CONSTRATINTS_ORACLE\nIN( $dbDifffDataToAdd )\n\n"
+                reporterLogLn("\n--Query\n $refQuery;")
+                def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get drop FK ref from $sourceDb", dbRunTypeRows, refQuery, 0, sourceDb)
+                sourceDbResult.each {
+                    reporterLogLn("--" + it["DROP_CASCADE"])
+                    reporterLogLn(it["DROP_"])
+                }
             }
             String refPrimaryKeyQuery = "$DROP_PRIMARY_KEY_ORACLE\nIN( $dbDifffDataToAdd )\n\n"
             reporterLogLn("\n--Query\n $refPrimaryKeyQuery;")
-            targetDbResult = targetDbSqlDriver.sqlConRun("Get drropp FK ref from $targetDb", dbRunTypeRows, refPrimaryKeyQuery, 0, targetDb)
-            targetDbResult.each{
+            def sourceDbResult = sourceDbSqlDriver.sqlConRun("Get drop FK ref from $sourceDb", dbRunTypeRows, refPrimaryKeyQuery, 0, sourceDb)
+            sourceDbResult.each {
+                reporterLogLn("--" + it["DROP_CASCADE"])
                 reporterLogLn(it["DROP_"])
             }
-        }else{
+        } else {
             reporterLogLn("\n<$objectType> Source = Target")
 
         }
