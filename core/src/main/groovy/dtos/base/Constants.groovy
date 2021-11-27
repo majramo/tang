@@ -96,11 +96,14 @@ public class Constants {
     public static final String SQL_HELPER = "SQL_HELPER"
     public static final String SOURCE_SQL_HELPER = "SOURCE_SQL_HELPER"
     public static final String TARGET_SQL_HELPER = "TARGET_SQL_HELPER"
+    public static final String PRE_TARGET_SQL_HELPER = "PRE_TARGET_SQL_HELPER"
     public static final String REPOSITORY_SQL_HELPER = "REPOSITORY_SQL_HELPER"
     public static final String DATABASE = "DATABASE"
     public static final String DATABASE_VENDOR_1 = "DATABASE_VENDOR_1"
     public static final String DATABASE_VENDOR_2 = "DATABASE_VENDOR_2"
-
+    public static final String SOURCE_DB = "sorceDb"
+    public static final String TARGET_DB = "targetDb"
+    public static final String PRE_TARGET_DB = "preTargetDb"
     public static final String EXCEL_BODY_ROW_NUMBER = "EXCEL_BODY_ROW_NUMBER"
 
     public static final int MAX_DB_RESULTS_TO_PRINT = 50
