@@ -47,7 +47,13 @@ class  VerifyMaskedTargetDb_TestFactory {
 //        excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Column", "UTDELNINGSADRESS")
 
         def excelBodyRowsMaskAction = SystemPropertiesInitation.readExcel(excelObjectProviderMaskAction)
-        def tableToIgnoreWhenVerification = settings.tableToIgnoreWhenVerification ?: ""
+        def tableToIgnoreWhenVerification
+        URL is = this.class.getResource("/${systemColumn}.tables.to.ignore.txt")
+        try{
+            tableToIgnoreWhenVerification = new FileReader(is.path).getText().split("\r\n").collect{it}
+        } catch (Exception e) {
+            tableToIgnoreWhenVerification = ""
+        }
         if(tableToIgnoreWhenVerification != ""){
             def tableToIgnoreWhenVerificationUc = tableToIgnoreWhenVerification.collect{it.toUpperCase()}
             excelBodyRowsMaskAction = excelBodyRowsMaskAction.findAll{
@@ -86,5 +92,6 @@ class  VerifyMaskedTargetDb_TestFactory {
             }
         }
         return result;
+
     }
 }
