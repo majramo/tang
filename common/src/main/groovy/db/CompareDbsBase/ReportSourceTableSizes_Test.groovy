@@ -26,14 +26,14 @@ class ReportSourceTableSizes_Test extends AnySqlCompareTest{
     File bigTablesFileToIgnoreWhenVerification
     def tableSizeMax = settings.tableSizeToIgnoreWhenVerification ?: 0
 
-    @Parameters(["systemColumn", "excelModifiedTablesOnly"] )
+    @Parameters(["systemColumn", "pdbColumn", "excelModifiedTablesOnly"] )
     @Test
-    void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("false")boolean excelModifiedTablesOnly, ITestContext testContext){
+    void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, String pdbColumn, @Optional("false")boolean excelModifiedTablesOnly, ITestContext testContext){
         super.setup()
 
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
 
-        def reportProfileDataPath = settings.profileDataPath + "/excel/${system.toLowerCase()}/${system.toLowerCase()}/excel/"
+        def reportProfileDataPath = settings.profileDataPath + "/excel/${pdbColumn.toLowerCase()}/${system.toLowerCase()}/excel/"
         reportProfileDataTableSizePath = reportProfileDataPath + "${system.toLowerCase()}.tables.size.txt"
         reportProfileDataTablesToIgnorePath = reportProfileDataPath + "${system.toLowerCase()}.tables.to.ignore.txt"
         textFile = new File(reportProfileDataTableSizePath)
