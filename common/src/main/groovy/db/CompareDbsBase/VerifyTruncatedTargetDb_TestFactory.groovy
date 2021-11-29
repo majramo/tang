@@ -9,14 +9,11 @@ import static dtos.base.Constants.CompareType.LIKE
 
 class VerifyTruncatedTargetDb_TestFactory {
 
-
-
     @Parameters(["systemColumn", "actionColumn"] )
     @Factory
     public Object[] createVerifyTruncatedInstances(String systemColumn, String actionColumn) {
         SettingsHelper settingsHelper = SettingsHelper.getInstance()
         def settings = settingsHelper.settings
-
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
 
         excelObjectProvider.addColumnsToRetriveFromFile(["Table"])
@@ -27,14 +24,21 @@ class VerifyTruncatedTargetDb_TestFactory {
 
         Reporter.log("Number of lines read <$excelBodyRows.size>")
         def result = [];
-        def excludeTablesStr = settings.truncateExcludeTables
+        def truncateVerifyMaxCount = settings.truncateVerifyMaxCount ?: 1000
+
+        def excludeTablesStr = settings.truncateExcludeTables ?: ""
         if(!excludeTablesStr.isEmpty()){
             def excludeTables = excludeTablesStr.split(";")
             excludeTables.each {tableNameToExclude->
-                excelBodyRows = excelBodyRows.findAll{!it["Table"].contains(tableNameToExclude)}
+                excelBodyRows = excelBodyRows.findAll{!it["Table"].contains(tableNameToExclude.toUpperCase())}
             }
             Reporter.log("Lines read after removing settings.excludeTables <$excludeTablesStr> <$excelBodyRows.size>")
 
+        }
+        if(truncateVerifyMaxCount != 1000){
+            if(truncateVerifyMaxCount < excelBodyRows.size()){
+                excelBodyRows = excelBodyRows[0..truncateVerifyMaxCount-1]
+            }
         }
         excelBodyRows.eachWithIndex { excelRow, index ->
             def table = excelRow["Table"]
@@ -42,5 +46,4 @@ class VerifyTruncatedTargetDb_TestFactory {
         }
         return result;
     }
-
 }
