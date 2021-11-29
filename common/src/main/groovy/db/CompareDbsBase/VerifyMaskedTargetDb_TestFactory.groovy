@@ -1,5 +1,6 @@
 package db.CompareDbsBase
 
+import dtos.SettingsHelper
 import excel.ExcelObjectProvider
 import org.testng.ITestContext
 import org.testng.Reporter
@@ -46,12 +47,20 @@ class  VerifyMaskedTargetDb_TestFactory {
 //        excelObjectProviderMaskAction.addColumnsCapabilitiesToRetrieve("Column", "UTDELNINGSADRESS")
 
         def excelBodyRowsMaskAction = SystemPropertiesInitation.readExcel(excelObjectProviderMaskAction)
+        def tableToIgnoreWhenVerification = settings.tableToIgnoreWhenVerification ?: ""
+        if(tableToIgnoreWhenVerification != ""){
+            def tableToIgnoreWhenVerificationUc = tableToIgnoreWhenVerification.collect{it.toUpperCase()}
+            excelBodyRowsMaskAction = excelBodyRowsMaskAction.findAll{
+                !tableToIgnoreWhenVerificationUc.contains(it.Table)
+            }
+        }
         excelObjectProviderMaskAction.printRow(excelBodyRowsMaskAction, ["System", "Table", "Column", "Masking", "Action", "Type"])
 
         Reporter.log("Lines read <$excelBodyRowsMaskAction.size>")
         println("Lines read <$excelBodyRowsMaskAction.size>")
         Reporter.log("Action <Masking> ")
-
+        def maskingCount =[:]
+        def maskingVerifyMaxCount = settings.maskingVerifyMaxCount ?: 1000 //maximum number of verification for each domain/masking
         def result = [];
         excelBodyRowsMaskAction.unique().eachWithIndex { excelRow, index ->
             def table = excelRow["Table"]
@@ -60,12 +69,18 @@ class  VerifyMaskedTargetDb_TestFactory {
             def searchCriteria = excelRow["SearchCriteria"]
             def searchExtraCondition = excelRow["SearchExtraCondition"]
             def masking = excelRow["Masking"]
-            if (searchCriteria == null || searchCriteria == "-" ){
-                searchCriteria = ""
+            if (maskingCount[masking] == null){
+                maskingCount[masking] = 1
             }
-            if (searchExtraCondition == null || searchExtraCondition == "-" ){
-                searchExtraCondition = ""
-            }
+
+            if (maskingCount[masking] <= maskingVerifyMaxCount) {
+                maskingCount[masking] = maskingCount[masking] + 1
+                if (searchCriteria == null || searchCriteria == "-") {
+                    searchCriteria = ""
+                }
+                if (searchExtraCondition == null || searchExtraCondition == "-") {
+                    searchExtraCondition = ""
+                }
 
                 result.add(new VerifyMaskedTargetColumn_Test(testContext, targetDb, sourceDb, excelRow["System"], table, column, type, actionColumn, masking, searchCriteria, searchExtraCondition))
             }
