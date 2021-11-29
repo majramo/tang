@@ -20,12 +20,26 @@ class ReportSourceTableSizes_Test extends AnySqlCompareTest{
     def SOURCE_GET_TABLE_SIZE_QUERY = "SELECT COUNT(1) COUNT_  FROM %s "
     def SOURCE_GET_TABLE_NAMES_QUERY_SQLSERVER = "SELECT DISTINCT '[' + Table_name + ']' Table_name FROM Information_schema.columns WHERE TABLE_SCHEMA = 'dbo' ORDER BY 1"
 
+    def reportProfileDataTableSizePath
+    def reportProfileDataTablesToIgnorePath
+    File textFile
+    File bigTablesFileToIgnoreWhenVerification
+    def tableSizeMax = settings.tableSizeToIgnoreWhenVerification ?: 0
+
     @Parameters(["systemColumn", "excelModifiedTablesOnly"] )
     @Test
     void compareSourceTableSizeEqualsTargetTableSizeTest(String systemColumn, @Optional("false")boolean excelModifiedTablesOnly, ITestContext testContext){
         super.setup()
 
         def (ExcelObjectProvider excelObjectProvider, String system, Object targetDb, Object sourceDb) = SystemPropertiesInitation.getSystemData(systemColumn)
+
+        def reportProfileDataPath = settings.profileDataPath + "/excel/${system.toLowerCase()}/${system.toLowerCase()}/excel/"
+        reportProfileDataTableSizePath = reportProfileDataPath + "${system.toLowerCase()}.tables.size.txt"
+        reportProfileDataTablesToIgnorePath = reportProfileDataPath + "${system.toLowerCase()}.tables.to.ignore.txt"
+        textFile = new File(reportProfileDataTableSizePath)
+        textFile.write("")
+        bigTablesFileToIgnoreWhenVerification = new File(reportProfileDataTablesToIgnorePath)
+        bigTablesFileToIgnoreWhenVerification.write("")
 
         def sourceTableSql = SOURCE_GET_TABLE_NAMES_QUERY_ORACLE.replaceAll(/\$\$\$/, /\$/).replaceAll(/___---'/, /\\_%'  ESCAPE '\\'/).replaceAll(/---/, /\%/).replaceAll(/___/, /\\_  ESCAPE '\\'/)
         if(getDbType(sourceDb).equals("sqlserver")){
@@ -34,12 +48,12 @@ class ReportSourceTableSizes_Test extends AnySqlCompareTest{
         super.setSourceSqlHelper(testContext, sourceDb)
         reporterLogLn(reporterHelper.addIcons(getDbType(sourceDb)))
         if(excelModifiedTablesOnly) {
-            reporterLogLn("Tables are from excelfile $excelObjectProvider.inputFile")
+            writeFileAndReporterLog("Tables are from excelfile $excelObjectProvider.inputFile")
         }else{
-            reporterLogLn("Tables are from database $system")
+            writeFileAndReporterLog("Tables are from database $system")
         }
 
-        reporterLogLn("Source: <$sourceDb>")
+        writeFileAndReporterLog("Source: <$sourceDb>")
 
         def numberOfTablesToCheckColumn = (settingsHelper.settings.numberOfTablesToCheckColumn).toString()
         if(numberOfTablesToCheckColumn != "[:]" && numberOfTablesToCheckColumn != "") {
@@ -47,7 +61,7 @@ class ReportSourceTableSizes_Test extends AnySqlCompareTest{
         }else{
             numberOfTablesToCheckColumn = 0
         }
-        reporterLogLn("Max number of tables to check: <$numberOfTablesToCheckColumn>\n")
+        writeFileAndReporterLog("Max number of tables to check: <$numberOfTablesToCheckColumn>\n")
         def tablesSizes = [:]
         if(excelModifiedTablesOnly){
             //read file
@@ -87,7 +101,7 @@ class ReportSourceTableSizes_Test extends AnySqlCompareTest{
 
     private reportTableSizes(sourceDb, SqlHelper sourceDbSqlDriver, tablesSizes, system, String inputFile) {
 
-        reporterLogLn("Number of tables to check in $sourceDb <" + tablesSizes.size() + ">")
+        writeFileAndReporterLog("Number of tables to check in $sourceDb <" + tablesSizes.size() + ">")
         reporterLogLn("")
         def sizeMap = [:]
         tablesSizes.each {tableName, value->
@@ -106,17 +120,25 @@ class ReportSourceTableSizes_Test extends AnySqlCompareTest{
                 }
             }
         }
-        reporterLogLn("Sort by size:")
+        writeFileAndReporterLog("Sort by size:")
         int i = 1
         sizeMap.sort{ it.value }.reverseEach{tableName, size->
-            reporterLogLn( String.format("%04d:", i++) + String.format("%,d", size).padLeft(20) + " $tableName")
+            writeFileAndReporterLog( String.format("%04d:", i++) + String.format("%,d", size).padLeft(20) + " $tableName", size, tableName)
         }
 
-        reporterLogLn("\n\nSort by name:")
+        writeFileAndReporterLog("\n\nSort by name:")
         i = 1
         sizeMap.sort().each{tableName, size->
-            reporterLogLn( String.format("%04d:", i++) + String.format("%,d", size).padLeft(20) + " $tableName")
+            writeFileAndReporterLog( String.format("%04d:", i++) + String.format("%,d", size).padLeft(20) + " $tableName")
         }
+    }
+
+    def writeFileAndReporterLog(data, size = 0, tableName = "") {
+        if (tableSizeMax != 0 && size > tableSizeMax) {
+            bigTablesFileToIgnoreWhenVerification.append(tableName + "\n")
+        }
+        reporterLogLn( data)
+        textFile.append(data + "\n")
     }
 
 }
