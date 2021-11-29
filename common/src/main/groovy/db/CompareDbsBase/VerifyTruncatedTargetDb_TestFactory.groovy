@@ -22,6 +22,21 @@ class VerifyTruncatedTargetDb_TestFactory {
         def excelBodyRows = SystemPropertiesInitation.readExcel(excelObjectProvider)
         excelObjectProvider.printRow(excelBodyRows, ["System", "Table", "Action"])
 
+        def tableToIgnoreWhenVerification
+        URL is = this.class.getResource("/${systemColumn}.tables.to.ignore.txt")
+        try{
+            tableToIgnoreWhenVerification = new FileReader(is.path).getText().split("\r\n").collect{it}
+        } catch (Exception e) {
+            tableToIgnoreWhenVerification = ""
+        }
+        if(tableToIgnoreWhenVerification != ""){
+            def tableToIgnoreWhenVerificationUc = tableToIgnoreWhenVerification.collect{it.toUpperCase()}
+            excelBodyRows = excelBodyRows.findAll{
+                !tableToIgnoreWhenVerificationUc.contains(it.Table)
+            }
+        }
+
+
         Reporter.log("Number of lines read <$excelBodyRows.size>")
         def result = [];
         def truncateVerifyMaxCount = settings.truncateVerifyMaxCount ?: 1000
