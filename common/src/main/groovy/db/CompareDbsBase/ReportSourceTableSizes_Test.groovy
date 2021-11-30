@@ -100,14 +100,15 @@ class ReportSourceTableSizes_Test extends AnySqlCompareTest{
     }
 
     private reportTableSizes(sourceDb, SqlHelper sourceDbSqlDriver, tablesSizes, system, String inputFile) {
-
-        writeFileAndReporterLog("Number of tables to check in $sourceDb <" + tablesSizes.size() + ">")
+        def numberOfTables = tablesSizes.size()
+        writeFileAndReporterLog("Number of tables to check in $sourceDb <$numberOfTables>")
         reporterLogLn("")
         def sizeMap = [:]
-        tablesSizes.each {tableName, value->
+        tablesSizes.eachWithIndex {tableName, value, i->
             def sourceTableSizeSql = String.format(SOURCE_GET_TABLE_SIZE_QUERY, tableName)
             def sourceDbTableSizeResult
             def tableNameReport = tableName.replaceAll(/\[|\]/,'')
+            this.log.info("${i+1}:$numberOfTables fetch data table<$tableNameReport>")
             try{
                 sourceDbTableSizeResult = sourceDbSqlDriver.sqlConRun("Get table <$tableName> size from $sourceDb", dbRunTypeRows, sourceTableSizeSql, 0, sourceDb)
                 sizeMap[tableNameReport] = new BigInteger(sourceDbTableSizeResult["COUNT_"][0].toString(), 10)
