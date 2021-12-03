@@ -12,9 +12,9 @@ import static dtos.base.Constants.CompareType.DIFF
 
 class  VerifyMaskedTargetDb_TestFactory {
 
-    @Parameters(["systemColumn", "actionColumn", "tableColumn", "excludeTableColumn", "maskingColumn", "excludeMaskingColumn"] )
+    @Parameters(["systemColumn", "actionColumn", "useHashMaxColumn", "tableColumn", "excludeTableColumn", "maskingColumn", "excludeMaskingColumn"] )
     @Factory
-    public Object[] createVerifyMaskedInstances(ITestContext testContext, String systemColumn, String actionColumn, @Optional ("") String tableColumn, @Optional ("") String excludeTableColumn, @Optional ("") String maskingColumn, @Optional ("") String excludeMaskingColumn) {
+    public Object[] createVerifyMaskedInstances(ITestContext testContext, String systemColumn, String actionColumn, boolean useHashMaxColumn, @Optional ("") String tableColumn, @Optional ("") String excludeTableColumn, @Optional ("") String maskingColumn, @Optional ("") String excludeMaskingColumn) {
 
         SettingsHelper settingsHelper = SettingsHelper.getInstance()
         def settings = settingsHelper.settings
@@ -88,7 +88,7 @@ class  VerifyMaskedTargetDb_TestFactory {
                     searchExtraCondition = ""
                 }
 
-                result.add(new VerifyMaskedTargetColumn_Test(testContext, targetDb, sourceDb, excelRow["System"], table, column, type, actionColumn, masking, searchCriteria, searchExtraCondition))
+                result.add(new VerifyMaskedTargetColumn_Test(testContext, targetDb, sourceDb, excelRow["System"], table, column, type, actionColumn, masking, searchCriteria, searchExtraCondition, useHashMaxColumn))
             }
         }
         return result;
