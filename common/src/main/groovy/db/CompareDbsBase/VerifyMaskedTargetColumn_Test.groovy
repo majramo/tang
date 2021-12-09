@@ -19,12 +19,14 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
     def column
     def type
     def actionColumn
+    boolean useHashMaxColumn
     def masking
     def searchCriteria
     def searchExtraCondition
     def numberOfLinesInSqlCompare = 101
+    static def tableIdMax = [:]
 
-    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, type, actionColumn, masking, searchCriteria = "", searchExtraCondition = "") {
+    public VerifyMaskedTargetColumn_Test(ITestContext testContext, targetDb, sourceDb, system, table, column, type, actionColumn, masking, searchCriteria = "", searchExtraCondition = "",  boolean useHashMaxColumn) {
         super.setup()
         this.targetDb = targetDb
         this.sourceDb = sourceDb
@@ -33,6 +35,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         this.type = type.toLowerCase()
         this.column = column.toLowerCase()
         this.actionColumn = actionColumn
+        this.useHashMaxColumn = useHashMaxColumn
         this.masking = masking
         this.searchCriteria = searchCriteria
         this.searchExtraCondition = searchExtraCondition
@@ -90,7 +93,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
         boolean sameData = false
         if(sourceDbResult != null && targetDbResult != null ) {
             def targetDbResultSize = targetDbResult.size()
-            if(targetDbResultSize < 100){
+            if(targetDbResultSize < 10){
                 def sourceDbResultSize = sourceDbResult.size()
                 if(sourceDbResultSize == 0 && targetDbResultSize == 0) {
                     reporterLogLn("Source and Target size are zero")
@@ -130,13 +133,17 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                     reporterLogLn(sourceDbResult[index].toString() + " == " + targetDbResult[index].toString())
                     index++
                 }
+            }else{
+                if(targetDbResultSize < 10) {
+                    skipTest("Run query and get data from Source and Target.  Check manually!")
+                }
             }
-        }else{
-            skipTest("Can't run query and get data from Source and Target.  Check manually!")
+
 //            tangAssert.assertTrue(false, "Table/Column <$table/$column> should be masked", "Table/Column can't be checked ");
+
         }
-        sourceDbSqlDriver = null
-        targetDbSqlDriver = null
+        sourceDbSqlDriver.disconnect()
+        targetDbSqlDriver.disconnect()
         tangAssert.assertTrue(!sameData, "Table/Column <$table/$column> should be masked", "Table/Column seems to be unmasked ");
 
     }
@@ -162,25 +169,37 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                         "where NOT $column IS NULL\n"
             }
 
-            def sourceDbResult = getSourceDbRowsResult(maxQuery)
-            def toMaxIdRaw = sourceDbResult[0]["MAX_ID"]
-            try {
-                if (toMaxIdRaw != null) {
-                    toMaxId = new BigDecimal(toMaxIdRaw)
-                }else{
-                    reporterLogLn("###### Can't get Max_ID <$searchCriteria>. It is NULL!")
-                    reporterLogLn("###### Can't get Max_ID <$searchCriteria>. It is NULL!")
-                    reporterLogLn("###### Can't get Max_ID <$searchCriteria>. It is NULL!")
-                    reporterLogLn("maxQuery <$maxQuery>")
-                    return [null, null]
+            def tableIdMaxKey = "$table$searchCriteria"
+            toMaxId = useHashMaxColumn ? (tableIdMax[tableIdMaxKey] ?: null) : null
+            reporterLogLn("useHashMaxColumn   <$useHashMaxColumn>")
+            reporterLogLn("tableIdMaxKey      <$tableIdMaxKey>")
+            reporterLogLn("toMaxId            <$toMaxId>")
+            if(toMaxId == null) {
+                reporterLogLn("######")
+                reporterLogLn("maxQuery   <$maxQuery>")
+                def sourceDbResult = getSourceDbRowsResult(maxQuery)
+                def toMaxIdRaw = sourceDbResult[0]["MAX_ID"]
+                reporterLogLn("toMaxIdRaw <$toMaxIdRaw>")
+
+                try {
+                    if (toMaxIdRaw != null) {
+                        toMaxId = new BigDecimal(toMaxIdRaw)
+                        tableIdMax[tableIdMaxKey] = toMaxId
+                    }else{
+                        reporterLogLn("###### Can't get Max_ID <$searchCriteria>. It is NULL!")
+                        reporterLogLn("###### Can't get Max_ID <$searchCriteria>. It is NULL!")
+                        reporterLogLn("###### Can't get Max_ID <$searchCriteria>. It is NULL!")
+                        reporterLogLn("maxQuery <$maxQuery>")
+                        return [null, null]
+                    }
+                } catch (NumberFormatException e) {
+                    reporterLogLn("######")
+                    reporterLogLn("Wrong type of Id, MUST be NUMERIC <$searchCriteria>")
+                    reporterLogLn("Got <$toMaxIdRaw>")
+                    reporterLogLn("######")
+                    reporterLogLn(maxQuery)
+                    throw e
                 }
-            } catch (NumberFormatException e) {
-                reporterLogLn("######")
-                reporterLogLn("Wrong type of Id, MUST be NUMERIC <$searchCriteria>")
-                reporterLogLn("Got <$toMaxIdRaw>")
-                reporterLogLn("######")
-                reporterLogLn(maxQuery)
-                throw e
             }
             if (numberOfLinesInSqlCompareTemp < toMaxId) {
                 fromId = toMaxId - numberOfLinesInSqlCompareTemp
@@ -197,12 +216,21 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                     notNumberColumnCompare +
                     " AND length($tmpColumn) > 0\n" +
                     " AND $searchCriteria BETWEEN $fromId AND $toMaxId\n" +
-                    " AND ROWNUM < 1001\n"
+                    " AND ROWNUM < 101\n"
         } else {
             def subSelectQuery = "SELECT '''' || rowid || '''' rowid_  FROM $table " +
                     "where NOT $column IS NULL\n"+
                     "AND NOT $column || '' in( 'START', 'SLUT' , 'REDANGJORD', 'GENOMFORDA', 'FINNSINTE', 'FEL', 'ANTAL')\n" +
-                    "AND ROWNUM < 1001"
+                    "AND ROWNUM < 101"
+            if(dataType == "CLOB" || dataType == "BLOB" ){
+                tmpColumn = "DBMS_LOB.SUBSTR( $column, 50, 1)"
+                subSelectQuery = "SELECT '''' || rowid || '''' rowid_  FROM $table " +
+                        "where NOT $column IS NULL\n"+
+                        "AND NOT $tmpColumn   in( 'START', 'SLUT' , 'REDANGJORD', 'GENOMFORDA', 'FINNSINTE', 'FEL', 'ANTAL')\n" +
+                        "AND ROWNUM < 101"
+            }
+            reporterLogLn("###### subSelectQuery")
+            reporterLogLn(subSelectQuery)
             def subSelectResult = getSourceDbRowsResult(subSelectQuery)
             def rowidCriteria = "--No Rowids exist in criteria\n"
             if (subSelectResult.size()) {
@@ -223,7 +251,7 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
                     " WHERE NOT $column IS NULL\n" +
                     " AND NOT $tmpColumn || ''  = ' '\n" +
                     " AND length($tmpColumn) > 0\n" +
-                    " AND ROWNUM < 1001\n" +
+                    " AND ROWNUM < 101\n" +
                     rowidCriteria
         }
         if (searchExtraCondition != "") {
