@@ -303,6 +303,10 @@ public class SqlHelper {
         return (queryConditionsTextList.size() || queryConditionsXmlList.size() || dbQuery != "")
     }
 
+    public boolean disconnect() {
+        jdbcConnections[dbName].disconnect()
+    }
+
     public JdbcConnection getConnection(dbName) {
         return jdbcConnections[dbName]
     }
