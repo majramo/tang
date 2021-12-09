@@ -7,7 +7,7 @@ import org.apache.log4j.Logger
 public class JdbcConnection {
     private static final String DB_NAME = ";databaseName="
     private static final String ERROR_DB_CONNECTION = "Could not establish connection to the database."
-    private jDbcConnection
+    private groovy.sql.Sql jDbcConnection
     private final static Logger log = Logger.getLogger("JdC  ")
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
@@ -57,4 +57,9 @@ public class JdbcConnection {
     public getJDbcConnection() {
         return  jDbcConnection
     }
+
+    public disconnect() {
+         jDbcConnection.close()
+    }
+
 }
