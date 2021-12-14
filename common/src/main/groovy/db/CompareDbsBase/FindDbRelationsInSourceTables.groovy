@@ -55,7 +55,7 @@ class FindDbRelationsInSourceTables extends AnySqlCompareTest {
         resetVariables(startTable, condition)
         if(!dbDataRead){
             if (readDb) {
-                def dbName = "${system}Target"
+                def dbName = "${system}Source"
                 super.setSourceSqlHelper(testContext, dbName)
                 reporterLogLn(reporterHelper.addIcons(getDbType(dbName)))
                 def fileName = "/referenceConstraints.sql"
