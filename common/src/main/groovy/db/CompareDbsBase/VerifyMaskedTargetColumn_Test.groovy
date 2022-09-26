@@ -210,13 +210,20 @@ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
             if(!["number", "date", "time"].contains(type)){
                 notNumberColumnCompare = " AND NOT $tmpColumn || ''  = ' '\n"
             }
-            sourceTargetSql += "SELECT $searchCriteria, $tmpColumn FROM $table\n" +
-                    " WHERE NOT $column IS NULL\n" +
-                    // " AND LENGTH(REPLACE($tmpColumn, ' ' , '')) > 0\n" +
-                    notNumberColumnCompare +
-                    " AND length($tmpColumn) > 0\n" +
-                    " AND $searchCriteria BETWEEN $fromId AND $toMaxId\n" +
-                    " AND ROWNUM < 101\n"
+            if(type.toString().toLowerCase().contains('lob')){
+                sourceTargetSql += "SELECT $searchCriteria, $tmpColumn FROM $table\n" +
+                        " WHERE NOT $column IS NULL\n" +
+                        " AND $searchCriteria BETWEEN $fromId AND $toMaxId\n" +
+                        " AND ROWNUM < 101\n"
+            }else {
+                sourceTargetSql += "SELECT $searchCriteria, $tmpColumn FROM $table\n" +
+                        " WHERE NOT $column IS NULL\n" +
+                        // " AND LENGTH(REPLACE($tmpColumn, ' ' , '')) > 0\n" +
+                        notNumberColumnCompare +
+                        " AND length($tmpColumn) > 0\n" +
+                        " AND $searchCriteria BETWEEN $fromId AND $toMaxId\n" +
+                        " AND ROWNUM < 101\n"
+            }
         } else {
             def subSelectQuery = "SELECT '''' || rowid || '''' rowid_  FROM $table " +
                     "where NOT $column IS NULL\n"+
