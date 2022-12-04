@@ -3,7 +3,8 @@ package db.CompareDbsBase
 import base.AnySqlCompareTest
 import dtos.base.SqlHelper
 import excel.ExcelObjectProvider
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.SkipException
 import org.testng.annotations.Optional
@@ -17,7 +18,7 @@ import static dtos.base.Constants.dbRunTypeFirstRow
 import static dtos.base.Constants.dbRunTypeRows
 
 public class CompareTableColumnCustomS2T_Test extends AnySqlCompareTest{
-    private final static Logger log = Logger.getLogger("CSC  ")
+    private final static Logger log = LogManager.getLogger("CSC  ")
 
     def SOURCE_TABLE_QUERY_ORACLE = """SELECT DISTINCT '''' || table_name || '_'  || column_name || '''' || ',' value
 FROM USER_TAB_COLS

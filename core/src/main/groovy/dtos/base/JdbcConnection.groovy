@@ -2,13 +2,14 @@ package dtos.base
 
 import dtos.SettingsHelper
 import groovy.sql.Sql
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 
 public class JdbcConnection {
     private static final String DB_NAME = ";databaseName="
     private static final String ERROR_DB_CONNECTION = "Could not establish connection to the database."
     private groovy.sql.Sql jDbcConnection
-    private final static Logger log = Logger.getLogger("JdC  ")
+    private final static Logger log = LogManager.getLogger("JdC  ")
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
     public boolean mockDb = false

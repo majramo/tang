@@ -5,13 +5,14 @@ import corebase.SeleniumDummyHelper
 import corebase.SeleniumHelper
 import dtos.SettingsHelper
 import org.apache.commons.lang3.StringUtils
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.Reporter
 import org.testng.annotations.AfterMethod
 
 public class AnyCCTest {
 
-    private final static Logger log = Logger.getLogger("ACCT ")
+    private final static Logger log = LogManager.getLogger("ACCT ")
     protected ISeleniumHelper driver
     public TangAssert tangAssert
     private final static DEFAULT_BROWSER = "Firefox"

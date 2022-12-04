@@ -1,9 +1,10 @@
 package dtos
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 class XmlAssert {
-    private final static Logger log = Logger.getLogger("XA   ")
+    private final static Logger log = LogManager.getLogger("XA   ")
 
     def moduleName
     def actionName

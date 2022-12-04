@@ -1,6 +1,7 @@
 package dtos.base
 
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.Reporter
 import org.testng.SkipException
 
@@ -24,7 +25,7 @@ public class SqlHelper {
     private jdbcConnections = [:]
     private static dbRecordLine
     private File sqlFile
-    private final static Logger logger = Logger.getLogger("SqH  ")
+    private final static Logger logger = LogManager.getLogger("SqH  ")
 
     public SqlHelper(File sqlFile, log, dbName, dbRun, settings, decrypterPassword = "") {
         this.dbRun = dbRun
@@ -87,7 +88,7 @@ public class SqlHelper {
         return jDbcConnection.isConnectionOk()
     }
 
-    private sqlConRun(dbLoggInfo, dbRunType, dbQueryRun, dbRecordLine = -1, dbName) {
+    private MySqlDbTestsqlConRun(dbLoggInfo, dbRunType, dbQueryRun, dbRecordLine = -1, dbName) {
         this.log.info "##SqlHelper " + this
         this.log.info "##Run dbName $dbName"
         jdbcConnections.each {

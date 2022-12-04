@@ -3,7 +3,8 @@ package db.CompareDbsBase
 import base.AnySqlCompareTest
 import dtos.base.SqlHelper
 import excel.ExcelObjectProvider
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.annotations.Optional
 import org.testng.annotations.Parameters
@@ -14,7 +15,7 @@ import static dtos.base.Constants.dbRunTypeFirstRow
 import static dtos.base.Constants.dbRunTypeRows
 
 class ReportSourceTableSizes_Test extends AnySqlCompareTest{
-    private final static Logger log = Logger.getLogger("CSC  ")
+    private final static Logger log = LogManager.getLogger("CSC  ")
 
     def SOURCE_GET_TABLE_NAMES_QUERY_ORACLE = "SELECT DISTINCT table_name FROM user_tab_cols WHERE NOT table_name IN (select view_name from all_views)  And NOT Table_Name Like 'EXT___---'  And NOT Table_Name Like 'TMPEXT___---' And Not Table_Name Like '---\\\$\\\$\\\$---' ORDER BY 1"
     def SOURCE_GET_TABLE_SIZE_QUERY = "SELECT COUNT(1) COUNT_  FROM %s "

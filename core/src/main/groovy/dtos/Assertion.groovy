@@ -1,13 +1,14 @@
 package dtos
 
 import org.apache.commons.lang3.StringUtils
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 
 import static dtos.base.Constants.*
 import static dtos.base.Constants.CompareType.*
 
 class Assertion {
-    final static Logger log = Logger.getLogger("ASS  ")
+    final static Logger log = LogManager.getLogger("ASS  ")
     String textOrSqlType
     String textOrSqlTypePresentation
     String textOrSqlFieldShort

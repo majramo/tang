@@ -3,7 +3,8 @@ package reports
 import corebase.ISeleniumHelper
 import corebase.ScreenshotReportNGUtils
 import dtos.SettingsHelper
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.apache.velocity.VelocityContext
 import org.testng.*
 import org.uncommons.reportng.HTMLReporter
@@ -23,7 +24,7 @@ import static dtos.base.Constants.*
 public class TangHtmlReporter extends HTMLReporter implements ITestListener, IConfigurationListener {
     protected static final ScreenshotReportNGUtils reportNGScreenShotUtils = new ScreenshotReportNGUtils()
     private final static String CLASS_NAME = this.getSimpleName() + ": "
-    private final static Logger log = Logger.getLogger(getClass())
+    private final static Logger log = LogManager.getLogger(getClass())
     protected final static ReporterHelper reporterHelper = new ReporterHelper()
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings

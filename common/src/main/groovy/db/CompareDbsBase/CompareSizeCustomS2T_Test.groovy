@@ -3,7 +3,8 @@ package db.CompareDbsBase
 import base.AnySqlCompareTest
 import dtos.base.SqlHelper
 import excel.ExcelObjectProvider
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.annotations.Parameters
 import org.testng.annotations.Test
@@ -18,7 +19,7 @@ import static dtos.base.Constants.dbRunTypeRows
 import static dtos.base.Constants.CompareType.DIFF
 
 class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
-    private final static Logger log = Logger.getLogger("CSC  ")
+    private final static Logger log = LogManager.getLogger("CSC  ")
     private final static String AND_QUERY_EXTENSION = "AND_QUERY_EXTENSION"
     public static final String MISSING_TABLE = "no table"
     def SOURCE_GET_TABLE_NAMES_QUERY_ORACLE = """SELECT DISTINCT table_name FROM user_tab_cols 

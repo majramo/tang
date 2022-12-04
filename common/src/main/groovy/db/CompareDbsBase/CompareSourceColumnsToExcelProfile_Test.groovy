@@ -5,7 +5,8 @@ import excel.ExcelFileReader
 import excel.ExcelFileWriter
 import base.AnySqlCompareTest
 import excel.ExcelObjectProvider
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.annotations.Parameters
 import org.testng.annotations.Test
@@ -15,7 +16,7 @@ import java.text.DecimalFormat
 import static dtos.base.Constants.dbRunTypeRows
 
 public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
-    private final static Logger log = Logger.getLogger("CSC  ")
+    private final static Logger log = LogManager.getLogger("CSC  ")
     private final static String AND_QUERY_EXTENSION = "AND_QUERY_EXTENSION"
     def SOURCE_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
     def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"

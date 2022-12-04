@@ -1,12 +1,13 @@
 package utils
 
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.Reporter
 
 import java.text.Format
 import java.text.SimpleDateFormat
 
-import static org.apache.log4j.Logger.getLogger
+import static org.apache.log4j.LogManager.getLogger
 
 public class Person implements Serializable {
     static  Calendar date = Calendar.getInstance();

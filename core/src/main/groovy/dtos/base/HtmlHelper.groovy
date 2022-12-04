@@ -1,7 +1,8 @@
 package dtos.base
 
 import org.apache.commons.lang3.StringUtils
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.htmlcleaner.*
 
 public class HtmlHelper implements XHtmlHelper{
@@ -9,7 +10,7 @@ public class HtmlHelper implements XHtmlHelper{
 	def sourecAnchor
 	def sourceAnchorNode
 	def soureCleanedRoot
-	private final static Logger log = Logger.getLogger("HH   ")
+	private final static Logger log = LogManager.getLogger("HH   ")
 	
 	public void setXHtmlHelper(String htmlXmlSource, String sourecAnchor){
 		this.sourecAnchor = sourecAnchor.replaceAll(/\b(\w+=")\s*(.+?)\s*"/, '$1$2\"').replaceAll (/ +/," ")

@@ -3,7 +3,8 @@ package db.CompareDbsBase
 
 import base.AnySqlCompareTest
 import exceptions.TangFileException
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.Reporter
 import org.testng.annotations.Parameters
@@ -22,7 +23,7 @@ the "delete statments" will be in the report
  */
 
 class FindDbRelationsInSourceTables extends AnySqlCompareTest {
-    private final   Logger log = Logger.getLogger("FDDS ")
+    private final   Logger log = LogManager.getLogger("FDDS ")
 
     def relationships = []
     def startTable = ""

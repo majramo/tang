@@ -5,7 +5,8 @@ import corebase.SeleniumDummyHelper
 import corebase.SeleniumHelper
 import dtos.SettingsHelper
 import dtos.base.SqlHelper
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.graphwalker.generators.PathGenerator
 import org.testng.Reporter
 
@@ -15,7 +16,7 @@ public class AnyMbtTest extends org.graphwalker.multipleModels.ModelAPI {
     public static TangAssert tangAssert
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
-    private final static Logger log = Logger.getLogger("AMT  ")
+    private final static Logger log = LogManager.getLogger("AMT  ")
 
     public AnyMbtTest(File model, boolean efsm, PathGenerator generator, boolean weight, String browser, String outputDirectory) {
         super(model, efsm, generator, weight);

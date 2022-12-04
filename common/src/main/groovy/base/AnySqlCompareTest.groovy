@@ -3,7 +3,8 @@ package base
 import dtos.SettingsHelper
 import dtos.base.Constants
 import dtos.base.SqlHelper
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.Reporter
 import org.testng.SkipException
@@ -19,7 +20,7 @@ import static corebase.GlobalConstants.REPORT_NG_REPORTING_TITLE
 import static dtos.base.Constants.*
 
 public class AnySqlCompareTest {
-    private final static Logger log = Logger.getLogger("ASC   ")
+    private final static Logger log = LogManager.getLogger("ASC   ")
     protected final static ReporterHelper reporterHelper = new ReporterHelper()
     public static final String BREAK_CLOSURE = "BreakClosure"
     public static final String REPOSITORY_DB = "repository"

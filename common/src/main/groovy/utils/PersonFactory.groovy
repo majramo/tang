@@ -4,15 +4,16 @@ import dtos.SettingsHelper
 import groovy.json.JsonBuilder
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.Reporter
 
-import static org.apache.log4j.Logger.getLogger
+import static org.apache.log4j.LogManager.getLogger
 
 public class PersonFactory implements Serializable {
     private static final long serialVersionUID = -160928058318117177L;
 
-    private static final Logger LOG = getLogger(PersonFactory.class.getName());
+    private static final Logger LOG = LogManager.getLogger(PersonFactory.class.getName());
     private static String settingsEmailDomain = "test.addtest.se"
     private settingsFirstNames = ['Female', 'Male']
     private settingsMaleFirstNames = ['Male1', 'Male2']

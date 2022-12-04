@@ -1,6 +1,7 @@
 package dtos
 
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.SkipException
 
 public class SettingsHelper {
@@ -8,7 +9,7 @@ public class SettingsHelper {
     public static settings
     private static timeStamp
     public static applicationConf = null
-    private final static Logger log = Logger.getLogger("StH  ")
+    private final static Logger log = LogManager.getLogger("StH  ")
     private static final INSTANCE = new SettingsHelper()
     private static int count = 1
     static getInstance() {

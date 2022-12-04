@@ -3,7 +3,8 @@ package db.CompareDbsBase
 
 import base.AnySqlCompareTest
 import excel.ExcelObjectProvider
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.annotations.Parameters
 import org.testng.annotations.Test
@@ -22,7 +23,7 @@ the "delete statments" will be in the report
  */
 
 class FindDeleteDependenciesInSourceTables extends AnySqlCompareTest{
-    private final static Logger log = Logger.getLogger("FDDS ")
+    private final static Logger log = LogManager.getLogger("FDDS ")
     def recurse = false
     def firstRelations = ""
     def alterStrs = ""

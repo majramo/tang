@@ -4,7 +4,8 @@ import dtos.SettingsHelper
 import exceptions.TangFileException
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.apache.poi.hssf.usermodel.HSSFRow
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -27,7 +28,7 @@ public class ExcelFileObjectReader {
     ExcelObjectData excelObjectData
     final GroovyClassLoader groovyLoader = new GroovyClassLoader();
     def builder = new ClassBuilder(groovyLoader)
-    private final static Logger log = Logger.getLogger(getClass())
+    private final static Logger log = LogManager.getLogger(getClass())
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     def settings = settingsHelper.settings
 /**

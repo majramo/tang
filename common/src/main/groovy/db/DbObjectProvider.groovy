@@ -2,14 +2,15 @@ package db
 
 import dtos.SettingsHelper
 import dtos.base.SqlHelper
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 
 import static dtos.base.Constants.dbRunTypeRows
 
 class DbObjectProvider {
 
     private static SqlHelper sqlHelper;
-    private final static Logger log = Logger.getLogger("DOP  ")
+    private final static Logger log = LogManager.getLogger("DOP  ")
     private final static SettingsHelper settingsHelper = SettingsHelper.getInstance()
     private final static def settings = settingsHelper.settings
     private final static def applicationConf = settingsHelper.applicationConf

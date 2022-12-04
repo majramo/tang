@@ -3,7 +3,8 @@ package corebase
 import dtos.SettingsHelper
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.apache.commons.lang3.StringUtils
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.codehaus.groovy.runtime.StackTraceUtils
 import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeDriver
@@ -49,7 +50,7 @@ public class SeleniumHelper implements ISeleniumHelper {
     private int slowDownForMilliSeconds = 2000
     private String testName = ""
     private counter = 1
-    private final static Logger log = Logger.getLogger("SeH   ")
+    private final static Logger log = LogManager.getLogger("SeH   ")
     protected String HTML
     protected SettingsHelper settingsHelper = SettingsHelper.getInstance()
     protected settings = settingsHelper.settings

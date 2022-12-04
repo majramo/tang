@@ -1,14 +1,15 @@
 package db.CompareDbsBase
 
 import base.AnySqlCompareTest
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.annotations.Test
 
 import static dtos.base.Constants.dbRunTypeFirstRow
 
 public class VerifyNullifiedTargetColumn_Test extends AnySqlCompareTest{
-    private final static Logger log = Logger.getLogger("VMT   ")
+    private final static Logger log = LogManager.getLogger("VMT   ")
     private static int row = 0
     private String targetDb;
     private String system;

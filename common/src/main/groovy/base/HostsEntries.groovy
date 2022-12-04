@@ -1,10 +1,11 @@
 package base
 
 import dtos.SettingsHelper
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 
 public class HostsEntries {
-    private final static Logger log = Logger.getLogger("HoEn ")
+    private final static Logger log = LogManager.getLogger("HoEn ")
 
     /*
     Get rid of everything after "#"

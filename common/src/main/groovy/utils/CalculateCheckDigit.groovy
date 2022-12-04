@@ -1,11 +1,12 @@
 package utils
 
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.Reporter
 
 class CalculateCheckDigit {
 
-    private final static Logger logger = Logger.getLogger("CCD ")
+    private final static Logger logger = LogManager.getLogger("CCD ")
 
     public static boolean isDigitLuhnNumberCorrect(String digits) {
         def checkDigit = Integer.parseInt(digits[-1])

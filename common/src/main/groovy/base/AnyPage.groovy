@@ -2,7 +2,8 @@ package base
 
 import corebase.ISeleniumHelper
 import dtos.SettingsHelper
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.codehaus.groovy.runtime.StackTraceUtils
 import org.testng.Reporter
 
@@ -15,7 +16,7 @@ public class AnyPage {
     public TangAssert tangAssert
     SettingsHelper settingsHelper = SettingsHelper.getInstance()
     public applicationConf = settingsHelper.applicationConf
-    private final static Logger log = Logger.getLogger("AnP  ")
+    private final static Logger log = LogManager.getLogger("AnP  ")
 
     public AnyPage(final ISeleniumHelper driver) {
         this.driver = driver

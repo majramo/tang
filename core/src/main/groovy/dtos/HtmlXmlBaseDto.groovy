@@ -5,7 +5,8 @@ import dtos.base.SqlHelper
 import dtos.base.XmlHelper
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import static dtos.base.Constants.*
 import static dtos.base.Constants.CompareType.*
 
@@ -15,7 +16,7 @@ class HtmlXmlBaseDto {
     String testId
     def htmlXmlSourceType = HTML
     Map context
-    private final static Logger log = Logger.getLogger("HXBD ")
+    private final static Logger log = LogManager.getLogger("HXBD ")
     protected sourceObjects = [:]
     def sutXmlMapTemplate = [:]
     protected anchor

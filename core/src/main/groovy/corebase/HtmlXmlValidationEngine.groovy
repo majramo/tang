@@ -1,12 +1,13 @@
 package corebase
 
 import dtos.HtmlXmlBaseDto
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import static dtos.base.Constants.HTML
 import static dtos.base.Constants.XML
 
 public class HtmlXmlValidationEngine {
-    private final static Logger log = Logger.getLogger("HXVE ")
+    private final static Logger log = LogManager.getLogger("HXVE ")
     private HtmlXmlBaseDto hxDto = null
     private dtoNamePath
 

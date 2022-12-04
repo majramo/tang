@@ -3,7 +3,8 @@ package base
 import dtos.SettingsHelper
 import dtos.base.SqlHelper
 import org.apache.commons.lang3.StringUtils
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.Reporter
 import org.testng.SkipException
@@ -15,7 +16,7 @@ import static excel.ExcelObjectProvider.getObjects
 
 public class AnySqlTest {
 
-    private final static Logger log = Logger.getLogger("AT   ")
+    private final static Logger log = LogManager.getLogger("AT   ")
     protected final static ReporterHelper reporterHelper = new ReporterHelper()
 
     protected SqlHelper driver

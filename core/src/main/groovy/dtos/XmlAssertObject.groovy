@@ -1,6 +1,7 @@
 package dtos
 
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 
 import static dtos.base.Constants.*
 
@@ -12,7 +13,7 @@ class XmlAssertObject {
     public assertResult = true
     static int noOfInstances;
     int myInstanceNo;
-    private final static Logger log = Logger.getLogger("XAO  ")
+    private final static Logger log = LogManager.getLogger("XAO  ")
     def xmlBuilder
     def xmlOut
 

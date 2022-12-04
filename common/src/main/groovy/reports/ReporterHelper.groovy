@@ -3,7 +3,8 @@ package reports
 import corebase.ISeleniumHelper
 import corebase.SeleniumHelper
 import dtos.FileUtilsHelper
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.ITestResult
 import org.testng.Reporter
@@ -11,7 +12,7 @@ import org.testng.Reporter
 import static corebase.GlobalConstants.*
 
 public class ReporterHelper extends Reporter {
-    private final static Logger log = Logger.getLogger(getClass())
+    private final static Logger log = LogManager.getLogger(getClass())
     private final static FileUtilsHelper fileUtilsHelper = new FileUtilsHelper()
 
     public static void log(String msg) {

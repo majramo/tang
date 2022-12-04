@@ -3,7 +3,8 @@ package db.CompareDbsBase
 import base.AnySqlCompareTest
 import dtos.base.SqlHelper
 import excel.ExcelObjectProvider
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.annotations.Optional
 import org.testng.annotations.Parameters
@@ -14,7 +15,7 @@ import static dtos.base.Constants.dbRunTypeFirstRow
 import static dtos.base.Constants.dbRunTypeRows
 
 public class FindClobBlobLengthNeededToChangeInTdmConfig_Test extends AnySqlCompareTest{
-    private final static Logger log = Logger.getLogger("CSC  ")
+    private final static Logger log = LogManager.getLogger("CSC  ")
 
     def SOURCE_TABLE_COLUMN_CLOB_BLOB_ORACLE = "SELECT  max( LENGTH(%1))  FROM %2 ;\n" ;
 

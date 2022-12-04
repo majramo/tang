@@ -1,6 +1,7 @@
 package dtos.base
 
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.w3c.dom.Document
 import org.xml.sax.InputSource
 
@@ -9,7 +10,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.xpath.XPathFactory
 
 public class XmlHelper implements XHtmlHelper {
-    private final static Logger log = Logger.getLogger("XH   ")
+    private final static Logger log = LogManager.getLogger("XH   ")
     def anchor
     public sourceAnchorNode
     def xhtmlRoot

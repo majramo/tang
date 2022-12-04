@@ -2,7 +2,8 @@ package db.CompareDbsBase
 
 import base.AnySqlCompareTest
 import excel.ExcelObjectProvider
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.annotations.Optional
 import org.testng.annotations.Parameters
@@ -13,7 +14,7 @@ import java.sql.SQLSyntaxErrorException
 import static dtos.base.Constants.dbRunTypeRows
 
 public class ReportSchemaSizes_Test extends AnySqlCompareTest{
-    private final static Logger log = Logger.getLogger("CSC  ")
+    private final static Logger log = LogManager.getLogger("CSC  ")
 
     def SOURCE_QUERY_ORACLE = """(
      select owner, segment_name name, round(bytes/1024/1024, 0) Size_MB

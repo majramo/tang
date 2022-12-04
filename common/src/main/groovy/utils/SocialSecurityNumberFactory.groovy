@@ -1,17 +1,17 @@
 package utils
 
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.core.Logger
 
 import java.text.Format
 import java.text.SimpleDateFormat
 
-import static org.apache.log4j.Logger.getLogger
 import static corebase.GlobalConstants.*
 
 public class SocialSecurityNumberFactory implements Serializable {
     private static final long serialVersionUID = -160928058318117179L;
 
-    private static final Logger LOG = getLogger(SocialSecurityNumberFactory.class.getName());
+    private static final Logger LOG = LogManager.getLogger(SocialSecurityNumberFactory.class.getName());
     private String yearMonthDayN
     String year
     String month
