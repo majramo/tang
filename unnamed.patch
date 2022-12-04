@@ -1,0 +1,1139 @@
+Index: core/src/main/groovy/corebase/When.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/corebase/When.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/corebase/When.groovy	(date 1665142122489)
+@@ -1,9 +1,10 @@
+ package corebase
+ 
+-import org.apache.log4j.Logger;
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager;
+ 
+ public class When extends GivenWhenThen{
+-	protected final static Logger log = Logger.getLogger("When ")
++	protected final static Logger log = LogManager.getLogger("When ")
+ 
+ 	public When(driver){
+ 		super(driver)
+Index: common/src/main/groovy/utils/PersonFactory.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/utils/PersonFactory.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/utils/PersonFactory.groovy	(date 1665142122441)
+@@ -4,10 +4,11 @@
+ import groovy.json.JsonBuilder
+ import groovy.xml.StreamingMarkupBuilder
+ import groovy.xml.XmlUtil
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.Reporter
+ 
+-import static org.apache.log4j.Logger.getLogger
++import static org.apache.log4j.LogManager.getLogger
+ 
+ public class PersonFactory implements Serializable {
+     private static final long serialVersionUID = -160928058318117177L;
+Index: common/src/main/groovy/utils/SocialSecurityNumberFactory.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/utils/SocialSecurityNumberFactory.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/utils/SocialSecurityNumberFactory.groovy	(date 1665142122523)
+@@ -1,11 +1,12 @@
+ package utils
+ 
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ 
+ import java.text.Format
+ import java.text.SimpleDateFormat
+ 
+-import static org.apache.log4j.Logger.getLogger
++import static org.apache.log4j.LogManager.getLogger
+ import static corebase.GlobalConstants.*
+ 
+ public class SocialSecurityNumberFactory implements Serializable {
+Index: common/src/main/groovy/db/CompareDbsBase/VerifyMaskedTargetColumn_Test.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/VerifyMaskedTargetColumn_Test.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/VerifyMaskedTargetColumn_Test.groovy	(date 1665142122457)
+@@ -1,14 +1,15 @@
+ package db.CompareDbsBase
+ 
+ import base.AnySqlCompareTest
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.annotations.Test
+ 
+ import static dtos.base.Constants.dbRunTypeFirstRow
+ 
+ public class VerifyMaskedTargetColumn_Test extends AnySqlCompareTest{
+-    private final static Logger log = Logger.getLogger("VMT   ")
++    private final static Logger log = LogManager.getLogger("VMT   ")
+     private static int row = 0
+     private String targetDb;
+     private String sourceDb;
+Index: common/src/main/groovy/base/HostsEntries.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/base/HostsEntries.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/base/HostsEntries.groovy	(date 1665142122464)
+@@ -1,10 +1,11 @@
+ package base
+ 
+ import dtos.SettingsHelper
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ 
+ public class HostsEntries {
+-    private final static Logger log = Logger.getLogger("HoEn ")
++    private final static Logger log = LogManager.getLogger("HoEn ")
+ 
+     /*
+     Get rid of everything after "#"
+Index: common/src/main/groovy/utils/CalculateCheckDigit.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/utils/CalculateCheckDigit.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/utils/CalculateCheckDigit.groovy	(date 1665142122400)
+@@ -1,11 +1,12 @@
+ package utils
+ 
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.Reporter
+ 
+ class CalculateCheckDigit {
+ 
+-    private final static Logger logger = Logger.getLogger("CCD ")
++    private final static Logger logger = LogManager.getLogger("CCD ")
+ 
+     public static boolean isDigitLuhnNumberCorrect(String digits) {
+         def checkDigit = Integer.parseInt(digits[-1])
+Index: common/pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/pom.xml	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/pom.xml	(date 1665138621448)
+@@ -5,7 +5,7 @@
+     <parent>
+         <groupId>org.tang.parent</groupId>
+         <artifactId>tang</artifactId>
+-        <version>0.1.01-SNAPSHOT</version>
++        <version>0.1.02-SNAPSHOT</version>
+     </parent>
+     <properties>
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+@@ -50,8 +50,8 @@
+             </exclusions>
+         </dependency>
+         <dependency>
+-            <groupId>log4j</groupId>
+-            <artifactId>log4j</artifactId>
++            <groupId>org.apache.logging.log4j</groupId>
++            <artifactId>log4j-core</artifactId>
+         </dependency>
+         <dependency>
+             <groupId>com.theoryinpractise</groupId>
+Index: common/src/main/groovy/base/AnyCCTest.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/base/AnyCCTest.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/base/AnyCCTest.groovy	(date 1665142122568)
+@@ -5,13 +5,14 @@
+ import corebase.SeleniumHelper
+ import dtos.SettingsHelper
+ import org.apache.commons.lang3.StringUtils
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.Reporter
+ import org.testng.annotations.AfterMethod
+ 
+ public class AnyCCTest {
+ 
+-    private final static Logger log = Logger.getLogger("ACCT ")
++    private final static Logger log = LogManager.getLogger("ACCT ")
+     protected ISeleniumHelper driver
+     public TangAssert tangAssert
+     private final static DEFAULT_BROWSER = "Firefox"
+Index: common/src/main/groovy/db/DbObjectProvider.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/DbObjectProvider.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/DbObjectProvider.groovy	(date 1665142122453)
+@@ -2,14 +2,15 @@
+ 
+ import dtos.SettingsHelper
+ import dtos.base.SqlHelper
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ 
+ import static dtos.base.Constants.dbRunTypeRows
+ 
+ class DbObjectProvider {
+ 
+     private static SqlHelper sqlHelper;
+-    private final static Logger log = Logger.getLogger("DOP  ")
++    private final static Logger log = LogManager.getLogger("DOP  ")
+     private final static SettingsHelper settingsHelper = SettingsHelper.getInstance()
+     private final static def settings = settingsHelper.settings
+     private final static def applicationConf = settingsHelper.applicationConf
+Index: common/src/main/groovy/base/AnyTest.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/base/AnyTest.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/base/AnyTest.groovy	(date 1665142122478)
+@@ -6,7 +6,8 @@
+ import dtos.SettingsHelper
+ import dtos.base.SqlHelper
+ import org.apache.commons.lang3.StringUtils
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.codehaus.groovy.runtime.StackTraceUtils
+ import org.testng.ITestContext
+ import org.testng.Reporter
+@@ -34,7 +35,7 @@
+ 
+ public class /**/AnyTest {
+ 
+-    private final static Logger log = Logger.getLogger("AnT  ")
++    private final static Logger log = LogManager.getLogger("AnT  ")
+     protected final static ReporterHelper reporterHelper = new ReporterHelper()
+ 
+     protected ISeleniumHelper driver
+Index: common/src/main/groovy/utils/Person.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/utils/Person.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/utils/Person.groovy	(date 1665142122422)
+@@ -1,12 +1,13 @@
+ package utils
+ 
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.Reporter
+ 
+ import java.text.Format
+ import java.text.SimpleDateFormat
+ 
+-import static org.apache.log4j.Logger.getLogger
++import static org.apache.log4j.LogManager.getLogger
+ 
+ public class Person implements Serializable {
+     static  Calendar date = Calendar.getInstance();
+Index: common/src/main/groovy/base/AnySqlCompareTest.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/base/AnySqlCompareTest.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/base/AnySqlCompareTest.groovy	(date 1665142122539)
+@@ -3,7 +3,8 @@
+ import dtos.SettingsHelper
+ import dtos.base.Constants
+ import dtos.base.SqlHelper
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.Reporter
+ import org.testng.SkipException
+@@ -19,7 +20,7 @@
+ import static dtos.base.Constants.*
+ 
+ public class AnySqlCompareTest {
+-    private final static Logger log = Logger.getLogger("ASC   ")
++    private final static Logger log = LogManager.getLogger("ASC   ")
+     protected final static ReporterHelper reporterHelper = new ReporterHelper()
+     public static final String BREAK_CLOSURE = "BreakClosure"
+     public static final String REPOSITORY_DB = "repository"
+Index: common/src/main/groovy/db/CompareDbsBase/FindDbRelationsInSourceTables.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/FindDbRelationsInSourceTables.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/FindDbRelationsInSourceTables.groovy	(date 1665142122386)
+@@ -3,7 +3,8 @@
+ 
+ import base.AnySqlCompareTest
+ import exceptions.TangFileException
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.Reporter
+ import org.testng.annotations.Parameters
+@@ -22,7 +23,7 @@
+  */
+ 
+ class FindDbRelationsInSourceTables extends AnySqlCompareTest {
+-    private final   Logger log = Logger.getLogger("FDDS ")
++    private final   Logger log = LogManager.getLogger("FDDS ")
+ 
+     def relationships = []
+     def startTable = ""
+Index: common/src/main/groovy/db/CompareDbsBase/ReportSchemaSizes_Test.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/ReportSchemaSizes_Test.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/ReportSchemaSizes_Test.groovy	(date 1665142122565)
+@@ -2,7 +2,8 @@
+ 
+ import base.AnySqlCompareTest
+ import excel.ExcelObjectProvider
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.annotations.Optional
+ import org.testng.annotations.Parameters
+@@ -13,7 +14,7 @@
+ import static dtos.base.Constants.dbRunTypeRows
+ 
+ public class ReportSchemaSizes_Test extends AnySqlCompareTest{
+-    private final static Logger log = Logger.getLogger("CSC  ")
++    private final static Logger log = LogManager.getLogger("CSC  ")
+ 
+     def SOURCE_QUERY_ORACLE = """(
+      select owner, segment_name name, round(bytes/1024/1024, 0) Size_MB
+Index: common/src/main/groovy/excel/ExcelFileObjectReader.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/excel/ExcelFileObjectReader.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/excel/ExcelFileObjectReader.groovy	(date 1665142122501)
+@@ -4,7 +4,8 @@
+ import exceptions.TangFileException
+ import groovy.time.TimeCategory
+ import groovy.time.TimeDuration
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.apache.poi.hssf.usermodel.HSSFRow
+ import org.apache.poi.hssf.usermodel.HSSFSheet
+ import org.apache.poi.hssf.usermodel.HSSFWorkbook
+@@ -27,7 +28,7 @@
+     ExcelObjectData excelObjectData
+     final GroovyClassLoader groovyLoader = new GroovyClassLoader();
+     def builder = new ClassBuilder(groovyLoader)
+-    private final static Logger log = Logger.getLogger(getClass())
++    private final static Logger log = LogManager.getLogger(getClass())
+     SettingsHelper settingsHelper = SettingsHelper.getInstance()
+     def settings = settingsHelper.settings
+ /**
+Index: core/pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/pom.xml	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/pom.xml	(date 1670146264629)
+@@ -5,7 +5,7 @@
+     <parent>
+         <groupId>org.tang.parent</groupId>
+         <artifactId>tang</artifactId>
+-        <version>0.1.01-SNAPSHOT</version>
++        <version>0.1.02-SNAPSHOT</version>
+     </parent>
+     <properties>
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+@@ -75,8 +75,8 @@
+             <artifactId>testng</artifactId>
+         </dependency>
+         <dependency>
+-            <groupId>log4j</groupId>
+-            <artifactId>log4j</artifactId>
++            <groupId>org.apache.logging.log4j</groupId>
++            <artifactId>log4j-core</artifactId>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+@@ -94,6 +94,12 @@
+         <dependency>
+             <groupId>org.seleniumhq.selenium</groupId>
+             <artifactId>htmlunit-driver</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>log4j</groupId>
++            <artifactId>log4j</artifactId>
++            <version>1.2.14</version>
++            <scope>compile</scope>
+         </dependency>
+     </dependencies>
+ 
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- pom.xml	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ pom.xml	(date 1670146310899)
+@@ -7,7 +7,7 @@
+     <artifactId>tang</artifactId>
+     <packaging>pom</packaging>
+     <name>tang</name>
+-    <version>0.1.01-SNAPSHOT</version>
++    <version>0.1.02-SNAPSHOT</version>
+     <modules>
+         <module>core</module>
+         <module>common</module>
+@@ -117,10 +117,11 @@
+                     </exclusion>
+                 </exclusions>
+             </dependency>
++            <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+             <dependency>
+-                <groupId>log4j</groupId>
+-                <artifactId>log4j</artifactId>
+-                <version>1.2.14</version>
++                <groupId>org.apache.logging.log4j</groupId>
++                <artifactId>log4j-core</artifactId>
++                <version>2.19.0</version>
+             </dependency>
+             <dependency>
+                 <groupId>commons-io</groupId>
+Index: common/src/main/groovy/db/CompareDbsBase/FindDeleteDependenciesInSourceTables.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/FindDeleteDependenciesInSourceTables.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/FindDeleteDependenciesInSourceTables.groovy	(date 1665142122495)
+@@ -3,7 +3,8 @@
+ 
+ import base.AnySqlCompareTest
+ import excel.ExcelObjectProvider
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.annotations.Parameters
+ import org.testng.annotations.Test
+@@ -22,7 +23,7 @@
+  */
+ 
+ class FindDeleteDependenciesInSourceTables extends AnySqlCompareTest{
+-    private final static Logger log = Logger.getLogger("FDDS ")
++    private final static Logger log = LogManager.getLogger("FDDS ")
+     def recurse = false
+     def firstRelations = ""
+     def alterStrs = ""
+Index: common/src/main/groovy/base/AnySqlTest.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/base/AnySqlTest.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/base/AnySqlTest.groovy	(date 1665142122408)
+@@ -3,7 +3,8 @@
+ import dtos.SettingsHelper
+ import dtos.base.SqlHelper
+ import org.apache.commons.lang3.StringUtils
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.Reporter
+ import org.testng.SkipException
+@@ -15,7 +16,7 @@
+ 
+ public class AnySqlTest {
+ 
+-    private final static Logger log = Logger.getLogger("AT   ")
++    private final static Logger log = LogManager.getLogger("AT   ")
+     protected final static ReporterHelper reporterHelper = new ReporterHelper()
+ 
+     protected SqlHelper driver
+Index: common/src/main/groovy/base/AnyPage.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/base/AnyPage.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/base/AnyPage.groovy	(date 1665142122546)
+@@ -2,7 +2,8 @@
+ 
+ import corebase.ISeleniumHelper
+ import dtos.SettingsHelper
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.codehaus.groovy.runtime.StackTraceUtils
+ import org.testng.Reporter
+ 
+@@ -15,7 +16,7 @@
+     public TangAssert tangAssert
+     SettingsHelper settingsHelper = SettingsHelper.getInstance()
+     public applicationConf = settingsHelper.applicationConf
+-    private final static Logger log = Logger.getLogger("AnP  ")
++    private final static Logger log = LogManager.getLogger("AnP  ")
+ 
+     public AnyPage(final ISeleniumHelper driver) {
+         this.driver = driver
+Index: common/src/main/groovy/db/CompareDbsBase/CompareSourceColumnsToExcelProfile_Test.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/CompareSourceColumnsToExcelProfile_Test.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/CompareSourceColumnsToExcelProfile_Test.groovy	(date 1665142122427)
+@@ -5,7 +5,8 @@
+ import excel.ExcelFileWriter
+ import base.AnySqlCompareTest
+ import excel.ExcelObjectProvider
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.annotations.Parameters
+ import org.testng.annotations.Test
+@@ -15,7 +16,7 @@
+ import static dtos.base.Constants.dbRunTypeRows
+ 
+ public class CompareSourceColumnsToExcelProfile_Test extends AnySqlCompareTest{
+-    private final static Logger log = Logger.getLogger("CSC  ")
++    private final static Logger log = LogManager.getLogger("CSC  ")
+     private final static String AND_QUERY_EXTENSION = "AND_QUERY_EXTENSION"
+     def SOURCE_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
+     def TARGET_TABLE_QUERY_SQLSERVER = "SELECT DISTINCT Table_name FROM Information_schema.columns ORDER BY 1"
+Index: common/src/main/groovy/base/AnyMbtTest.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/base/AnyMbtTest.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/base/AnyMbtTest.groovy	(date 1665142122543)
+@@ -5,7 +5,8 @@
+ import corebase.SeleniumHelper
+ import dtos.SettingsHelper
+ import dtos.base.SqlHelper
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.graphwalker.generators.PathGenerator
+ import org.testng.Reporter
+ 
+@@ -15,7 +16,7 @@
+     public static TangAssert tangAssert
+     SettingsHelper settingsHelper = SettingsHelper.getInstance()
+     def settings = settingsHelper.settings
+-    private final static Logger log = Logger.getLogger("AMT  ")
++    private final static Logger log = LogManager.getLogger("AMT  ")
+ 
+     public AnyMbtTest(File model, boolean efsm, PathGenerator generator, boolean weight, String browser, String outputDirectory) {
+         super(model, efsm, generator, weight);
+Index: common/src/main/groovy/db/CompareDbsBase/ReportDbObjectsDiff.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/ReportDbObjectsDiff.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/ReportDbObjectsDiff.groovy	(date 1665142122533)
+@@ -2,7 +2,8 @@
+ 
+ import base.AnySqlCompareTest
+ import excel.ExcelObjectProvider
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.annotations.Optional
+ import org.testng.annotations.Parameters
+@@ -11,7 +12,7 @@
+ import static dtos.base.Constants.dbRunTypeRows
+ 
+ public class ReportDbObjectsDiff extends AnySqlCompareTest{
+-    private final static Logger log = Logger.getLogger("CSC  ")
++    private final static Logger log = LogManager.getLogger("CSC  ")
+     def DROP_REF_CONSTRATINTS_ORACLE = "SELECT  ('ALTER TABLE ' || table_name || ' DROP CONSTRAINT ' || CONSTRAINT_NAME || ' cascade ;--DropRefConstraint') DROP_CASCADE, \n" +
+             "('ALTER TABLE ' || table_name || ' DROP CONSTRAINT ' || CONSTRAINT_NAME || ' ;--DropRefConstraint') DROP_ \n" +
+             "FROM user_constraints \n" +
+Index: common/src/main/groovy/reports/TangHtmlReporter.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/reports/TangHtmlReporter.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/reports/TangHtmlReporter.groovy	(date 1665142122550)
+@@ -3,7 +3,8 @@
+ import corebase.ISeleniumHelper
+ import corebase.ScreenshotReportNGUtils
+ import dtos.SettingsHelper
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.apache.velocity.VelocityContext
+ import org.testng.*
+ import org.uncommons.reportng.HTMLReporter
+@@ -23,7 +24,7 @@
+ public class TangHtmlReporter extends HTMLReporter implements ITestListener, IConfigurationListener {
+     protected static final ScreenshotReportNGUtils reportNGScreenShotUtils = new ScreenshotReportNGUtils()
+     private final static String CLASS_NAME = this.getSimpleName() + ": "
+-    private final static Logger log = Logger.getLogger(getClass())
++    private final static Logger log = LogManager.getLogger(getClass())
+     protected final static ReporterHelper reporterHelper = new ReporterHelper()
+     SettingsHelper settingsHelper = SettingsHelper.getInstance()
+     def settings = settingsHelper.settings
+Index: common/src/main/groovy/db/CompareDbsBase/ReportPdbData_Test.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/ReportPdbData_Test.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/ReportPdbData_Test.groovy	(date 1665142122558)
+@@ -2,7 +2,8 @@
+ 
+ import base.AnySqlCompareTest
+ import dtos.base.SqlHelper
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.annotations.Parameters
+ import org.testng.annotations.Test
+@@ -10,7 +11,7 @@
+ import static dtos.base.Constants.dbRunTypeRows
+ 
+ public class ReportPdbData_Test extends AnySqlCompareTest{
+-    private final static Logger log = Logger.getLogger("CSC  ")
++    private final static Logger log = LogManager.getLogger("CSC  ")
+ 
+     def PDB_QUERY = """SELECT REPLACE(NAME, 'PDB', '') pdb, NAME, OPEN_MODE, RESTRICTED, TOTAL_SIZE, RECOVERY_STATUS 
+ From V\$containers
+Index: common/src/main/groovy/reports/ReporterHelper.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/reports/ReporterHelper.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/reports/ReporterHelper.groovy	(date 1665142122571)
+@@ -3,7 +3,8 @@
+ import corebase.ISeleniumHelper
+ import corebase.SeleniumHelper
+ import dtos.FileUtilsHelper
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.ITestResult
+ import org.testng.Reporter
+@@ -11,7 +12,7 @@
+ import static corebase.GlobalConstants.*
+ 
+ public class ReporterHelper extends Reporter {
+-    private final static Logger log = Logger.getLogger(getClass())
++    private final static Logger log = LogManager.getLogger(getClass())
+     private final static FileUtilsHelper fileUtilsHelper = new FileUtilsHelper()
+ 
+     public static void log(String msg) {
+Index: core/src/main/groovy/dtos/XmlAssertObject.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/dtos/XmlAssertObject.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/dtos/XmlAssertObject.groovy	(date 1665142122506)
+@@ -1,6 +1,7 @@
+ package dtos
+ 
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ 
+ import static dtos.base.Constants.*
+ 
+@@ -12,7 +13,7 @@
+     public assertResult = true
+     static int noOfInstances;
+     int myInstanceNo;
+-    private final static Logger log = Logger.getLogger("XAO  ")
++    private final static Logger log = LogManager.getLogger("XAO  ")
+     def xmlBuilder
+     def xmlOut
+ 
+Index: core/src/main/groovy/dtos/SettingsHelper.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/dtos/SettingsHelper.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/dtos/SettingsHelper.groovy	(date 1665141902842)
+@@ -1,6 +1,7 @@
+ package dtos
+ 
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.SkipException
+ 
+ public class SettingsHelper {
+@@ -8,7 +9,7 @@
+     public static settings
+     private static timeStamp
+     public static applicationConf = null
+-    private final static Logger log = Logger.getLogger("StH  ")
++    private final static Logger log = LogManager.getLogger("StH  ")
+     private static final INSTANCE = new SettingsHelper()
+     private static int count = 1
+     static getInstance() {
+Index: core/src/main/groovy/dtos/HtmlXmlBaseDto.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/dtos/HtmlXmlBaseDto.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/dtos/HtmlXmlBaseDto.groovy	(date 1665142122414)
+@@ -5,7 +5,8 @@
+ import dtos.base.XmlHelper
+ import groovy.xml.MarkupBuilder
+ import groovy.xml.XmlUtil
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import static dtos.base.Constants.*
+ import static dtos.base.Constants.CompareType.*
+ 
+@@ -15,7 +16,7 @@
+     String testId
+     def htmlXmlSourceType = HTML
+     Map context
+-    private final static Logger log = Logger.getLogger("HXBD ")
++    private final static Logger log = LogManager.getLogger("HXBD ")
+     protected sourceObjects = [:]
+     def sutXmlMapTemplate = [:]
+     protected anchor
+Index: core/src/main/groovy/dtos/Assertion.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/dtos/Assertion.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/dtos/Assertion.groovy	(date 1665142122396)
+@@ -1,13 +1,14 @@
+ package dtos
+ 
+ import org.apache.commons.lang3.StringUtils
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ 
+ import static dtos.base.Constants.*
+ import static dtos.base.Constants.CompareType.*
+ 
+ class Assertion {
+-    final static Logger log = Logger.getLogger("ASS  ")
++    final static Logger log = LogManager.getLogger("ASS  ")
+     String textOrSqlType
+     String textOrSqlTypePresentation
+     String textOrSqlFieldShort
+Index: core/src/main/groovy/dtos/XmlAssert.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/dtos/XmlAssert.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/dtos/XmlAssert.groovy	(date 1665142122509)
+@@ -1,9 +1,10 @@
+ package dtos
+ 
+-import org.apache.log4j.Logger;
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager;
+ 
+ class XmlAssert {
+-    private final static Logger log = Logger.getLogger("XA   ")
++    private final static Logger log = LogManager.getLogger("XA   ")
+ 
+     def moduleName
+     def actionName
+Index: common/src/main/groovy/db/CompareDbsBase/CompareSizeCustomS2T_Test.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/CompareSizeCustomS2T_Test.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/CompareSizeCustomS2T_Test.groovy	(date 1665142122518)
+@@ -3,7 +3,8 @@
+ import base.AnySqlCompareTest
+ import dtos.base.SqlHelper
+ import excel.ExcelObjectProvider
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.annotations.Parameters
+ import org.testng.annotations.Test
+@@ -18,7 +19,7 @@
+ import static dtos.base.Constants.CompareType.DIFF
+ 
+ class CompareSizeCustomS2T_Test extends AnySqlCompareTest{
+-    private final static Logger log = Logger.getLogger("CSC  ")
++    private final static Logger log = LogManager.getLogger("CSC  ")
+     private final static String AND_QUERY_EXTENSION = "AND_QUERY_EXTENSION"
+     public static final String MISSING_TABLE = "no table"
+     def SOURCE_GET_TABLE_NAMES_QUERY_ORACLE = """SELECT DISTINCT table_name FROM user_tab_cols 
+Index: core/src/main/groovy/dtos/base/SqlHelper.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/dtos/base/SqlHelper.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/dtos/base/SqlHelper.groovy	(date 1668961045724)
+@@ -1,6 +1,7 @@
+ package dtos.base
+ 
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.Reporter
+ import org.testng.SkipException
+ 
+@@ -24,7 +25,7 @@
+     private jdbcConnections = [:]
+     private static dbRecordLine
+     private File sqlFile
+-    private final static Logger logger = Logger.getLogger("SqH  ")
++    private final static Logger logger = LogManager.getLogger("SqH  ")
+ 
+     public SqlHelper(File sqlFile, log, dbName, dbRun, settings, decrypterPassword = "") {
+         this.dbRun = dbRun
+@@ -87,7 +88,7 @@
+         return jDbcConnection.isConnectionOk()
+     }
+ 
+-    private sqlConRun(dbLoggInfo, dbRunType, dbQueryRun, dbRecordLine = -1, dbName) {
++    private MySqlDbTestsqlConRun(dbLoggInfo, dbRunType, dbQueryRun, dbRecordLine = -1, dbName) {
+         this.log.info "##SqlHelper " + this
+         this.log.info "##Run dbName $dbName"
+         jdbcConnections.each {
+Index: common/src/main/groovy/db/CompareDbsBase/MaskSourceDataToTargetColumn_Test.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/MaskSourceDataToTargetColumn_Test.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/MaskSourceDataToTargetColumn_Test.groovy	(date 1665142122527)
+@@ -3,7 +3,8 @@
+ 
+ import base.AnySqlCompareTest
+ import excel.ExcelObjectProvider
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.annotations.Parameters
+ import org.testng.annotations.Test
+@@ -23,7 +24,7 @@
+  */
+ 
+ class MaskSourceDataToTargetColumn_Test extends AnySqlCompareTest{
+-    private final static Logger log = Logger.getLogger("MSTT ")
++    private final static Logger log = LogManager.getLogger("MSTT ")
+     def maskings = [:]
+ 
+ 
+Index: core/src/main/groovy/dtos/base/XmlHelper.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/dtos/base/XmlHelper.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/dtos/base/XmlHelper.groovy	(date 1665142122370)
+@@ -1,6 +1,7 @@
+ package dtos.base
+ 
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.w3c.dom.Document
+ import org.xml.sax.InputSource
+ 
+@@ -9,7 +10,7 @@
+ import javax.xml.xpath.XPathFactory
+ 
+ public class XmlHelper implements XHtmlHelper {
+-    private final static Logger log = Logger.getLogger("XH   ")
++    private final static Logger log = LogManager.getLogger("XH   ")
+     def anchor
+     public sourceAnchorNode
+     def xhtmlRoot
+Index: common/src/main/groovy/db/CompareDbsBase/CompareTableColumnCustomS2T_Test.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/CompareTableColumnCustomS2T_Test.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/CompareTableColumnCustomS2T_Test.groovy	(date 1665142122432)
+@@ -3,7 +3,8 @@
+ import base.AnySqlCompareTest
+ import dtos.base.SqlHelper
+ import excel.ExcelObjectProvider
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.SkipException
+ import org.testng.annotations.Optional
+@@ -17,7 +18,7 @@
+ import static dtos.base.Constants.dbRunTypeRows
+ 
+ public class CompareTableColumnCustomS2T_Test extends AnySqlCompareTest{
+-    private final static Logger log = Logger.getLogger("CSC  ")
++    private final static Logger log = LogManager.getLogger("CSC  ")
+ 
+     def SOURCE_TABLE_QUERY_ORACLE = """SELECT DISTINCT '''' || table_name || '_'  || column_name || '''' || ',' value
+ FROM USER_TAB_COLS
+Index: common/src/main/groovy/db/CompareDbsBase/ReportSourceTableSizes_Test.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/ReportSourceTableSizes_Test.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/ReportSourceTableSizes_Test.groovy	(date 1665142122391)
+@@ -3,7 +3,8 @@
+ import base.AnySqlCompareTest
+ import dtos.base.SqlHelper
+ import excel.ExcelObjectProvider
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.annotations.Optional
+ import org.testng.annotations.Parameters
+@@ -14,7 +15,7 @@
+ import static dtos.base.Constants.dbRunTypeRows
+ 
+ class ReportSourceTableSizes_Test extends AnySqlCompareTest{
+-    private final static Logger log = Logger.getLogger("CSC  ")
++    private final static Logger log = LogManager.getLogger("CSC  ")
+ 
+     def SOURCE_GET_TABLE_NAMES_QUERY_ORACLE = "SELECT DISTINCT table_name FROM user_tab_cols WHERE NOT table_name IN (select view_name from all_views)  And NOT Table_Name Like 'EXT___---'  And NOT Table_Name Like 'TMPEXT___---' And Not Table_Name Like '---\\\$\\\$\\\$---' ORDER BY 1"
+     def SOURCE_GET_TABLE_SIZE_QUERY = "SELECT COUNT(1) COUNT_  FROM %s "
+Index: core/src/main/groovy/dtos/base/JdbcConnection.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/dtos/base/JdbcConnection.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/dtos/base/JdbcConnection.groovy	(date 1665142122417)
+@@ -2,13 +2,14 @@
+ 
+ import dtos.SettingsHelper
+ import groovy.sql.Sql
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ 
+ public class JdbcConnection {
+     private static final String DB_NAME = ";databaseName="
+     private static final String ERROR_DB_CONNECTION = "Could not establish connection to the database."
+     private groovy.sql.Sql jDbcConnection
+-    private final static Logger log = Logger.getLogger("JdC  ")
++    private final static Logger log = LogManager.getLogger("JdC  ")
+     SettingsHelper settingsHelper = SettingsHelper.getInstance()
+     def settings = settingsHelper.settings
+     public boolean mockDb = false
+Index: core/src/main/groovy/dtos/base/HtmlHelper.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/dtos/base/HtmlHelper.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/dtos/base/HtmlHelper.groovy	(date 1665142122460)
+@@ -1,7 +1,8 @@
+ package dtos.base
+ 
+ import org.apache.commons.lang3.StringUtils
+-import org.apache.log4j.Logger;
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager;
+ import org.htmlcleaner.*
+ 
+ public class HtmlHelper implements XHtmlHelper{
+@@ -9,7 +10,7 @@
+ 	def sourecAnchor
+ 	def sourceAnchorNode
+ 	def soureCleanedRoot
+-	private final static Logger log = Logger.getLogger("HH   ")
++	private final static Logger log = LogManager.getLogger("HH   ")
+ 	
+ 	public void setXHtmlHelper(String htmlXmlSource, String sourecAnchor){
+ 		this.sourecAnchor = sourecAnchor.replaceAll(/\b(\w+=")\s*(.+?)\s*"/, '$1$2\"').replaceAll (/ +/," ")
+Index: core/src/main/groovy/corebase/Then.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/corebase/Then.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/corebase/Then.groovy	(date 1665142122561)
+@@ -1,10 +1,11 @@
+ package corebase
+ 
+-import org.apache.log4j.Logger;
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager;
+ 
+ 
+ public class Then extends GivenWhenThen{
+-	protected final static Logger log = Logger.getLogger("Then ")
++	protected final static Logger log = LogManager.getLogger("Then ")
+ 	
+ 	public Then(driver){
+ 		super(driver)
+Index: core/src/main/groovy/corebase/HtmlXmlValidationEngine.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/corebase/HtmlXmlValidationEngine.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/corebase/HtmlXmlValidationEngine.groovy	(date 1665142122482)
+@@ -1,12 +1,13 @@
+ package corebase
+ 
+ import dtos.HtmlXmlBaseDto
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import static dtos.base.Constants.HTML
+ import static dtos.base.Constants.XML
+ 
+ public class HtmlXmlValidationEngine {
+-    private final static Logger log = Logger.getLogger("HXVE ")
++    private final static Logger log = LogManager.getLogger("HXVE ")
+     private HtmlXmlBaseDto hxDto = null
+     private dtoNamePath
+ 
+Index: core/src/main/groovy/corebase/Given.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/corebase/Given.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/corebase/Given.groovy	(date 1665142122404)
+@@ -1,9 +1,10 @@
+ package corebase
+ 
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ 
+ class Given extends GivenWhenThen{
+-	protected final static Logger log = Logger.getLogger("Given")
++	protected final static Logger log = LogManager.getLogger("Given")
+ 	protected settings
+ 	protected applicationConf
+ 
+Index: common/src/main/groovy/db/CompareDbsBase/FindClobBlobLengthNeededToChangeInTdmConfig_Test.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/FindClobBlobLengthNeededToChangeInTdmConfig_Test.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/FindClobBlobLengthNeededToChangeInTdmConfig_Test.groovy	(date 1665142122436)
+@@ -3,7 +3,8 @@
+ import base.AnySqlCompareTest
+ import dtos.base.SqlHelper
+ import excel.ExcelObjectProvider
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.annotations.Optional
+ import org.testng.annotations.Parameters
+@@ -14,7 +15,7 @@
+ import static dtos.base.Constants.dbRunTypeRows
+ 
+ public class FindClobBlobLengthNeededToChangeInTdmConfig_Test extends AnySqlCompareTest{
+-    private final static Logger log = Logger.getLogger("CSC  ")
++    private final static Logger log = LogManager.getLogger("CSC  ")
+ 
+     def SOURCE_TABLE_COLUMN_CLOB_BLOB_ORACLE = "SELECT  max( LENGTH(%1))  FROM %2 ;\n" ;
+ 
+Index: common/src/main/groovy/db/CompareDbsBase/VerifyNullifiedTargetColumn_Test.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- common/src/main/groovy/db/CompareDbsBase/VerifyNullifiedTargetColumn_Test.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ common/src/main/groovy/db/CompareDbsBase/VerifyNullifiedTargetColumn_Test.groovy	(date 1665142122486)
+@@ -1,14 +1,15 @@
+ package db.CompareDbsBase
+ 
+ import base.AnySqlCompareTest
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.testng.ITestContext
+ import org.testng.annotations.Test
+ 
+ import static dtos.base.Constants.dbRunTypeFirstRow
+ 
+ public class VerifyNullifiedTargetColumn_Test extends AnySqlCompareTest{
+-    private final static Logger log = Logger.getLogger("VMT   ")
++    private final static Logger log = LogManager.getLogger("VMT   ")
+     private static int row = 0
+     private String targetDb;
+     private String system;
+Index: core/src/main/groovy/corebase/SeleniumHelper.groovy
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/groovy/corebase/SeleniumHelper.groovy	(revision b4970a4bbc3671b1c5b44c3e440c5c393cf12950)
++++ core/src/main/groovy/corebase/SeleniumHelper.groovy	(date 1665142122449)
+@@ -3,7 +3,8 @@
+ import dtos.SettingsHelper
+ import io.github.bonigarcia.wdm.WebDriverManager
+ import org.apache.commons.lang3.StringUtils
+-import org.apache.log4j.Logger
++import org.apache.logging.log4j.Logger;
++import org.apache.logging.log4j.LogManager
+ import org.codehaus.groovy.runtime.StackTraceUtils
+ import org.openqa.selenium.*
+ import org.openqa.selenium.chrome.ChromeDriver
+@@ -49,7 +50,7 @@
+     private int slowDownForMilliSeconds = 2000
+     private String testName = ""
+     private counter = 1
+-    private final static Logger log = Logger.getLogger("SeH   ")
++    private final static Logger log = LogManager.getLogger("SeH   ")
+     protected String HTML
+     protected SettingsHelper settingsHelper = SettingsHelper.getInstance()
+     protected settings = settingsHelper.settings
