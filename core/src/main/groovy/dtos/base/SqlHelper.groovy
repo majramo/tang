@@ -88,7 +88,7 @@ public class SqlHelper {
         return jDbcConnection.isConnectionOk()
     }
 
-    private MySqlDbTestsqlConRun(dbLoggInfo, dbRunType, dbQueryRun, dbRecordLine = -1, dbName) {
+    private sqlConRun(dbLoggInfo, dbRunType, dbQueryRun, dbRecordLine = -1, dbName) {
         this.log.info "##SqlHelper " + this
         this.log.info "##Run dbName $dbName"
         jdbcConnections.each {
